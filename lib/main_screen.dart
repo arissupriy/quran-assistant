@@ -1,8 +1,8 @@
 // lib/main_screen.dart
 import 'dart:ui'; // Import untuk ImageFilter
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Jika masih menggunakan Riverpod
-import 'package:google_fonts/google_fonts.dart'; // Untuk GoogleFonts
+// Jika masih menggunakan Riverpod
+// Untuk GoogleFonts
 
 // Impor halaman-halaman yang sudah dibuat
 import 'package:quran_assistant/pages/home_page.dart';
