@@ -1,0 +1,135 @@
+// lib/core/models/search_model.dart
+
+// Merepresentasikan satu item hasil pencarian yang langsung dari AyahText Rust.
+// Merepresentasikan satu item hasil pencarian, mencerminkan AyahTextEntry dari Rust.
+
+// Merepresentasikan satu item hasil pencarian yang langsung dari Tantivy FFI Rust.
+class SearchResultItem {
+  final double score;
+  final String verseKey;
+  final String ayahTextUthmani;
+  final String translationText;
+  final int chapterNumber;
+  final int ayahNumber;
+
+  SearchResultItem({
+    required this.score,
+    required this.verseKey,
+    required this.ayahTextUthmani,
+    required this.translationText,
+    required this.chapterNumber,
+    required this.ayahNumber,
+  });
+
+  factory SearchResultItem.fromJson(Map<String, dynamic> json) {
+    return SearchResultItem(
+      score: (json['score'] as num?)?.toDouble() ?? 0.0,
+      verseKey: json['verse_key'] as String? ?? '', 
+      ayahTextUthmani: json['ayah_text_uthmani'] as String? ?? '', 
+      translationText: json['translation_text'] as String? ?? '', 
+      chapterNumber: json['chapter_number'] as int? ?? 0,
+      ayahNumber: json['ayah_number'] as int? ?? 0,
+    );
+  }
+}
+
+
+class AyahTextSearchResult {
+  final String verseKey;
+  final String textUthmani; // Sesuai dengan textUthmani dari Rust
+  final String textUthmaniSimple;
+  final String textQpcHafs;
+  // Anda bisa memilih salah satu dari textUthmani, textUthmaniSimple, atau textQpcHafs
+  // sebagai 'text' utama untuk tampilan jika Anda masih menginginkan field 'text'
+
+  AyahTextSearchResult({
+    required this.verseKey,
+    required this.textUthmani,
+    required this.textUthmaniSimple,
+    required this.textQpcHafs,
+  });
+
+  factory AyahTextSearchResult.fromJson(Map<String, dynamic> json) {
+    return AyahTextSearchResult(
+      // Mengambil dari key camelCase sesuai JSON Rust
+      verseKey: json['verseKey'] ?? '', 
+      textUthmani: json['textUthmani'] ?? '', 
+      textUthmaniSimple: json['textUthmaniSimple'] ?? '', 
+      textQpcHafs: json['textQpcHafs'] ?? '', 
+    );
+  }
+}
+
+// Merepresentasikan satu item dalam daftar ayat serupa (MatchedAyah di Rust).
+class SimilarAyahItem {
+  final String matchedAyahKey;
+  // Jika Rust mengembalikan skor atau info lain, tambahkan di sini
+  // final double similarityScore; // Jika ada di Rust
+
+  SimilarAyahItem({
+    required this.matchedAyahKey,
+    // this.similarityScore,
+  });
+
+  factory SimilarAyahItem.fromJson(Map<String, dynamic> json) {
+    return SimilarAyahItem(
+      matchedAyahKey: json['matched_ayah_key'] ?? '',
+      // similarityScore: (json['similarity_score'] ?? 0.0).toDouble(),
+    );
+  }
+}
+
+// Merepresentasikan mapping highlight kata untuk sebuah frasa dalam konteks ayat (VerseHighlightMap di Rust).
+class VerseHighlightMap {
+  final Map<String, List<int>> highlights; // verseKey -> List of word positions
+
+  VerseHighlightMap({required this.highlights});
+
+  factory VerseHighlightMap.fromJson(Map<String, dynamic> json) {
+    final Map<String, List<int>> parsedHighlights = {};
+    json.forEach((key, value) {
+      if (value is List) {
+        parsedHighlights[key] = value.map((e) => e as int).toList();
+      }
+    });
+    return VerseHighlightMap(highlights: parsedHighlights);
+  }
+}
+
+// Model untuk metadata terjemahan
+class TranslationMetadata {
+  final int id;
+  final String name; // Nama penerjemah
+  final String author;
+  final String slug;
+  final String languageName;
+  final String translatedName;
+
+  TranslationMetadata({
+    required this.id,
+    required this.name,
+    required this.author,
+    required this.slug,
+    required this.languageName,
+    required this.translatedName,
+  });
+
+  factory TranslationMetadata.fromJson(Map<String, dynamic> json) {
+    return TranslationMetadata(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      author: json['author'] ?? '',
+      slug: json['slug'] ?? '',
+      languageName: json['language_name'] ?? '',
+      translatedName: json['translated_name'] ?? '',
+    );
+  }
+}
+
+enum SearchType {
+  lemma,
+  stem,
+  semantic,
+  // fullText // Jika ada di Rust
+}
+
