@@ -1,5 +1,4 @@
 // lib/main.dart
-import 'dart:ui'; // Import untuk ImageFilter (masih dibutuhkan jika digunakan di tempat lain, misal card)
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -1,7 +1,6 @@
 // lib/core/api/rust_engine_service.dart
 import 'dart:convert'; // For jsonEncode, jsonDecode, utf8
 import 'dart:ffi'; // For Pointer, allocate/free
-import 'dart:typed_data'; // For Uint8List
 
 import 'package:ffi/ffi.dart'; // For .toNativeUtf8, .toDartString, calloc, free
 
