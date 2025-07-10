@@ -253,3 +253,9 @@ typedef GenerateWordPuzzleQuizDart = Pointer<Utf8> Function(
 final GenerateWordPuzzleQuizDart generateWordPuzzleQuiz = _rustLib
     .lookupFunction<GenerateWordPuzzleQuizNative, GenerateWordPuzzleQuizDart>(
         'generate_word_puzzle_quiz');
+
+// --- TAMBAHAN INI: Binding untuk fts_search ---
+typedef FtsSearchNative = Pointer<Utf8> Function(Pointer<Utf8> queryFfi);
+typedef FtsSearchDart = Pointer<Utf8> Function(Pointer<Utf8> queryFfi);
+final ftsSearch = _rustLib.lookupFunction<FtsSearchNative, FtsSearchDart>('fts_search');
+// --- AKHIR TAMBAHAN ---

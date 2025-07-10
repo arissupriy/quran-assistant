@@ -1,6 +1,7 @@
 // lib/main_screen.dart
 import 'dart:ui'; // Import untuk ImageFilter
 import 'package:flutter/material.dart';
+import 'package:quran_assistant/pages/fts_search_page.dart';
 // Jika masih menggunakan Riverpod
 // Untuk GoogleFonts
 
@@ -26,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   // Daftar halaman yang akan ditampilkan
   static const List<Widget> _pages = <Widget>[
     HomePage(),
-    SearchPage(),
+    FtsSearchPage(),
     QuizPage(),
     MorePage(),
   ];

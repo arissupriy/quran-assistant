@@ -7,6 +7,7 @@ import 'package:ffi/ffi.dart'; // For .toNativeUtf8, .toDartString, calloc, free
 import 'package:quran_assistant/core/api/ffi.dart'
     as rust_ffi; // Mengimpor binding FFI
 import 'package:quran_assistant/core/models/chapter_model.dart'; // Untuk Chapter, Verse, Word, AyahText
+import 'package:quran_assistant/core/models/fts_search_model.dart';
 import 'package:quran_assistant/core/models/juz_model.dart'; // Untuk Juz
 import 'package:quran_assistant/core/models/mushaf_model.dart'; // Untuk PageLayout, MushafWordData, Line
 import 'package:quran_assistant/core/models/quiz_model.dart'; // Untuk QuizFilter, QuizGenerationResult, QuizScope, QuizQuestion, QuizOption, QuizGenerationErrorType
@@ -482,5 +483,13 @@ class RustEngineService {
   /// Menghasilkan kuis Word Puzzle.
   QuizGenerationResult generateWordPuzzleQuiz(QuizFilter filter) {
     return _callQuizGenerator(rust_ffi.generateWordPuzzleQuiz, filter);
+  }
+
+    Future<List<FtsSearchResult>> searchFullText(String query) async {
+    return _callJsonArrayFunctionWithStringInput(
+      (inputPtr) => rust_ffi.ftsSearch(inputPtr), // Call the ftsSearch binding
+      query,
+      (jsonItem) => FtsSearchResult.fromJson(jsonItem as Map<String, dynamic>),
+    );
   }
 }
