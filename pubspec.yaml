@@ -37,6 +37,10 @@ dependencies:
   ffi: ^2.1.0
   flutter_riverpod: ^2.6.1
   google_fonts: ^6.2.1
+  dio: ^5.8.0+1
+  permission_handler: ^12.0.1
+  path_provider: ^2.1.5
+  path: ^1.9.1
   
 
 dev_dependencies:
@@ -70,11 +74,44 @@ flutter:
 
   # assets: # Jika Anda memiliki aset gambar, tambahkan di sini
   #   # - images/
-    
+
+
+  assets:
+    - assets/glyphs_json/
   fonts:
     - family: UthmaniHafs
       fonts:
         - asset: assets/fonts/UthmanicHafs.ttf # Ganti dengan nama file Anda
+    # - family: UthmaniHafsV22
+    #   fonts:
+    #     - asset: assets/fonts/UthmanicHafs_V22.ttf # Ganti dengan nama file Anda
+    # - family: KGFQPC
+    #   fonts:
+    #     - asset: assets/fonts/KFGQPC_Uthmanic_Script_HAFS_Regular.otf # Ganti dengan nama file Anda
+    # - family: MeQuran
+    #   fonts:
+    #     - asset: assets/fonts/me_quran.ttf # Ganti dengan nama file Anda
+    # - family: QuranCommon
+    #   fonts:
+    #     - asset: assets/fonts/quran-common.ttf # Ganti dengan nama file Anda
+    # - family: SurahNames
+    #   fonts:
+    #     - asset: assets/fonts/surah_names.ttf # Ganti dengan nama file Anda
+    # - family: SurahNameV2
+    #   fonts:
+    #     - asset: assets/fonts/surah-name-v2.ttf # Ganti dengan nama file Anda
+    # - family: SurahNameV4
+    #   fonts:
+    #     - asset: assets/fonts/surah-name-v4.ttf # Ganti dengan nama file Anda
+    # - family: UthmanTahaNaskh
+    #   fonts:
+    #     - asset: assets/fonts/KFGQPC_Uthman_Taha_Naskh_Regular.ttf # Ganti dengan nama file Anda
+    # - family: Indopak
+    #   fonts:
+    #     - asset: assets/fonts/KFGQPCNastaleeq-Regular.ttf # Ganti dengan nama file Anda
+    
+    
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

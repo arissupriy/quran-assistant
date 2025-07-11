@@ -2,13 +2,13 @@
 
 // Merepresentasikan pemetaan kunci ayat (verse key) ke ID ayat.
 class VerseMapping {
-  final Map<String, int> mapping; // verseKey (String) -> verseId (int)
+  final Map<String, String> mapping; // verseKey (String) -> verseId (int)
 
   VerseMapping({required this.mapping});
 
   factory VerseMapping.fromJson(Map<String, dynamic> json) {
     return VerseMapping(
-      mapping: json.map((key, value) => MapEntry(key, value as int)),
+      mapping: json.map((key, value) => MapEntry(key, value as String)),
     );
   }
 }

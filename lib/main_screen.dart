@@ -7,9 +7,10 @@ import 'package:quran_assistant/pages/fts_search_page.dart';
 
 // Impor halaman-halaman yang sudah dibuat
 import 'package:quran_assistant/pages/home_page.dart';
-import 'package:quran_assistant/pages/search_page.dart';
 import 'package:quran_assistant/pages/quiz_page.dart';
 import 'package:quran_assistant/pages/more_page.dart';
+import 'package:quran_assistant/pages/quran_page.dart'; // Pastikan QuranPage sudah diimplementasikan
+// import 'package:quran_assistant/pages/quran_page.dart';
 
 // Asumsi RustEngineService dan model sudah diinisialisasi dan diimpor di main.dart
 // import 'package:quran_assistant/core/api/rust_engine_service.dart';
@@ -28,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   static const List<Widget> _pages = <Widget>[
     HomePage(),
     FtsSearchPage(),
+    QuranPage(), // Pastikan QuranPage sudah diimplementasikan
     QuizPage(),
     MorePage(),
   ];
@@ -70,6 +72,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: Icon(Icons.search_rounded), // Rekomendasi ikon
                   label: 'Pencarian',
                 ),
+                BottomNavigationBarItem(icon: Icon(Icons.book_rounded), label: 'Quran'),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.lightbulb_outline_rounded), // Rekomendasi ikon
                   label: 'Kuis',

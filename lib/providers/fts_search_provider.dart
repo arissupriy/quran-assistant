@@ -1,32 +1,41 @@
 // lib/providers/fts_search_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // <-- Gunakan flutter_riverpod
-import 'package:flutter/foundation.dart'; // Untuk @required jika masih dipakai, atau debug
 import 'package:quran_assistant/core/api/rust_engine_service.dart'; // Import service Rust
 import 'package:quran_assistant/core/models/fts_search_model.dart'; // Import model pencarian
 
 // Definisikan State (immutable) yang akan dikelola oleh StateNotifier
 class FtsSearchState {
+  final String query;
   final List<FtsSearchResult> searchResults;
   final bool isLoading;
   final String? errorMessage;
+  final bool showTranslation; // <-- TAMBAHKAN INI
+  
+
 
   FtsSearchState({
     this.searchResults = const [],
     this.isLoading = false,
     this.errorMessage,
+    this.query = '',
+    this.showTranslation = false, // Default ke true
   });
 
   // Metode copyWith untuk membuat state baru (immutable)
   FtsSearchState copyWith({
+    String? query,
     List<FtsSearchResult>? searchResults,
     bool? isLoading,
     String? errorMessage,
+    bool? showTranslation, // <-- TAMBAHKAN INI
   }) {
     return FtsSearchState(
+      query: query ?? this.query,
       searchResults: searchResults ?? this.searchResults,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage, // Note: error messages should be cleared explicitly or passed null
+      showTranslation: showTranslation ?? this.showTranslation,
     );
   }
 }
@@ -54,7 +63,12 @@ class FtsSearchNotifier extends StateNotifier<FtsSearchState> {
 
   /// Membersihkan hasil pencarian.
   void clearSearchResults() {
-    state = FtsSearchState(); // Kembali ke state default kosong
+    state = FtsSearchState(showTranslation: state.showTranslation); // Kembali ke state default kosong
+  }
+
+   // Method untuk mengubah status tampilkan terjemahan
+  void toggleShowTranslation() {
+    state = state.copyWith(showTranslation: !state.showTranslation);
   }
 }
 

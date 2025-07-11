@@ -3,6 +3,7 @@ import 'dart:convert'; // For jsonEncode, jsonDecode, utf8
 import 'dart:ffi'; // For Pointer, allocate/free
 
 import 'package:ffi/ffi.dart'; // For .toNativeUtf8, .toDartString, calloc, free
+import 'package:flutter/foundation.dart';
 
 import 'package:quran_assistant/core/api/ffi.dart'
     as rust_ffi; // Mengimpor binding FFI
@@ -25,7 +26,7 @@ class RustEngineService {
   /// Menginisialisasi engine Rust. Harus dipanggil sekali saat aplikasi dimulai.
   void initEngine() {
     rust_ffi.initEngine();
-    print('Rust Engine initialized.');
+    debugPrint('Rust Engine initialized.');
   }
 
   /// Helper untuk memanggil fungsi FFI yang mengembalikan JSON string (single object).
@@ -36,56 +37,56 @@ class RustEngineService {
   ) {
     final ptr = ffiCall();
     if (ptr == nullptr) {
-      print('DEBUG_PAGELAYOUT_DETAIL: FFI call returned nullptr.');
+      debugPrint('DEBUG_PAGELAYOUT_DETAIL: FFI call returned nullptr.');
       return null;
     }
     try {
       final jsonString = ptr.toDartString();
       // LOGGING SANGAT DETAIL UNTUK PAGELAYOUT
-      print('DEBUG_PAGELAYOUT_DETAIL: Pointer address: ${ptr.address}');
-      print(
-        'DEBUG_PAGELAYOUT_DETAIL: JSON string length: ${jsonString.length}',
-      );
+      // print('DEBUG_PAGELAYOUT_DETAIL: Pointer address: ${ptr.address}');
+      // print(
+      //   'DEBUG_PAGELAYOUT_DETAIL: JSON string length: ${jsonString.length}',
+      // );
       // Cetak raw JSON string dengan tanda kutip untuk melihat spasi/null byte tersembunyi
-      print(
-        'DEBUG_PAGELAYOUT_DETAIL: Raw JSON string (quoted): "${jsonString}"',
-      );
-      // Cetak panjang substring untuk memastikan tidak ada truncation tersembunyi
-      print(
-        'DEBUG_PAGELAYOUT_DETAIL: First 100 chars: "${jsonString.substring(0, jsonString.length > 100 ? 100 : jsonString.length)}"',
-      );
-      print(
-        'DEBUG_PAGELAYOUT_DETAIL: Last 100 chars: "${jsonString.substring(jsonString.length > 100 ? jsonString.length - 100 : 0)}"',
-      );
+      // print(
+      //   'DEBUG_PAGELAYOUT_DETAIL: Raw JSON string (quoted): "${jsonString}"',
+      // );
+      // // Cetak panjang substring untuk memastikan tidak ada truncation tersembunyi
+      // print(
+      //   'DEBUG_PAGELAYOUT_DETAIL: First 100 chars: "${jsonString.substring(0, jsonString.length > 100 ? 100 : jsonString.length)}"',
+      // );
+      // print(
+      //   'DEBUG_PAGELAYOUT_DETAIL: Last 100 chars: "${jsonString.substring(jsonString.length > 100 ? jsonString.length - 100 : 0)}"',
+      // );
 
       if (jsonString == 'null') {
-        print('DEBUG_PAGELAYOUT_DETAIL: Raw JSON string is "null".');
+        // print('DEBUG_PAGELAYOUT_DETAIL: Raw JSON string is "null".');
         return null;
       }
       final decodedJson = jsonDecode(jsonString);
       // LOGGING SANGAT DETAIL UNTUK PAGELAYOUT
-      print('DEBUG_PAGELAYOUT_DETAIL: Decoded JSON: $decodedJson');
-      print(
-        'DEBUG_PAGELAYOUT_DETAIL: Decoded JSON runtimeType: ${decodedJson.runtimeType}',
-      );
+      // print('DEBUG_PAGELAYOUT_DETAIL: Decoded JSON: $decodedJson');
+      // print(
+      //   'DEBUG_PAGELAYOUT_DETAIL: Decoded JSON runtimeType: ${decodedJson.runtimeType}',
+      // );
 
       if (decodedJson is Map<String, dynamic>) {
-        print(
-          'DEBUG_PAGELAYOUT_DETAIL: Decoded JSON is a Map. Parsing with fromJson.',
-        );
+        // print(
+        //   'DEBUG_PAGELAYOUT_DETAIL: Decoded JSON is a Map. Parsing with fromJson.',
+        // );
         return fromJson(decodedJson);
       } else {
         // Inilah yang seharusnya menangkap error Anda
-        print(
-          'DEBUG_PAGELAYOUT_DETAIL: ERROR: Expected JSON object (Map), but received: $decodedJson (Type: ${decodedJson.runtimeType})',
-        );
+        // print(
+        //   'DEBUG_PAGELAYOUT_DETAIL: ERROR: Expected JSON object (Map), but received: $decodedJson (Type: ${decodedJson.runtimeType})',
+        // );
         return null;
       }
     } catch (e) {
-      print('DEBUG_PAGELAYOUT_DETAIL: ERROR during JSON decoding: $e');
-      print(
-        'DEBUG_PAGELAYOUT_DETAIL: Raw JSON string during error (quoted): "${ptr.toDartString()}"',
-      );
+      // print('DEBUG_PAGELAYOUT_DETAIL: ERROR during JSON decoding: $e');
+      // print(
+      //   'DEBUG_PAGELAYOUT_DETAIL: Raw JSON string during error (quoted): "${ptr.toDartString()}"',
+      // );
       return null;
     } finally {
       rust_ffi.freeString(ptr);
@@ -113,14 +114,14 @@ class RustEngineService {
         if (decodedJson is Map<String, dynamic>) {
           return fromJson(decodedJson);
         } else {
-          print(
-            'Error: _callJsonFunctionWithStringInput expected JSON object, but received: $decodedJson (Type: ${decodedJson.runtimeType})',
-          );
+          // print(
+          //   'Error: _callJsonFunctionWithStringInput expected JSON object, but received: $decodedJson (Type: ${decodedJson.runtimeType})',
+          // );
           return null;
         }
       } catch (e) {
-        print('Error decoding JSON from FFI for string input: $e');
-        print('Raw JSON string: ${ptr.toDartString()}');
+        // print('Error decoding JSON from FFI for string input: $e');
+        // print('Raw JSON string: ${ptr.toDartString()}');
         return null;
       } finally {
         rust_ffi.freeString(ptr);
@@ -151,8 +152,8 @@ class RustEngineService {
         final jsonList = jsonDecode(jsonString) as List<dynamic>;
         return jsonList.map((item) => fromJson(item)).toList();
       } catch (e) {
-        print('Error decoding JSON array from FFI for string input: $e');
-        print('Raw JSON string: ${ptr.toDartString()}');
+        // print('Error decoding JSON array from FFI for string input: $e');
+        // print('Raw JSON string: ${ptr.toDartString()}');
         return [];
       } finally {
         rust_ffi.freeString(ptr);
@@ -206,9 +207,9 @@ class RustEngineService {
     try {
       ptr = ffiCall(filterDataPtr, filterBytes.length);
       if (ptr == nullptr) {
-        print(
-          'Quiz Generator FFI call returned a nullptr. This indicates a caught panic or unhandled error in Rust.',
-        );
+        // print(
+        //   'Quiz Generator FFI call returned a nullptr. This indicates a caught panic or unhandled error in Rust.',
+        // );
         return QuizGenerationResult(
           error: QuizGenerationErrorType.internalError,
         );
@@ -218,7 +219,7 @@ class RustEngineService {
       final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
       return QuizGenerationResult.fromJson(jsonMap);
     } catch (e) {
-      print('Error generating quiz from FFI: $e');
+      // print('Error generating quiz from FFI: $e');
       return QuizGenerationResult(error: QuizGenerationErrorType.internalError);
     } finally {
       calloc.free(filterDataPtr);
@@ -248,12 +249,12 @@ class RustEngineService {
       (json) => Chapter.fromJson(json),
     );
     // LOGGING TAMBAHAN UNTUK CHAPTER
-    print(
-      'DEBUG_CHAPTER_SERVICE: Chapter object after parsing: $chapter',
-    ); // <-- TAMBAH INI
-    print(
-      'DEBUG_CHAPTER_SERVICE: Chapter nameSimple after parsing: ${chapter?.nameSimple}',
-    ); // <-- TAMBAH INI
+    // print(
+    //   'DEBUG_CHAPTER_SERVICE: Chapter object after parsing: $chapter',
+    // ); // <-- TAMBAH INI
+    // print(
+    //   'DEBUG_CHAPTER_SERVICE: Chapter nameSimple after parsing: ${chapter?.nameSimple}',
+    // ); // <-- TAMBAH INI
     return chapter;
   }
 
@@ -329,7 +330,12 @@ class RustEngineService {
   PageLayout? getPageLayoutByPageNumber(int pageNumber) {
     return _callJsonFunction(
       () => rust_ffi.getPageLayoutByPageNumber(pageNumber),
-      (json) => PageLayout.fromJson(json),
+      (json) {
+        debugPrint(
+          'DEBUG_PAGELAYOUT_DETAIL: JSON received for page $pageNumber: $json',
+        );
+        return PageLayout.fromJson(json);
+      }
     );
   }
 
@@ -363,8 +369,8 @@ class RustEngineService {
       }
       return jsonDecode(jsonStringLiteral) as String;
     } catch (e) {
-      print('Error decoding translation metadata JSON literal: $e');
-      print('Raw JSON string literal: ${ptr.toDartString()}');
+      // print('Error decoding translation metadata JSON literal: $e');
+      // print('Raw JSON string literal: ${ptr.toDartString()}');
       return null;
     } finally {
       rust_ffi.freeString(ptr);

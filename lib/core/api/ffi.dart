@@ -2,7 +2,8 @@
 import 'dart:ffi'; // Core FFI types: Pointer, Utf8, Void, Uint32, Uint64
 import 'dart:io' show Platform; // For platform detection to load the correct dynamic library
 
-import 'package:ffi/ffi.dart'; // For extension methods like .toNativeUtf8 and .toDartString, and calloc/free
+import 'package:ffi/ffi.dart';
+import 'package:flutter/material.dart'; // For extension methods like .toNativeUtf8 and .toDartString, and calloc/free
 
 final String _libraryName = 'libhafiz_assistant_engine';
 /// Path to the Rust dynamic library.
@@ -259,3 +260,30 @@ typedef FtsSearchNative = Pointer<Utf8> Function(Pointer<Utf8> queryFfi);
 typedef FtsSearchDart = Pointer<Utf8> Function(Pointer<Utf8> queryFfi);
 final ftsSearch = _rustLib.lookupFunction<FtsSearchNative, FtsSearchDart>('fts_search');
 // --- AKHIR TAMBAHAN ---
+
+typedef DecompressNative = Pointer<Utf8> Function(Pointer<Utf8>, Pointer<Utf8>);
+typedef DecompressDart = Pointer<Utf8> Function(Pointer<Utf8>, Pointer<Utf8>);
+
+typedef FreeRustStringNative = Void Function(Pointer<Utf8>);
+typedef FreeRustStringDart = void Function(Pointer<Utf8>);
+
+final decompressTarZst = _rustLib
+    .lookupFunction<DecompressNative, DecompressDart>('decompress_tar_zst');
+
+void decompressFile(String inputPath, String outputDir) {
+  final input = inputPath.toNativeUtf8();
+  final output = outputDir.toNativeUtf8();
+
+  final result = decompressTarZst(input, output);
+
+  calloc.free(input);
+  calloc.free(output);
+
+  if (result != nullptr) {
+    final message = result.toDartString();
+    debugPrint("Rust error: $message");
+    freeString(result); // penting
+  } else {
+    debugPrint("Success decompress");
+  }
+}
