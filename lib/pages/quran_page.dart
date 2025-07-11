@@ -1,52 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
-import 'package:quran_assistant/pages/mushaf_page.dart';
 import 'package:quran_assistant/providers/quran_provider.dart';
-import 'package:quran_assistant/pages/quran_detail_page.dart'; // <-- IMPOR HALAMAN DETAIL
+import 'package:quran_assistant/pages/quran_detail_page.dart';
+import 'package:quran_assistant/utils/mushaf_utils.dart'; // <-- IMPOR HALAMAN DETAIL
 
 class QuranPage extends ConsumerWidget {
   const QuranPage({super.key});
 
-  // Fungsi untuk memperkirakan halaman awal Juz
   int _getStartPageForJuz(int juzNumber) {
-    // Ini adalah pemetaan perkiraan. Anda mungkin perlu data yang lebih akurat.
+    // ... (kode yang sudah ada) ...
     const juzStartPages = [
-      1,
-      22,
-      42,
-      62,
-      82,
-      102,
-      121,
-      142,
-      162,
-      182,
-      201,
-      222,
-      242,
-      262,
-      282,
-      302,
-      322,
-      342,
-      362,
-      382,
-      402,
-      422,
-      442,
-      462,
-      482,
-      502,
-      522,
-      542,
-      562,
-      582,
+      1, 22, 42, 62, 82, 102, 121, 142, 162, 182, 201, 222, 242, 262, 282, 302,
+      322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582,
     ];
     if (juzNumber > 0 && juzNumber <= juzStartPages.length) {
       return juzStartPages[juzNumber - 1];
     }
-    return 1; // Default ke halaman 1
+    return 1;
   }
 
   @override
@@ -84,16 +55,39 @@ class QuranPage extends ConsumerWidget {
                     'Dimulai dari Surah $firstSurah ayat $verseRange\nTotal: ${juz.versesCount} ayat',
                   ),
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  // -- FUNGSI ONTAP UNTUK NAVIGASI --
-                  onTap: () {
+                  onTap: () async { // Tambahkan 'async' di sini
                     final startPage = _getStartPageForJuz(juz.juzNumber);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            MushafDownloadPage(), // Ganti dengan halaman yang sesuai
-                      ),
+                    
+                    // 1. Dapatkan status Mushaf berdasarkan lebar layar saat ini
+                    final mushafStatus = await MushafUtils.checkMushafStatus(
+                      MediaQuery.of(context).size.width,
                     );
+
+                    if (mushafStatus.isDownloaded) {
+                      // 2. Jika sudah diunduh, langsung navigasi ke QuranPerPage
+                      // CATATAN: QuranPerPage dan QuranPageViewer perlu dimodifikasi
+                      // untuk menerima initialPage.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuranPerPage(
+                            resolution: mushafStatus.variant,
+                            initialPage: startPage, // Parameter BARU
+                          ),
+                        ),
+                      );
+                    } else {
+                      // 3. Jika belum diunduh, navigasi ke MushafDownloadPage
+                      // CATATAN: MushafDownloadPage perlu dimodifikasi untuk menerima initialPage.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MushafDownloadPage(
+                            initialPage: startPage, // Parameter BARU
+                          ),
+                        ),
+                      );
+                    }
                   },
                 ),
               );

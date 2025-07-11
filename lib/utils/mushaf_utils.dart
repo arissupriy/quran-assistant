@@ -25,8 +25,11 @@ class MushafUtils {
   /// Fungsi utama untuk mengecek status data mushaf berdasarkan lebar layar.
   /// Mengembalikan object [MushafStatus] yang berisi semua info yang dibutuhkan.
   static Future<MushafStatus> checkMushafStatus(double screenWidth) async {
+
+    debugPrint("Checking Mushaf status for screen width: $screenWidth");
     // 1. Tentukan varian resolusi
     final String variant = _getMushafVariant(screenWidth);
+    
 
     // 2. Tentukan semua path yang relevan
     final docDir = await getApplicationDocumentsDirectory();
@@ -37,6 +40,9 @@ class MushafUtils {
 
     // 3. Cek apakah file sudah ada
     final bool isDownloaded = await _isMushafDownloaded(outputPath);
+
+    final sentinelFile = File('$outputPath/page002.png');
+    debugPrint("Sentinel file exists: ${sentinelFile.exists()}");
 
     debugPrint("Mushaf variant: $variant, Downloaded: $isDownloaded");
 
@@ -54,12 +60,12 @@ class MushafUtils {
   static String _getMushafVariant(double screenWidth) {
     if (screenWidth >= 1440) {
       return 'width_1440';
-    } else if (screenWidth >= 1080) {
+    } else  {
       return 'width_1080';
-    } else {
-      return 'width_720';
-    }
+    } 
   }
+
+  
 
   /// Mengecek apakah mushaf pada direktori tertentu sudah diunduh.
   /// Cukup dengan memeriksa file pertama saja ('page001.png').
