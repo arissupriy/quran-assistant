@@ -1,11 +1,8 @@
-// lib/pages/quran_detail_page.dart
-
-import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'package:quran_assistant/utils/glyph_cache_utils.dart';
 
 class QuranPerPage extends StatelessWidget {
   final String resolution;
@@ -40,55 +37,59 @@ class QuranPageViewer extends StatefulWidget {
 class _QuranPageViewerState extends State<QuranPageViewer> {
   late final PageController _controller;
   int _lastPageIndex = 0;
+  final Map<int, Future<void>> _preloadTasks = {};
 
   @override
   void initState() {
     super.initState();
-    int calculatedInitialIndex;
-
-    // Dengan reverse: false, index 0 = halaman 1
-    // Jadi, index = (halaman - 1)
-    if (widget.initialPage != null &&
-        widget.initialPage! >= 1 &&
-        widget.initialPage! <= 604) {
-      calculatedInitialIndex = widget.initialPage! - 1;
-    } else {
-      calculatedInitialIndex = 0; // Default ke halaman 1
-    }
+    int calculatedInitialIndex =
+        (widget.initialPage != null &&
+            widget.initialPage! >= 1 &&
+            widget.initialPage! <= 604)
+        ? widget.initialPage! - 1
+        : 0;
 
     _lastPageIndex = calculatedInitialIndex;
     _controller = PageController(initialPage: calculatedInitialIndex);
 
+    _preloadSurroundingPages(_lastPageIndex);
+
     _controller.addListener(() {
       final currentPageIndex = _controller.page?.round();
       if (currentPageIndex != null && currentPageIndex != _lastPageIndex) {
-        final int oldQuranPage = _lastPageIndex + 1;
-        final int newQuranPage = currentPageIndex + 1;
-
-        String swipeDirection = '';
-        String pageMovement = '';
-
-        if (currentPageIndex > _lastPageIndex) {
-          // Indeks naik → user swipe ke kiri → Halaman +1
-          swipeDirection = 'Geser ke Kiri (finger moved right-to-left)';
-          pageMovement = 'Halaman Selanjutnya (+1)';
-        } else if (currentPageIndex < _lastPageIndex) {
-          // Indeks turun → user swipe ke kanan → Halaman -1
-          swipeDirection = 'Geser ke Kanan (finger moved left-to-right)';
-          pageMovement = 'Halaman Sebelumnya (-1)';
-        }
+        final oldPage = _lastPageIndex + 1;
+        final newPage = currentPageIndex + 1;
 
         debugPrint('--- PAGE SWIPE DEBUG ---');
-        debugPrint('Detected $swipeDirection');
-        debugPrint('Internal Index: $_lastPageIndex -> $currentPageIndex');
-        debugPrint(
-          'Quran Page Number: Halaman $oldQuranPage -> Halaman $newQuranPage ($pageMovement)',
-        );
+        debugPrint('Quran Page: $oldPage → $newPage');
         debugPrint('------------------------');
 
+        _preloadSurroundingPages(currentPageIndex);
         _lastPageIndex = currentPageIndex;
       }
     });
+  }
+
+  void _preloadSurroundingPages(int index) async {
+    final dir = await getApplicationDocumentsDirectory();
+
+    for (int i = index - 5; i <= index + 5; i++) {
+      if (i < 0 || i >= 604 || _preloadTasks.containsKey(i)) continue;
+
+      final pageStr = (i + 1).toString().padLeft(3, '0');
+      final imagePath = '${dir.path}/${widget.resolution}/page$pageStr.png';
+
+      _preloadTasks[i] = File(imagePath)
+          .exists()
+          .then((exists) {
+            if (!exists) {
+              debugPrint('[Preload] Gambar page $pageStr tidak ditemukan');
+            }
+          })
+          .whenComplete(() {
+            _preloadTasks.remove(i);
+          });
+    }
   }
 
   @override
@@ -104,8 +105,7 @@ class _QuranPageViewerState extends State<QuranPageViewer> {
       body: PageView.builder(
         key: const PageStorageKey<String>('QuranPageView'),
         controller: _controller,
-        reverse:
-            true, // sekarang false, agar finger left→right berarti halaman +1
+        reverse: true,
         itemCount: 604,
         itemBuilder: (context, index) {
           final pageNumber = index + 1;
@@ -139,69 +139,214 @@ class _SingleQuranPageDisplayState extends State<_SingleQuranPageDisplay> {
   List<dynamic> glyphs = [];
   Set<String> highlightedWords = {};
   Set<String> highlightedAyah = {};
-  bool isLoading = true;
+  bool isLoading = false;
   String? imagePath;
+  TapDownDetails? _tapDetails;
+  bool _longPressTriggered = false;
 
   @override
   void initState() {
     super.initState();
-    _loadGlyphsAndImage();
+    _loadImageAndUseCachedGlyph();
   }
 
   @override
-  void didUpdateWidget(_SingleQuranPageDisplay oldWidget) {
+  void didUpdateWidget(covariant _SingleQuranPageDisplay oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.pageNumber != oldWidget.pageNumber ||
         widget.resolution != oldWidget.resolution) {
-      _loadGlyphsAndImage();
+      _loadImageAndUseCachedGlyph();
     }
   }
 
-  Future<void> _loadGlyphsAndImage() async {
-    setState(() => isLoading = true);
-    debugPrint('Loading page ${widget.pageNumber} (${widget.resolution})...');
-    try {
-      final jsonStr = await rootBundle.loadString(
-        'assets/glyphs_json/page_${widget.pageNumber.toString().padLeft(3, '0')}.json',
-      );
-      final parsed = await compute(_parseJson, jsonStr);
+  Future<void> _loadImageAndUseCachedGlyph() async {
+    final pageStr = widget.pageNumber.toString().padLeft(3, '0');
+    final dir = await getApplicationDocumentsDirectory();
+    final path = '${dir.path}/${widget.resolution}/page$pageStr.png';
+    final imageFile = File(path);
 
-      final dir = await getApplicationDocumentsDirectory();
-      final path =
-          '${dir.path}/${widget.resolution}/page${widget.pageNumber.toString().padLeft(3, '0')}.png';
-
-      final imageFile = File(path);
-      if (await imageFile.exists()) {
-        setState(() {
-          glyphs = parsed;
-          highlightedWords.clear();
-          highlightedAyah.clear();
-          imagePath = path;
-          isLoading = false;
-        });
-        debugPrint('Page ${widget.pageNumber} loaded successfully from $path');
-      } else {
-        debugPrint(
-          'Error: Gambar halaman ${widget.pageNumber} (${widget.resolution}) tidak ditemukan di $path',
-        );
-        setState(() {
-          glyphs = [];
-          imagePath = null;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error memuat data untuk halaman ${widget.pageNumber}: $e');
+    if (!await imageFile.exists()) {
+      if (!mounted) return;
       setState(() {
-        glyphs = [];
+        isLoading = true;
         imagePath = null;
-        isLoading = false;
       });
+      return;
     }
+
+    if (!mounted) return;
+    setState(() {
+      imagePath = path;
+      isLoading = false;
+      glyphs = GlyphCache().getGlyph(widget.pageNumber);
+      highlightedWords.clear();
+      highlightedAyah.clear();
+    });
   }
 
-  static List<dynamic> _parseJson(String jsonStr) {
-    return json.decode(jsonStr);
+  void showGlyphPopupMenu({
+    required BuildContext context,
+    required Offset globalPosition,
+    required bool isWord, // 🆕
+    VoidCallback? onDismiss,
+  }) {
+    final overlay = Overlay.of(context);
+
+    late OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        final renderBox = context.findRenderObject() as RenderBox?;
+        final screenSize = renderBox?.size ?? MediaQuery.of(context).size;
+
+        const popupWidth = 200.0;
+        const popupHeight = 120.0;
+        const margin = 12.0;
+
+        double left = globalPosition.dx;
+        double top = globalPosition.dy;
+
+        if (left + popupWidth + margin > screenSize.width) {
+          left = screenSize.width - popupWidth - margin;
+        }
+        if (top + popupHeight + margin > screenSize.height) {
+          top = screenSize.height - popupHeight - margin;
+        }
+
+        return GestureDetector(
+          onTap: () {
+            overlayEntry.remove();
+            onDismiss?.call();
+          },
+          child: Stack(
+            children: [
+              Positioned.fill(child: Container(color: Colors.transparent)),
+              Positioned(
+                left: left,
+                top: top,
+                width: popupWidth,
+                height: popupHeight,
+                child: Material(
+                  color: Colors.transparent,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              isWord ? 'Kata Quran' : 'Ayat Quran',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            TextButton.icon(
+                              icon: Icon(
+                                isWord
+                                    ? Icons.info_outline
+                                    : Icons.menu_book_rounded,
+                                color: Colors.white,
+                              ),
+                              label: Text(
+                                isWord
+                                    ? 'Lihat Detail Kata'
+                                    : 'Lihat Detail Ayat',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () {
+                                overlayEntry.remove(); // Tutup popup
+
+                                Future.delayed(Duration.zero, () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.white,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(24),
+                                      ),
+                                    ),
+                                    builder: (_) => Container(
+                                      constraints: const BoxConstraints(
+                                        minHeight: 160,
+                                      ), // ✅ Min height
+                                      padding: const EdgeInsets.all(24),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Center(
+                                            child: Container(
+                                              width: 40,
+                                              height: 4,
+                                              margin: const EdgeInsets.only(
+                                                bottom: 16,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[300],
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            isWord
+                                                ? 'Detail Kata'
+                                                : 'Detail Ayat',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            isWord
+                                                ? 'Detail kata Quran akan ditampilkan di sini.'
+                                                : 'Detail ayat Quran akan ditampilkan di sini.',
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ).whenComplete(() {
+                                    onDismiss?.call();
+                                  });
+                                });
+                                // Tampilkan Bottomm
+                                // TODO: Aksi klik
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    overlay.insert(overlayEntry);
   }
 
   @override
@@ -223,7 +368,7 @@ class _SingleQuranPageDisplayState extends State<_SingleQuranPageDisplay> {
                 const Icon(Icons.error_outline, color: Colors.red, size: 50),
                 const SizedBox(height: 10),
                 Text(
-                  'Gambar halaman ${widget.pageNumber} tidak tersedia. Mohon unduh data Mushaf.',
+                  'Gambar halaman ${widget.pageNumber} tidak tersedia.',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -242,25 +387,21 @@ class _SingleQuranPageDisplayState extends State<_SingleQuranPageDisplay> {
               },
               child: Image.file(
                 File(imagePath!),
+                gaplessPlayback: true,
                 width: imageWidth,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   debugPrint(
-                    'Image.file error for page ${widget.pageNumber}: $error',
+                    'Image error for page ${widget.pageNumber}: $error',
                   );
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.broken_image_rounded,
-                          color: Colors.grey,
-                          size: 50,
-                        ),
+                        const Icon(Icons.broken_image_rounded, size: 50),
                         const SizedBox(height: 10),
                         Text(
                           'Gagal memuat gambar halaman ${widget.pageNumber}.',
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -268,7 +409,7 @@ class _SingleQuranPageDisplayState extends State<_SingleQuranPageDisplay> {
                 },
               ),
             ),
-
+            if (highlightedAyah.isNotEmpty) ..._buildAyahOverlay(scale),
             ...glyphs.map((glyph) {
               final double left = glyph['min_x'] * scale;
               final double top = glyph['min_y'] * scale;
@@ -286,27 +427,84 @@ class _SingleQuranPageDisplayState extends State<_SingleQuranPageDisplay> {
                 width: width,
                 height: height,
                 child: GestureDetector(
-                  onTap: () {
+                  onTapDown: (details) {
+                    _tapDetails = details;
+                  },
+                  onTapUp: (_) {
+                    if (_tapDetails == null) return;
+
+                    if (_longPressTriggered) {
+                      // Sudah long-press, abaikan tap
+                      _longPressTriggered = false;
+                      return;
+                    }
+
+                    if (highlightedWords.isNotEmpty ||
+                        highlightedAyah.isNotEmpty) {
+                      setState(() {
+                        highlightedWords.clear();
+                        highlightedAyah.clear();
+                      });
+                      return;
+                    }
+
+                    final tapOffset = _tapDetails!.globalPosition;
+
                     setState(() {
-                      highlightedWords.clear();
-                      highlightedAyah.clear();
                       highlightedWords.add(key);
                     });
+
+                    showGlyphPopupMenu(
+                      context: context,
+                      globalPosition: tapOffset,
+                      isWord: true,
+
+                      onDismiss: () {
+                        setState(() {
+                          highlightedWords.clear();
+                          highlightedAyah.clear();
+                        });
+                      },
+                    );
                   },
-                  onLongPress: () {
+                  onLongPressStart: (details) {
+                    _longPressTriggered = true;
+
+                    if (highlightedWords.isNotEmpty ||
+                        highlightedAyah.isNotEmpty) {
+                      setState(() {
+                        highlightedWords.clear();
+                        highlightedAyah.clear();
+                      });
+                      return;
+                    }
+
+                    final pressOffset = details.globalPosition;
+
                     setState(() {
-                      highlightedWords.clear();
-                      highlightedAyah.clear();
                       highlightedAyah.add(ayahKey);
+                    });
+
+                    Future.microtask(() {
+                      showGlyphPopupMenu(
+                        context: context,
+                        globalPosition: pressOffset,
+                        isWord: false,
+
+                        onDismiss: () {
+                          setState(() {
+                            highlightedWords.clear();
+                            highlightedAyah.clear();
+                          });
+                        },
+                      );
                     });
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isAyahHighlighted
-                          ? Colors.green.withOpacity(0.3)
-                          : isWordHighlighted
+                      color: isWordHighlighted
                           ? Colors.blue.withOpacity(0.3)
-                          : Colors.transparent,
+                          : Colors.transparent, // ⛔ Hapus warna untuk ayat
                     ),
                   ),
                 ),
@@ -316,5 +514,72 @@ class _SingleQuranPageDisplayState extends State<_SingleQuranPageDisplay> {
         );
       },
     );
+  }
+
+  List<Widget> _buildAyahOverlay(double scale) {
+    if (highlightedAyah.isEmpty) return [];
+
+    final ayahKey = highlightedAyah.first;
+    final ayahGlyphs = glyphs
+        .where((g) => "${g['sura']}:${g['ayah']}" == ayahKey)
+        .map(
+          (g) => {
+            'min_x': (g['min_x'] as num).toDouble(),
+            'max_x': (g['max_x'] as num).toDouble(),
+            'min_y': (g['min_y'] as num).toDouble(),
+            'max_y': (g['max_y'] as num).toDouble(),
+          },
+        )
+        .toList();
+
+    // Kelompokkan glyph berdasarkan posisi Y (anggap dalam 30px satu baris)
+    const double lineThreshold = 30.0;
+
+    List<List<Map<String, double>>> lines = [];
+
+    for (var glyph in ayahGlyphs) {
+      bool added = false;
+      for (var line in lines) {
+        final avgY =
+            line.map((g) => g['min_y']!).reduce((a, b) => a + b) / line.length;
+        if ((glyph['min_y']! - avgY).abs() < lineThreshold) {
+          line.add(glyph);
+          added = true;
+          break;
+        }
+      }
+      if (!added) {
+        lines.add([glyph]);
+      }
+    }
+
+    // Buat highlight overlay per baris
+    return lines.map((lineGlyphs) {
+      final minX = lineGlyphs
+          .map((g) => g['min_x']!)
+          .reduce((a, b) => a < b ? a : b);
+      final maxX = lineGlyphs
+          .map((g) => g['max_x']!)
+          .reduce((a, b) => a > b ? a : b);
+      final minY = lineGlyphs
+          .map((g) => g['min_y']!)
+          .reduce((a, b) => a < b ? a : b);
+      final maxY = lineGlyphs
+          .map((g) => g['max_y']!)
+          .reduce((a, b) => a > b ? a : b);
+
+      return Positioned(
+        left: minX * scale,
+        top: minY * scale,
+        width: (maxX - minX) * scale,
+        height: (maxY - minY) * scale,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.25),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+      );
+    }).toList();
   }
 }

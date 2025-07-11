@@ -24,7 +24,7 @@ class RustEngineService {
   RustEngineService._internal();
 
   /// Menginisialisasi engine Rust. Harus dipanggil sekali saat aplikasi dimulai.
-  void initEngine() {
+  Future<void> initEngine() async {
     rust_ffi.initEngine();
     debugPrint('Rust Engine initialized.');
   }
