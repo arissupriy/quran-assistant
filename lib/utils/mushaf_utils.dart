@@ -10,7 +10,7 @@ class MushafStatus {
   final String variant; // cth: 'width_1080'
   final String downloadUrl;
   final String archivePath; // Path untuk menyimpan file .tar.zst
-  final String outputPath;  // Path untuk folder hasil dekompresi
+  final String outputPath; // Path untuk folder hasil dekompresi
 
   MushafStatus({
     required this.isDownloaded,
@@ -25,11 +25,9 @@ class MushafUtils {
   /// Fungsi utama untuk mengecek status data mushaf berdasarkan lebar layar.
   /// Mengembalikan object [MushafStatus] yang berisi semua info yang dibutuhkan.
   static Future<MushafStatus> checkMushafStatus(double screenWidth) async {
-
     debugPrint("Checking Mushaf status for screen width: $screenWidth");
     // 1. Tentukan varian resolusi
     final String variant = _getMushafVariant(screenWidth);
-    
 
     // 2. Tentukan semua path yang relevan
     final docDir = await getApplicationDocumentsDirectory();
@@ -60,12 +58,10 @@ class MushafUtils {
   static String _getMushafVariant(double screenWidth) {
     if (screenWidth >= 1440) {
       return 'width_1440';
-    } else  {
+    } else {
       return 'width_1080';
-    } 
+    }
   }
-
-  
 
   /// Mengecek apakah mushaf pada direktori tertentu sudah diunduh.
   /// Cukup dengan memeriksa file pertama saja ('page001.png').

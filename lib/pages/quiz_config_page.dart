@@ -1,0 +1,270 @@
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import ini
+import 'package:quran_assistant/pages/quiz_play.dart';
+import 'package:quran_assistant/src/rust/api/quiz/quiz_fragment_completion.dart';
+import 'package:quran_assistant/src/rust/api/quiz/verse_completion.dart';
+import 'package:quran_assistant/src/rust/data_loader/quiz_models.dart';
+import 'package:quran_assistant/providers/quiz_provider.dart'; // Import providers Anda
+
+class QuizConfigPage extends ConsumerStatefulWidget {
+  final String selectedQuizType;
+
+  const QuizConfigPage({super.key, required this.selectedQuizType});
+
+  @override
+  ConsumerState<QuizConfigPage> createState() => _QuizConfigPageState();
+}
+
+class _QuizConfigPageState extends ConsumerState<QuizConfigPage> {
+  String selectedScopeType = 'all';
+  final surahIdController = TextEditingController(text: '1');
+  final juzStartController = TextEditingController(text: '1');
+  final juzEndController = TextEditingController(text: '1');
+  final questionCountController = TextEditingController(text: '5');
+
+  late QuizScope scope;
+  int questionCount = 5;
+
+  // --- TAMBAHAN BARU: State untuk Loading Indicator ---
+  bool _isLoading = false; 
+  // --- AKHIR TAMBAHAN BARU ---
+
+  @override
+  void initState() {
+    super.initState();
+    scope = const QuizScope.all(); // default
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(quizSessionControllerProvider).resetAllQuizState();
+    });
+  }
+
+  @override
+  void dispose() {
+    surahIdController.dispose();
+    juzStartController.dispose();
+    juzEndController.dispose();
+    questionCountController.dispose();
+    super.dispose();
+  }
+
+  void _onScopeChanged(String type) {
+    setState(() {
+      selectedScopeType = type;
+      switch (type) {
+        case 'surah':
+          final id = int.tryParse(surahIdController.text.trim()) ?? 1;
+          scope = QuizScope.bySurah(surahId: id);
+          break;
+        case 'juz':
+          final start = int.tryParse(juzStartController.text.trim()) ?? 1;
+          final end = int.tryParse(juzEndController.text.trim()) ?? start;
+
+          if (start < 1 || end < 1 || start > end || end > 30) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Rentang Juz tidak valid")),
+            );
+            return;
+          }
+
+          debugPrint('Start: $start, End: $end');
+          final juzList = <int>[];
+          for (int i = start; i <= end; i++) {
+            juzList.add(i);
+          }
+          
+          scope = QuizScope.byJuz(juzNumbers: Uint32List.fromList(juzList));
+          break;
+        default:
+          scope = const QuizScope.all();
+      }
+    });
+  }
+
+  void _startQuiz() async {
+    // --- TAMBAHAN BARU: Set isLoading menjadi true saat memulai ---
+    setState(() {
+      _isLoading = true;
+    });
+    // --- AKHIR TAMBAHAN BARU ---
+
+    final count = int.tryParse(questionCountController.text.trim()) ?? 5;
+    questionCount = count;
+
+    debugPrint("🟦 Memulai _startQuiz");
+    debugPrint("🟦 selectedScopeType: $selectedScopeType");
+    debugPrint("🟦 scope.runtimeType: ${scope.runtimeType}");
+    debugPrint("🟦 scope.toString(): $scope");
+    debugPrint("🟦 Jumlah soal yang diminta: $count");
+
+    final filter = QuizFilter(scope: scope, questionCount: count);
+
+    QuizQuestions result;
+
+    debugPrint("🟦 Filter terkirim ke Rust: $filter");
+
+    try {
+      switch (widget.selectedQuizType) {
+        case 'fragment_completion':
+          debugPrint("🟩 Menjalankan generateVerseFragmentQuizBatch...");
+          result = await generateVerseFragmentQuizBatch(filter: filter);
+          break;
+        default:
+          debugPrint("🟩 Menjalankan generateVerseCompletionQuizBatch...");
+          result = await generateVerseCompletionQuizBatch(filter: filter);
+          break;
+      }
+
+      debugPrint("🟩 Fungsi Rust selesai dipanggil.");
+
+      if (!mounted) {
+        debugPrint("🟨 Widget tidak lagi mounted, abort.");
+        return;
+      }
+
+      debugPrint("🟩 Jumlah soal yang dihasilkan: ${result.questions.length}");
+
+      if (result.questions.isEmpty) {
+        debugPrint("🟥 Tidak ada soal berhasil dihasilkan.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tidak ada soal berhasil dihasilkan.')),
+        );
+        return; // Jangan lupa return jika tidak ada soal
+      }
+
+      ref.read(quizSessionControllerProvider).startNewQuizSession(
+        questions: result.questions,
+        quizType: widget.selectedQuizType,
+        scope: scope,
+        requestedQuestionCount: count,
+        actualQuestionCount: result.questions.length,
+      );
+
+      debugPrint("✅ Navigasi ke QuizPlay dimulai...");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const QuizPlay(),
+        ),
+      ).then((_) {
+        debugPrint("🟪 QuizPlay ditutup, mengakhiri sesi kuis.");
+        ref.read(quizSessionControllerProvider).endQuizSession();
+      });
+    } catch (e, stacktrace) {
+      debugPrint('🟥 Error generating quiz: $e');
+      debugPrint('🟥 Stacktrace: $stacktrace');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal menghasilkan kuis: $e')));
+    } finally {
+      // --- TAMBAHAN BARU: Set isLoading menjadi false di blok finally ---
+      // Ini akan selalu dijalankan, baik sukses maupun ada error.
+      if (mounted) { // Pastikan widget masih ada sebelum setState
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      // --- AKHIR TAMBAHAN BARU ---
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Konfigurasi Kuis'), centerTitle: true),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text(
+            'Cakupan Soal',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: selectedScopeType,
+            items: const [
+              DropdownMenuItem(value: 'all', child: Text('Semua Ayat')),
+              DropdownMenuItem(value: 'juz', child: Text('Berdasarkan Juz')),
+              DropdownMenuItem(
+                value: 'surah',
+                child: Text('Berdasarkan Surah'),
+              ),
+            ],
+            onChanged: (val) => _onScopeChanged(val ?? 'all'),
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Pilih Cakupan',
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (selectedScopeType == 'surah') ...[
+            TextField(
+              controller: surahIdController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'ID Surah (1-114)',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (_) => _onScopeChanged('surah'),
+            ),
+            const SizedBox(height: 16),
+          ],
+          if (selectedScopeType == 'juz') ...[
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: juzStartController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Juz Awal',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => _onScopeChanged('juz'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: juzEndController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Juz Akhir',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => _onScopeChanged('juz'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+          TextField(
+            controller: questionCountController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Jumlah Soal',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: _isLoading // --- TAMBAHAN BARU: Tampilkan CircularProgressIndicator jika loading ---
+                ? const CircularProgressIndicator(color: Colors.white) 
+                : const Text('Mulai Kuis'),
+            // --- AKHIR TAMBAHAN BARU ---
+            // --- TAMBAHAN BARU: Nonaktifkan tombol jika sedang loading ---
+            onPressed: _isLoading ? null : _startQuiz, 
+            // --- AKHIR TAMBAHAN BARU ---
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

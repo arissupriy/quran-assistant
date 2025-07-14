@@ -42,7 +42,16 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   shared_preferences: ^2.5.3
+  rust_lib_quran_assistant:
+    path: rust_builder
+  flutter_rust_bridge: 2.11.1
+  super_context_menu: ^0.9.1
+  freezed_annotation: ^2.4.1 # <--- TAMBAHKAN BARIS INI (gunakan versi terbaru yang stabil)
+  uuid: ^4.4.2
+  # isar: ^3.1.0+1
+  hive_flutter: ^1.1.0
   
+
 
 dev_dependencies:
   flutter_test:
@@ -54,8 +63,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  build_runner: ^2.5.4
-  riverpod_generator: ^2.6.5
+  build_runner: ^2.4.6 # Atau versi yang direkomendasikan oleh Isar/FRB
+  # isar_generator: ^3.1.0+1
+  # riverpod_generator: ^2.6.4
+  hive_generator: ^2.0.1
+  integration_test:
+    sdk: flutter
+  freezed: ^2.4.5  
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -78,7 +93,8 @@ flutter:
 
 
   assets:
-    - assets/glyphs_json/
+    - assets/quran_assets/
+    - assets/quran_assets/verse-by-chapter/
   fonts:
     - family: UthmaniHafs
       fonts:

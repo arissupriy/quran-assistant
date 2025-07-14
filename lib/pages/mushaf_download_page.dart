@@ -2,14 +2,12 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:quran_assistant/core/api/ffi.dart';
-import 'package:quran_assistant/pages/quran_detail_page.dart';
-import 'package:quran_assistant/utils/mushaf_utils.dart';
+import 'package:quran_assistant/pages/mushaf_detail_page.dart';
 import 'package:quran_assistant/providers/download_progress_provider.dart';
+import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MushafDownloadPage extends ConsumerStatefulWidget {
@@ -24,61 +22,53 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAndProcessMushaf());
+    // debugPrint('MushafDownloadPage initialized with initialPage: ${widget.initialPage}');
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAndDownloadIfNeeded());
   }
 
-  // Method untuk memulai ulang proses unduhan dari awal
   void _retryDownload() {
-    ref.read(downloadProgressProvider.notifier).reset(); // Reset state Riverpod
-    _checkAndProcessMushaf(); // Mulai ulang proses
+    ref.read(downloadProgressProvider.notifier).reset();
+    _checkAndDownloadIfNeeded();
   }
 
-  Future<void> _checkAndProcessMushaf() async {
+  Future<void> _checkAndDownloadIfNeeded() async {
     final notifier = ref.read(downloadProgressProvider.notifier);
     notifier.setChecking();
 
     try {
-      final status = await MushafUtils.checkMushafStatus(
-        MediaQuery.of(context).size.width,
-      );
+      final resolution = getMushafResolutionSuffix(context);
+      final mushafDir = await getApplicationSupportDirectory();
+      final mushafPath = '${mushafDir.path}/data.mushafpack';
+      final mushafFile = File(mushafPath);
 
-      if (status.isDownloaded) {
+      final url = await getMushafDownloadUrl(resolution);
+
+      if (mushafFile.existsSync()) {
         notifier.setCompleted();
-        await Future.delayed(const Duration(milliseconds: 800));
-        _navigateToQuran(status.variant, widget.initialPage);
+        await Future.delayed(const Duration(milliseconds: 500));
+        _navigateToMushaf();
       } else {
-        await _startDownloadAndDecompress(
-          url: status.downloadUrl,
-          savePath: status.archivePath,
-          outputDir: status.outputPath,
-        );
+        await _downloadMushaf(url, mushafPath);
       }
     } catch (e) {
-      debugPrint("Terjadi error saat check status: $e");
-      notifier.setError('Gagal memeriksa data: ${e.toString()}'); // Pastikan error message diubah ke String
+      notifier.setError('Terjadi kesalahan: ${e.toString()}');
     }
   }
 
-  Future<void> _startDownloadAndDecompress({
-    required String url,
-    required String savePath,
-    required String outputDir,
-  }) async {
+  Future<void> _downloadMushaf(String url, String savePath) async {
     final notifier = ref.read(downloadProgressProvider.notifier);
 
     try {
       notifier.setDownloading(0.0);
       final dio = Dio();
+
       await dio.download(
         url,
         savePath,
         onReceiveProgress: (received, total) {
-          if (mounted) {
-            if (total != -1) {
-              notifier.setDownloading(received / total);
-            } else {
-              notifier.setDownloading(0.0);
-            }
+          if (total > 0) {
+            final progress = received / total;
+            notifier.setDownloading(progress);
           }
         },
         options: Options(
@@ -88,36 +78,23 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
         ),
       );
 
-      notifier.setDecompressing();
-      debugPrint("Download selesai. Memulai dekompresi...");
-      await compute(_decompressInIsolate, {'input': savePath, 'output': outputDir});
-      debugPrint("Dekompresi selesai.");
-
-      await File(savePath).delete();
-
-      if (mounted) {
-        notifier.setCompleted();
-        await Future.delayed(const Duration(milliseconds: 800));
-        _navigateToQuran(outputDir.split('/').last, widget.initialPage);
-      }
+      notifier.setCompleted();
+      await Future.delayed(const Duration(milliseconds: 500));
+      _navigateToMushaf();
     } catch (e) {
-      debugPrint("Terjadi error: $e");
-      if (mounted) {
-        notifier.setError('Gagal mengunduh atau mengekstrak data: ${e.toString()}'); // Pastikan error message diubah ke String
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mempersiapkan data: ${e.toString()}')),
-        );
-      }
+      notifier.setError('Download gagal: ${e.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengunduh mushaf: $e')),
+      );
     }
   }
 
-  void _navigateToQuran(String resolution, int? targetPage) {
+  void _navigateToMushaf() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => QuranPerPage(
-          resolution: resolution,
-          initialPage: targetPage,
+        builder: (_) => MushafDetailPage(
+          pageNumber: widget.initialPage ?? 1,
         ),
       ),
     );
@@ -125,7 +102,7 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
 
   @override
   Widget build(BuildContext context) {
-    final downloadState = ref.watch(downloadProgressProvider);
+    final state = ref.watch(downloadProgressProvider);
 
     return Scaffold(
       backgroundColor: Colors.teal[50],
@@ -135,7 +112,6 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'Mempersiapkan Mushaf Digital',
@@ -147,32 +123,21 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-
-                _buildStatusIndicator(downloadState),
-
+                _buildStatusIndicator(state),
                 const SizedBox(height: 30),
-
                 Text(
-                  downloadState.message.isNotEmpty
-                      ? downloadState.message
-                      : (downloadState.status == DownloadStatus.initial
-                          ? "Memulai proses..."
-                          : "Memeriksa data mushaf..."), // Pesan default yang lebih jelas
-                  style: GoogleFonts.roboto(
-                    fontSize: 18,
-                    color: Colors.teal[700],
-                  ),
+                  state.message.isNotEmpty
+                      ? state.message
+                      : 'Memeriksa data mushaf...',
+                  style: GoogleFonts.roboto(fontSize: 18, color: Colors.teal[700]),
                   textAlign: TextAlign.center,
                 ),
-
                 const SizedBox(height: 20),
-
-                if (downloadState.status == DownloadStatus.downloading ||
-                    downloadState.status == DownloadStatus.decompressing)
+                if (state.status == DownloadStatus.downloading)
                   Column(
                     children: [
                       LinearProgressIndicator(
-                        value: downloadState.progress,
+                        value: state.progress,
                         backgroundColor: Colors.teal[100],
                         valueColor: const AlwaysStoppedAnimation<Color>(Colors.teal),
                         minHeight: 8,
@@ -180,9 +145,7 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        downloadState.progress != null
-                            ? '${(downloadState.progress! * 100).toStringAsFixed(1)}%'
-                            : 'Mohon tunggu...',
+                        '${(state.progress! * 100).toStringAsFixed(1)}%',
                         style: GoogleFonts.roboto(
                           fontSize: 16,
                           color: Colors.teal[600],
@@ -190,31 +153,15 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
                       ),
                     ],
                   ),
-                
-                if (downloadState.errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Text(
-                      downloadState.errorMessage!,
-                      style: GoogleFonts.roboto(
-                        color: Colors.red[700],
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                // Tombol "Download Ulang" jika terjadi error
-                if (downloadState.status == DownloadStatus.error)
+                if (state.status == DownloadStatus.error)
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
                     child: ElevatedButton.icon(
-                      onPressed: _retryDownload, // Panggil fungsi retry
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Download Ulang'),
+                      onPressed: _retryDownload,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Coba Lagi'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red, // Warna tombol merah untuk error
+                        backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -234,47 +181,16 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
 
   Widget _buildStatusIndicator(DownloadProgressState state) {
     switch (state.status) {
-      case DownloadStatus.initial:
       case DownloadStatus.checking:
-        return Column(
-          children: [
-            CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.teal)),
-            const SizedBox(height: 10),
-            Text('Memeriksa...', style: GoogleFonts.roboto(color: Colors.teal[600])),
-          ],
-        );
-      case DownloadStatus.downloading:
-        return Icon(
-          Icons.cloud_download_rounded,
-          size: 80,
-          color: Colors.teal,
-        );
-      case DownloadStatus.decompressing:
-        return Icon(
-          Icons.archive_rounded,
-          size: 80,
-          color: Colors.teal,
-        );
-      case DownloadStatus.completed:
-        return Icon(
-          Icons.check_circle_rounded,
-          size: 80,
-          color: Colors.green,
-        );
-      case DownloadStatus.error:
-        return Icon(
-          Icons.error_outline_rounded,
-          size: 80,
-          color: Colors.red,
-        );
-      default:
         return const CircularProgressIndicator();
+      case DownloadStatus.downloading:
+        return const Icon(Icons.cloud_download_rounded, size: 80, color: Colors.teal);
+      case DownloadStatus.completed:
+        return const Icon(Icons.check_circle_rounded, size: 80, color: Colors.green);
+      case DownloadStatus.error:
+        return const Icon(Icons.error_outline_rounded, size: 80, color: Colors.red);
+      default:
+        return const SizedBox.shrink();
     }
   }
-}
-
-Future<void> _decompressInIsolate(Map<String, String> paths) async {
-  final inputPath = paths['input']!;
-  final outputPath = paths['output']!;
-  decompressFile(inputPath, outputPath);
 }

@@ -1,6 +1,5 @@
 // lib/splash_loader.dart
 import 'package:flutter/material.dart';
-import 'package:quran_assistant/core/api/rust_engine_service.dart';
 import 'package:quran_assistant/main_screen.dart';
 import 'package:quran_assistant/utils/glyph_cache_utils.dart';
 
@@ -11,7 +10,8 @@ class SplashLoader extends StatefulWidget {
   State<SplashLoader> createState() => _SplashLoaderState();
 }
 
-class _SplashLoaderState extends State<SplashLoader> with SingleTickerProviderStateMixin {
+class _SplashLoaderState extends State<SplashLoader>
+    with SingleTickerProviderStateMixin {
   bool _isReady = false;
   late AnimationController _controller;
 
@@ -26,12 +26,12 @@ class _SplashLoaderState extends State<SplashLoader> with SingleTickerProviderSt
   }
 
   Future<void> _initApp() async {
-    await RustEngineService().initEngine();
+    // await RustEngineService().initEngine();
 
-    final glyphCache = GlyphCache();
-    await glyphCache.preloadAllGlyphs();
+    // final glyphCache = GlyphCache();
+    // await glyphCache.preloadAllGlyphs();
 
-    if (!mounted) return;
+    // if (!mounted) return;
     setState(() => _isReady = true);
   }
 
@@ -64,7 +64,11 @@ class _SplashLoaderState extends State<SplashLoader> with SingleTickerProviderSt
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // 🌙 Logo atau Icon
-              const Icon(Icons.menu_book_rounded, size: 80, color: Colors.white),
+              const Icon(
+                Icons.menu_book_rounded,
+                size: 80,
+                color: Colors.white,
+              ),
               const SizedBox(height: 20),
 
               // 🕊️ Judul
@@ -86,7 +90,11 @@ class _SplashLoaderState extends State<SplashLoader> with SingleTickerProviderSt
                 builder: (_, __) {
                   return Transform.rotate(
                     angle: _controller.value * 6.3,
-                    child: const Icon(Icons.sync_rounded, color: Colors.white70, size: 32),
+                    child: const Icon(
+                      Icons.sync_rounded,
+                      color: Colors.white70,
+                      size: 32,
+                    ),
                   );
                 },
               ),

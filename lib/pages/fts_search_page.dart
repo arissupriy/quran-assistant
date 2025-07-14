@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // <-- Gunakan flutter_riverpod
 
-import 'package:quran_assistant/core/models/fts_search_model.dart'; // Model hasil pencarian Anda
-import 'package:quran_assistant/providers/fts_search_provider.dart'; // Provider pencarian Anda
+import 'package:quran_assistant/core/models/fts_search_model.dart_'; // Model hasil pencarian Anda
+import 'package:quran_assistant/providers/fts_search_provider.dart';
+import 'package:quran_assistant/src/rust/data_loader/search_models.dart'; // Provider pencarian Anda
 
 class FtsSearchPage extends ConsumerStatefulWidget {
   // <-- Ganti menjadi ConsumerStatefulWidget
@@ -155,7 +156,7 @@ class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
   }
 
   // Helper untuk me-render kata-kata ayat dengan penyorotan
-  Widget _buildVerseWords(List<FtsWordResult> words, FtsSearchState state) {
+  Widget _buildVerseWords(List<WordResult> words, FtsSearchState state) {
     return Wrap(
       spacing: 4.0,
       runSpacing: 4.0,

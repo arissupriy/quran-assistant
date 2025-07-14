@@ -1,19 +1,10 @@
-// lib/main_screen.dart
-import 'dart:ui'; // Import untuk ImageFilter
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:quran_assistant/pages/fts_search_page.dart';
-// Jika masih menggunakan Riverpod
-// Untuk GoogleFonts
-
-// Impor halaman-halaman yang sudah dibuat
 import 'package:quran_assistant/pages/home_page.dart';
 import 'package:quran_assistant/pages/quiz_page.dart';
 import 'package:quran_assistant/pages/more_page.dart';
-import 'package:quran_assistant/pages/quran_page.dart'; // Pastikan QuranPage sudah diimplementasikan
-// import 'package:quran_assistant/pages/quran_page.dart';
-
-// Asumsi RustEngineService dan model sudah diinisialisasi dan diimpor di main.dart
-// import 'package:quran_assistant/core/api/rust_engine_service.dart';
+import 'package:quran_assistant/pages/quran_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -23,15 +14,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0; // Indeks halaman yang aktif
+  int _selectedIndex = 0;
 
-  // Daftar halaman yang akan ditampilkan
-  static const List<Widget> _pages = <Widget>[
-    HomePage(),
-    FtsSearchPage(),
-    QuranPage(), // Pastikan QuranPage sudah diimplementasikan
-    QuizPage(),
-    MorePage(),
+  final List<Widget> _pages = [
+    const HomePage(),
+    const FtsSearchPage(),
+    const QuranPage(),
+    const QuizPage(),
+    const MorePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -46,44 +36,51 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text('Quran Assistant'),
         centerTitle: true,
+        elevation: 0,
       ),
-      body: _pages[_selectedIndex], // Menampilkan halaman yang dipilih
-
-      // Implementasi BottomNavigationBar dengan Frosted Glass
-      bottomNavigationBar: ClipRRect( // ClipRRect untuk sudut membulat jika diinginkan
+      body: SafeArea(child: _pages[_selectedIndex]),
+      bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Efek blur
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5), // Warna dasar transparan untuk efek
+              color: Colors.white.withOpacity(0.6),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               border: Border(
-                top: BorderSide(color: Colors.white.withOpacity(0.3), width: 0.5), // Border atas tipis
+                top: BorderSide(color: Colors.white.withOpacity(0.3), width: 0.5),
               ),
             ),
             child: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              selectedItemColor: Theme.of(context).colorScheme.primary,
+              unselectedItemColor: Colors.black54,
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+              items: const [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.home_rounded), // Rekomendasi ikon
+                  icon: Icon(Icons.home_rounded),
                   label: 'Beranda',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.search_rounded), // Rekomendasi ikon
+                  icon: Icon(Icons.search_rounded),
                   label: 'Pencarian',
                 ),
-                BottomNavigationBarItem(icon: Icon(Icons.book_rounded), label: 'Quran'),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.lightbulb_outline_rounded), // Rekomendasi ikon
+                  icon: Icon(Icons.book_rounded),
+                  label: 'Quran',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.lightbulb_outline_rounded),
                   label: 'Kuis',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.menu_rounded), // Rekomendasi ikon (hamburger icon)
+                  icon: Icon(Icons.menu_rounded),
                   label: 'Lainnya',
                 ),
               ],
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
             ),
           ),
         ),

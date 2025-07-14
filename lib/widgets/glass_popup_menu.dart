@@ -17,9 +17,7 @@ class GlassPopupMenu extends StatelessWidget {
       children: [
         // Tap luar area popup untuk menutup
         Positioned.fill(
-          child: GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-          ),
+          child: GestureDetector(onTap: () => Navigator.of(context).pop()),
         ),
         Positioned(
           left: position.dx,
@@ -36,10 +34,7 @@ class GlassPopupMenu extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: items,
-                ),
+                child: Column(mainAxisSize: MainAxisSize.min, children: items),
               ),
             ),
           ),

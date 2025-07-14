@@ -26,7 +26,9 @@ class GlyphCache {
     for (int i = 1; i <= 604; i++) {
       final pageStr = i.toString().padLeft(3, '0');
       try {
-        final jsonStr = await rootBundle.loadString('assets/glyphs_json/page_$pageStr.json');
+        final jsonStr = await rootBundle.loadString(
+          'assets/glyphs_json/page_$pageStr.json',
+        );
         final parsed = json.decode(jsonStr);
         _cache[i] = parsed;
       } catch (e) {
@@ -36,7 +38,10 @@ class GlyphCache {
     }
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_cacheKey, true); // Simpan status siap ke SharedPreferences
+    await prefs.setBool(
+      _cacheKey,
+      true,
+    ); // Simpan status siap ke SharedPreferences
     isReady = true;
   }
 

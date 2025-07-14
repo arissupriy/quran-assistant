@@ -1,23 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quran_assistant/pages/mushaf_detail_page.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/quran_provider.dart';
-import 'package:quran_assistant/pages/quran_detail_page.dart';
-import 'package:quran_assistant/utils/mushaf_utils.dart'; // <-- IMPOR HALAMAN DETAIL
+import 'package:quran_assistant/src/rust/data_loader/juzs.dart';
+import 'package:quran_assistant/utils/quran_utils.dart';
 
 class QuranPage extends ConsumerWidget {
   const QuranPage({super.key});
 
-  int _getStartPageForJuz(int juzNumber) {
-    // ... (kode yang sudah ada) ...
-    const juzStartPages = [
-      1, 22, 42, 62, 82, 102, 121, 142, 162, 182, 201, 222, 242, 262, 282, 302,
-      322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582,
-    ];
-    if (juzNumber > 0 && juzNumber <= juzStartPages.length) {
-      return juzStartPages[juzNumber - 1];
+  Future<void> _handleJuzTap(BuildContext context, int startPage) async {
+    final file = await getMushafDownloadedFile('data.mushafpack');
+
+    if (file == null || !await file.exists()) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MushafDownloadPage(initialPage: startPage),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MushafDetailPage(pageNumber: startPage),
+        ),
+      );
     }
-    return 1;
   }
 
   @override
@@ -25,18 +34,27 @@ class QuranPage extends ConsumerWidget {
     final juzListAsync = ref.watch(juzListProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Daftar Juz'),
+        backgroundColor: Colors.teal.shade700,
+      ),
       body: juzListAsync.when(
         data: (juzList) {
           return ListView.builder(
             itemCount: juzList.length,
             itemBuilder: (context, index) {
-              final juz = juzList[index];
-              final firstSurah = juz.verseMapping.mapping.keys.first;
-              final verseRange = juz.verseMapping.mapping.values.first;
+              final JuzWithPage item = juzList[index];
+              final Juz juz = item.juz;
+              final startPage = item.pageNumber;
+
+              final verseRange = juz.verseMapping.entries.first.value;
+              final surahKey = juz.verseMapping.entries.first.key;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                elevation: 2,
                 child: ListTile(
+                  onTap: () => _handleJuzTap(context, startPage),
                   leading: CircleAvatar(
                     backgroundColor: Colors.teal.withOpacity(0.1),
                     child: Text(
@@ -52,51 +70,17 @@ class QuranPage extends ConsumerWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    'Dimulai dari Surah $firstSurah ayat $verseRange\nTotal: ${juz.versesCount} ayat',
+                    'Dimulai dari Surah $surahKey ayat $verseRange\nTotal: ${juz.versesCount} ayat',
+                    style: const TextStyle(fontSize: 12),
                   ),
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () async { // Tambahkan 'async' di sini
-                    final startPage = _getStartPageForJuz(juz.juzNumber);
-                    
-                    // 1. Dapatkan status Mushaf berdasarkan lebar layar saat ini
-                    final mushafStatus = await MushafUtils.checkMushafStatus(
-                      MediaQuery.of(context).size.width,
-                    );
-
-                    if (mushafStatus.isDownloaded) {
-                      // 2. Jika sudah diunduh, langsung navigasi ke QuranPerPage
-                      // CATATAN: QuranPerPage dan QuranPageViewer perlu dimodifikasi
-                      // untuk menerima initialPage.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QuranPerPage(
-                            resolution: mushafStatus.variant,
-                            initialPage: startPage, // Parameter BARU
-                          ),
-                        ),
-                      );
-                    } else {
-                      // 3. Jika belum diunduh, navigasi ke MushafDownloadPage
-                      // CATATAN: MushafDownloadPage perlu dimodifikasi untuk menerima initialPage.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MushafDownloadPage(
-                            initialPage: startPage, // Parameter BARU
-                          ),
-                        ),
-                      );
-                    }
-                  },
                 ),
               );
             },
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) =>
-            Center(child: Text('Gagal memuat data: $error')),
+        error: (error, _) => Center(child: Text('Gagal memuat data: $error')),
       ),
     );
   }

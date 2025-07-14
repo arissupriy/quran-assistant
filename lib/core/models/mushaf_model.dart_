@@ -1,0 +1,191 @@
+// lib/core/models/mushaf_model.dart
+
+// Representasi data kata di konteks PageLayout (WordData di Rust)
+class MushafWordData {
+  final int id;
+  final int pageNumber;
+  final int lineNumber;
+  final int position;
+  final String verseKey;
+  final String charType;
+  final String textUthmani;
+  final String? textIndopak;
+  final int? rubElHizb;
+  final String location;
+
+  MushafWordData({
+    required this.id,
+    required this.pageNumber,
+    required this.lineNumber,
+    required this.position,
+    required this.verseKey,
+    required this.charType,
+    required this.textUthmani,
+    this.textIndopak,
+    this.rubElHizb,
+    required this.location,
+  });
+
+  // --- PERBAIKAN UTAMA ADA DI SINI ---
+  factory MushafWordData.fromJson(Map<String, dynamic> json) {
+    return MushafWordData(
+      // Gunakan camelCase sesuai dengan JSON yang diterima dari Rust
+      id: json['id'] ?? 0,
+      pageNumber: json['pageNumber'] ?? 0,
+      lineNumber: json['lineNumber'] ?? 0,
+      position: json['position'] ?? 0,
+      verseKey: json['verseKey'] ?? '',
+      charType: json['charType'] ?? '',
+      textUthmani: json['textUthmani'] ?? '',
+      textIndopak: json['textIndopak'], // camelCase
+      rubElHizb: json['rubElHizb'], // camelCase
+      location: json['location'] ?? '',
+    );
+  }
+}
+
+// --- Model: Line (Abstract Base Class & Implementations) ---
+abstract class Line {
+  final String type;
+  final int lineNumber;
+
+  Line({required this.type, required this.lineNumber});
+
+  factory Line.fromJson(Map<String, dynamic> json) {
+    final String type = json['type'] as String;
+    final int lineNumber = json['lineNumber'] as int;
+
+    switch (type) {
+      case 'surah_name':
+        return SurahNameLine(
+          lineNumber: lineNumber,
+          chapterId: json['chapterId'] as int,
+        );
+      case 'basmallah':
+        return BasmallahLine(
+          lineNumber: lineNumber,
+          words:
+              (json['words'] as List<dynamic>?)
+                  ?.map(
+                    (e) => MushafWordData.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList() ??
+              [],
+        );
+      case 'ayah':
+        return AyahLine(
+          lineNumber: lineNumber,
+          words:
+              (json['words'] as List<dynamic>?)
+                  ?.map(
+                    (e) => MushafWordData.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList() ??
+              [],
+        );
+      default:
+        throw ArgumentError('Unknown line type: $type');
+    }
+  }
+
+  Map<String, dynamic> toJson();
+}
+
+class SurahNameLine extends Line {
+  final int chapterId;
+
+  SurahNameLine({required super.lineNumber, required this.chapterId})
+    : super(type: 'surah_name');
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {'type': type, 'lineNumber': lineNumber, 'chapterId': chapterId};
+  }
+}
+
+class BasmallahLine extends Line {
+  final List<MushafWordData> words;
+
+  BasmallahLine({required super.lineNumber, this.words = const []})
+    : super(type: 'basmallah');
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'lineNumber': lineNumber,
+      'words': words.map((w) => w).toList(),
+    };
+  }
+}
+
+class AyahLine extends Line {
+  final List<MushafWordData> words;
+
+  AyahLine({required super.lineNumber, this.words = const []})
+    : super(type: 'ayah');
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'lineNumber': lineNumber,
+      'words': words.map((w) => w).toList(),
+    };
+  }
+}
+
+// --- Model: PageLayout ---
+class PageLayout {
+  final int page;
+  final bool isCentered;
+  final List<Line> lines;
+
+  PageLayout({
+    required this.page,
+    required this.isCentered,
+    required this.lines,
+  });
+
+  factory PageLayout.fromJson(Map<String, dynamic> json) {
+    return PageLayout(
+      page: json['page'] as int,
+      isCentered: json['is_centered'] as bool,
+      lines: (json['lines'] as List<dynamic>)
+          .map((e) => Line.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'page': page,
+      'is_centered': isCentered,
+      'lines': lines.map((l) => l.toJson()).toList(),
+    };
+  }
+}
+
+// --- Model: PageLayouts (Optional Wrapper for Map) ---
+// Jika JSON top-level Anda langsung berupa Map (misal: {"1": {...}, "2": {...}}),
+// Anda tidak perlu kelas ini dan bisa langsung mendeserialisasi ke Map<String, PageLayout>.
+// Kelas ini hanya diperlukan jika ada object root yang membungkus map tersebut.
+class PageLayouts {
+  final Map<String, PageLayout> map;
+
+  PageLayouts({required this.map});
+
+  factory PageLayouts.fromJson(Map<String, dynamic> json) {
+    final Map<String, PageLayout> parsedMap = {};
+    json.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        parsedMap[key] = PageLayout.fromJson(value);
+      }
+    });
+    return PageLayouts(map: parsedMap);
+  }
+
+  Map<String, dynamic> toJson() {
+    return map.map((key, value) => MapEntry(key, value.toJson()));
+  }
+}
