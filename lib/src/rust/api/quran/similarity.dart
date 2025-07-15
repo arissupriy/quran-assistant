@@ -11,3 +11,8 @@ Future<List<MatchedAyah>> getSimilarAyahs({required String verseKey}) => RustLib
     .instance
     .api
     .crateApiQuranSimilarityGetSimilarAyahs(verseKey: verseKey);
+
+Future<List<MatchedAyah>> getSimilarAyahsInverted({required String verseKey}) =>
+    RustLib.instance.api.crateApiQuranSimilarityGetSimilarAyahsInverted(
+      verseKey: verseKey,
+    );

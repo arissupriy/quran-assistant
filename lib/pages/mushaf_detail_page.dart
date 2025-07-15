@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,7 @@ import 'package:quran_assistant/src/rust/data_loader/mushaf_page_info.dart';
 import 'package:quran_assistant/src/rust/data_loader/verse_by_chapter.dart';
 import 'package:quran_assistant/src/rust/models.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
+import 'package:quran_assistant/widgets/ayah_context_menu.dart';
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
 import 'package:super_context_menu/super_context_menu.dart';
 
@@ -232,7 +234,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                       currentPageInfo.nextPageRouteText,
                                       style: const TextStyle(
                                         fontSize: 16,
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                     ),
                                     Container(
@@ -240,16 +242,16 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                      // decoration: BoxDecoration(
+                                      //   color: Theme.of(context).primaryColor,
+                                      //   borderRadius: BorderRadius.circular(20),
+                                      // ),
                                       child: Text(
                                         '${currentPageInfo.pageNumber}',
                                         style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -267,7 +269,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                           opacity: isAppBarVisible ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
                           child: AppBar(
-                            title: const Text('Mushaf Madani'),
+                            title: const Text('Quran Assistant'),
                             centerTitle: true,
                             backgroundColor:
                                 Theme.of(context).appBarTheme.backgroundColor ??
@@ -280,7 +282,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                 padding: const EdgeInsets.only(right: 16.0),
                                 child: Center(
                                   child: Text(
-                                    'Halaman $_currentPageNumber / 604',
+                                    '$_currentPageNumber / 604',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -369,20 +371,34 @@ class MushafPageDisplay extends ConsumerWidget {
                   // isAppBarVisible: isAppBarVisible,
                   pageInfo: pageInfo,
                   topOffset: topOffset,
-                  onTap: (sura, ayah) {
+                  onTap: (info) {
                     final notifier = ref.read(
                       highlightedAyahProvider(pageNumber).notifier,
                     );
-                    final tapped = (sura: sura, ayah: ayah);
-                    notifier.state = notifier.state == tapped ? null : tapped;
 
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (ctx) => VerseDetailBottomSheet(
-                        verseKey: "${tapped.sura}:${tapped.ayah}",
-                      ),
-                    );
+                    final tapped = (sura: info.sura, ayah: info.ayah);
+                    final isSame = notifier.state == tapped;
+
+                    notifier.state = isSame ? null : tapped;
+
+                    if (!isSame) {
+                      showAyahContextMenuOverlay(
+                        context: context,
+                        position: info.globalPosition,
+                        sura: info.sura,
+                        ayah: info.ayah,
+                        onDismiss: () {
+                          ref
+                                  .read(
+                                    highlightedAyahProvider(
+                                      pageNumber,
+                                    ).notifier,
+                                  )
+                                  .state =
+                              null;
+                        },
+                      );
+                    }
                   },
                 );
               },
@@ -393,9 +409,35 @@ class MushafPageDisplay extends ConsumerWidget {
     );
   }
 
+  Offset calculateGlyphGlobalPosition({
+    required BuildContext context,
+    required GlyphPosition glyph,
+    required double scale,
+    required double offsetX,
+    required double offsetY,
+  }) {
+    final left = glyph.minX * scale + offsetX;
+    final top = glyph.minY * scale + offsetY;
+
+    final box = context.findRenderObject() as RenderBox;
+    return box.localToGlobal(Offset(left, top));
+  }
+
   Widget _loading() => const Center(child: CircularProgressIndicator());
 
   Widget _error(String msg) => Center(child: Text(msg));
+}
+
+class AyahTapInfo {
+  final int sura;
+  final int ayah;
+  final Offset globalPosition;
+
+  AyahTapInfo({
+    required this.sura,
+    required this.ayah,
+    required this.globalPosition,
+  });
 }
 
 class _MushafPageContent extends ConsumerWidget {
@@ -404,7 +446,7 @@ class _MushafPageContent extends ConsumerWidget {
   final ({int sura, int ayah})? highlighted;
   final MushafPageInfo pageInfo;
   final double topOffset;
-  final void Function(int sura, int ayah) onTap;
+  final void Function(AyahTapInfo info) onTap;
 
   const _MushafPageContent({
     super.key,
@@ -481,6 +523,8 @@ class _MushafPageContent extends ConsumerWidget {
           }
         }
 
+        // final List<Widget> contextMenuGlyphWidgets = [];
+
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () {
@@ -507,26 +551,30 @@ class _MushafPageContent extends ConsumerWidget {
               });
             }
           },
-          onTapDown: (details) {
-            if (ref.read(appBarVisibilityProvider)) {
-              final localPos = details.localPosition;
-              final dx = localPos.dx;
-              final dy = localPos.dy;
-              debugPrint("📍 Tap at: x=$dx, y=$dy");
+          onLongPressStart: (details) {
+            final localPos = details.localPosition;
+            final dx = localPos.dx;
+            final dy = localPos.dy;
+            // debugPrint("📍 Tap at: x=$dx, y=$dy");
 
-              for (final g in glyphs) {
-                final left = g.minX * uniformScale + imageOffsetX;
-                final right = g.maxX * uniformScale + imageOffsetX;
-                final top = g.minY * uniformScale + totalContentOffsetY;
-                final bottom = g.maxY * uniformScale + totalContentOffsetY;
+            for (final g in glyphs) {
+              final left = g.minX * uniformScale + imageOffsetX;
+              final right = g.maxX * uniformScale + imageOffsetX;
+              final top = g.minY * uniformScale + totalContentOffsetY;
+              final bottom = g.maxY * uniformScale + totalContentOffsetY;
 
-                if (dx >= left && dx <= right && dy >= top && dy <= bottom) {
-                  debugPrint(
-                    "🌟 MATCH: ${g.sura}:${g.ayah} (line ${g.lineNumber})",
-                  );
-                  onTap(g.sura, g.ayah);
-                  break;
-                }
+              if (dx >= left && dx <= right && dy >= top && dy <= bottom) {
+                // debugPrint(
+                //   "🌟 MATCH: ${g.sura}:${g.ayah} (line ${g.lineNumber})",
+                // );
+                onTap(
+                  AyahTapInfo(
+                    sura: g.sura,
+                    ayah: g.ayah,
+                    globalPosition: details.globalPosition,
+                  ),
+                );
+                break;
               }
             }
           },
@@ -539,6 +587,23 @@ class _MushafPageContent extends ConsumerWidget {
                 fit: BoxFit.contain,
               ),
               ...highlightWidgets,
+              // AyahContextMenuOverlay(
+              //   glyphs: glyphs,
+              //   scale: uniformScale,
+              //   offsetX: imageOffsetX,
+              //   offsetY: totalContentOffsetY,
+              //   pageNumber: pageInfo.pageNumber,
+              //   onHighlight: (sura, ayah) {
+              //     ref
+              //         .read(
+              //           highlightedAyahProvider(pageInfo.pageNumber).notifier,
+              //         )
+              //         .state = (
+              //       sura: sura,
+              //       ayah: ayah,
+              //     );
+              //   },
+              // ),
             ],
           ),
         );

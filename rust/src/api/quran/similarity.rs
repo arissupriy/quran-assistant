@@ -22,3 +22,46 @@ pub fn get_similar_ayahs(verse_key: String) -> Vec<MatchedAyah> { // Input `Stri
         Vec::new() // Mengembalikan Vec kosong jika tidak ditemukan
     }
 }
+
+#[frb]
+pub fn get_similar_ayahs_inverted(verse_key: String) -> Vec<MatchedAyah> {
+    let engine_data = &GLOBAL_DATA;
+
+    if verse_key.trim().is_empty() {
+        log::error!("get_similar_ayahs_inverted: verse_key kosong!");
+        return Vec::new();
+    }
+
+    let mut results = Vec::new();
+
+    for (source_key, matched_list) in engine_data.valid_matching_ayah.map.iter() {
+        for matched in matched_list {
+            if matched.matched_ayah_key == verse_key {
+                let mut inverted = matched.clone();
+                inverted.matched_ayah_key = source_key.clone(); // Ganti jadi source!
+                results.push(inverted);
+            }
+        }
+    }
+
+    if results.is_empty() {
+        log::warn!(
+            "get_similar_ayahs_inverted: Tidak ditemukan ayat yang menunjuk ke '{}'",
+            verse_key
+        );
+    } else {
+        log::debug!(
+            "get_similar_ayahs_inverted: Ditemukan {} ayat menunjuk ke '{}'",
+            results.len(),
+            verse_key
+        );
+    }
+
+    results.sort_by(|a, b| {
+        b.score
+            .cmp(&a.score)
+            .then(a.matched_ayah_key.cmp(&b.matched_ayah_key))
+    });
+
+    results
+}

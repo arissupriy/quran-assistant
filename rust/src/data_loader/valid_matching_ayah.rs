@@ -24,6 +24,16 @@ pub struct ValidMatchingAyah {
     pub map: HashMap<String, Vec<MatchedAyah>>, // Kunci adalah verseKey, nilai adalah daftar MatchedAyah
 }
 
+
+// #[derive(Debug, Clone, Serialize, Deserialize)]
+// pub struct InvertedMatchedAyah {
+//     pub source_ayah_key: String, // yang menunjuk ke verse_key
+//     pub matched_words_count: u32,
+//     pub coverage: u32,
+//     pub score: u32,
+//     pub match_words: Vec<Vec<u32>>,
+// }
+
 // Tambahkan di AKHIR FILE src/data-loader/valid_matching_ayah.rs
 
 // src/data-loader/valid_matching_ayah.rs

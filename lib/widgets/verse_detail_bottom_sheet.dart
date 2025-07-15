@@ -111,7 +111,7 @@ class VerseDetailBottomSheet extends StatelessWidget {
       verseNumber: verseNum,
     );
 
-    final similar = await getSimilarAyahs(verseKey: verseKey);
+    final similar = await getSimilarAyahsInverted(verseKey: verseKey);
 
     return _VerseDetailData(verse: verse!, similarAyahs: similar);
   }
