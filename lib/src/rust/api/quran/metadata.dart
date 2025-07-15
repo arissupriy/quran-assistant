@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../data_loader/juzs.dart';
+import '../../data_loader/mushaf_page_info.dart';
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -21,3 +22,9 @@ Future<int> getPageFromVerseId({required int verseId}) => RustLib.instance.api
 
 Future<List<JuzWithPage>> getAllJuzsWithPage() =>
     RustLib.instance.api.crateApiQuranMetadataGetAllJuzsWithPage();
+
+/// Mengambil semua informasi kontekstual (nama surah, juz, kata awal halaman berikutnya) untuk halaman Mushaf tertentu.
+Future<MushafPageInfo> getMushafPageContextInfo({required int pageNumber}) =>
+    RustLib.instance.api.crateApiQuranMetadataGetMushafPageContextInfo(
+      pageNumber: pageNumber,
+    );

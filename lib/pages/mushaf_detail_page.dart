@@ -1,15 +1,28 @@
+import 'dart:math';
 import 'dart:typed_data';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:quran_assistant/pages/mushaf_detail_page%20copy%202.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/mushaf_provider.dart';
 import 'package:quran_assistant/src/rust/api/quran/verse.dart';
+import 'package:quran_assistant/src/rust/data_loader/mushaf_page_info.dart';
 import 'package:quran_assistant/src/rust/data_loader/verse_by_chapter.dart';
 import 'package:quran_assistant/src/rust/models.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
 import 'package:super_context_menu/super_context_menu.dart';
+
+// extension StringExtension on String {
+//   String toCapitalized() =>
+//       length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
+//   String toTitleCase() => replaceAll(
+//     RegExp(' +'),
+//     ' ',
+//   ).split(' ').map((str) => str.toCapitalized()).join(' ');
+// }
 
 class MushafDetailPage extends ConsumerStatefulWidget {
   final int pageNumber;
@@ -25,15 +38,107 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   bool _navigated = false;
   late final PageController _pageController;
 
+  Timer? _hideAppBarTimer;
+  int _currentPageNumber = 0;
+
+  @override
+  void deactivate() {
+    // ref.invalidate(highlightedAyahProvider);
+    super.deactivate();
+  }
+
   @override
   void initState() {
     super.initState();
+    _currentPageNumber = widget.pageNumber;
     _pageController = PageController(initialPage: widget.pageNumber - 1);
     _mushafPathFuture = getMushafFilePathIfExists();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(appBarVisibilityProvider.notifier).state = true;
+      }
+    });
+    _startHideAppBarTimer();
+    _loadInitialPageInfo();
+  }
+
+  void _loadInitialPageInfo() {
+    ref.read(mushafPageInfoProvider(_currentPageNumber).future).then((
+      pageInfo,
+    ) {
+      if (mounted) {
+        ref.read(currentPageInfoProvider.notifier).state = pageInfo;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _hideAppBarTimer?.cancel();
+
+    // Jadwalkan invalidate di frame berikutnya (tidak crash meski dispose)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        // ref.invalidate(highlightedAyahProvider);
+      }
+    });
+
+    super.dispose();
+  }
+
+  void _startHideAppBarTimer() {
+    _hideAppBarTimer?.cancel();
+    _hideAppBarTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        ref.read(appBarVisibilityProvider.notifier).state = false;
+      }
+    });
+  }
+
+  void _toggleAppBarVisibility() {
+    final current = ref.read(appBarVisibilityProvider);
+    final newValue = !current;
+
+    debugPrint("🔺 Toggling app bar visibility: $current → $newValue");
+    ref.read(appBarVisibilityProvider.notifier).state = newValue;
+
+    if (newValue) {
+      _startHideAppBarTimer();
+    } else {
+      _hideAppBarTimer?.cancel();
+    }
+  }
+
+  void _onPageChanged(int index) {
+    final nextPage = index + 1;
+    _currentPageNumber = nextPage;
+
+    if (!mounted) return;
+
+    ref.invalidate(highlightedAyahProvider);
+
+    ref.read(mushafPageInfoProvider(nextPage).future).then((pageInfo) {
+      if (mounted) {
+        ref.read(currentPageInfoProvider.notifier).state = pageInfo;
+      }
+    });
+
+    if (ref.read(appBarVisibilityProvider)) {
+      _startHideAppBarTimer();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isAppBarVisible = ref.watch(appBarVisibilityProvider);
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+    final double appBarHeight = kToolbarHeight;
+    final double totalTopOffset = statusBarHeight + appBarHeight;
+
+    final currentPageInfo = ref.watch(currentPageInfoProvider);
+
     return FutureBuilder<String?>(
       future: _mushafPathFuture,
       builder: (context, snapshot) {
@@ -42,7 +147,6 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
         }
 
         final path = snapshot.data;
-
         if (path == null) {
           _navigateToDownloadPageIfNeeded();
           return _buildLoading();
@@ -59,18 +163,139 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
             }
 
             return Scaffold(
-              appBar: AppBar(
-                title: const Text('Mushaf Madani'),
-                centerTitle: true,
-              ),
-              body: PageView.builder(
-                controller: _pageController,
-                reverse: true,
-                itemCount: 604,
-                itemBuilder: (context, index) {
-                  final currentPage = index + 1;
-                  return MushafPageDisplay(pageNumber: currentPage);
+              body: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  debugPrint('🟢 TAP DETECTED!');
+                  _toggleAppBarVisibility();
                 },
+                child: SafeArea(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Column(
+                          children: [
+                            if (currentPageInfo != null)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 6,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      currentPageInfo.surahNameArabic,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Juz ${currentPageInfo.juzNumber}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            Expanded(
+                              child: PageView.builder(
+                                controller: _pageController,
+                                reverse: true,
+                                itemCount: 604,
+                                onPageChanged: _onPageChanged,
+                                itemBuilder: (context, index) {
+                                  final currentPage = index + 1;
+                                  return MushafPageDisplay(
+                                    pageNumber: currentPage,
+                                    topOffset: totalTopOffset,
+                                  );
+                                },
+                              ),
+                            ),
+                            if (currentPageInfo != null)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      currentPageInfo.nextPageRouteText,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).primaryColor,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        '${currentPageInfo.pageNumber}',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: AnimatedOpacity(
+                          opacity: isAppBarVisible ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: AppBar(
+                            title: const Text('Mushaf Madani'),
+                            centerTitle: true,
+                            backgroundColor:
+                                Theme.of(context).appBarTheme.backgroundColor ??
+                                Theme.of(context).primaryColor,
+                            foregroundColor:
+                                Theme.of(context).appBarTheme.foregroundColor ??
+                                Colors.white,
+                            actions: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Center(
+                                  child: Text(
+                                    'Halaman $_currentPageNumber / 604',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
@@ -80,15 +305,17 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   }
 
   void _navigateToDownloadPageIfNeeded() {
-    if (_navigated) return;
+    if (_navigated || !mounted) return;
     _navigated = true;
 
     Future.microtask(() {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => MushafDownloadPage(initialPage: widget.pageNumber),
-        ),
-      );
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => MushafDownloadPage(initialPage: widget.pageNumber),
+          ),
+        );
+      }
     });
   }
 
@@ -101,14 +328,22 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
 class MushafPageDisplay extends ConsumerWidget {
   final int pageNumber;
+  // final bool isAppBarVisible;
+  final double topOffset;
 
-  const MushafPageDisplay({super.key, required this.pageNumber});
+  const MushafPageDisplay({
+    super.key,
+    required this.pageNumber,
+    // required this.isAppBarVisible,
+    required this.topOffset,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageAsync = ref.watch(mushafImageProvider(pageNumber));
     final glyphAsync = ref.watch(mushafGlyphProvider(pageNumber));
     final highlighted = ref.watch(highlightedAyahProvider(pageNumber));
+    final pageInfoAsync = ref.watch(mushafPageInfoProvider(pageNumber));
 
     return imageAsync.when(
       loading: _loading,
@@ -120,18 +355,36 @@ class MushafPageDisplay extends ConsumerWidget {
           loading: _loading,
           error: (e, _) => _error('Gagal memuat glyph: $e'),
           data: (glyphs) {
-            if (glyphs!.isEmpty) return _error('Glyph tidak ditemukan.');
+            if (glyphs == null || glyphs.isEmpty)
+              return _error('Glyph tidak ditemukan.');
 
-            return _MushafPageContent(
-              imageBytes: imageBytes,
-              glyphs: glyphs,
-              highlighted: highlighted,
-              onTap: (sura, ayah) {
-                final notifier = ref.read(
-                  highlightedAyahProvider(pageNumber).notifier,
+            return pageInfoAsync.when(
+              loading: _loading,
+              error: (e, _) => _error('Gagal memuat info halaman: $e'),
+              data: (pageInfo) {
+                return _MushafPageContent(
+                  imageBytes: imageBytes,
+                  glyphs: glyphs,
+                  highlighted: highlighted,
+                  // isAppBarVisible: isAppBarVisible,
+                  pageInfo: pageInfo,
+                  topOffset: topOffset,
+                  onTap: (sura, ayah) {
+                    final notifier = ref.read(
+                      highlightedAyahProvider(pageNumber).notifier,
+                    );
+                    final tapped = (sura: sura, ayah: ayah);
+                    notifier.state = notifier.state == tapped ? null : tapped;
+
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (ctx) => VerseDetailBottomSheet(
+                        verseKey: "${tapped.sura}:${tapped.ayah}",
+                      ),
+                    );
+                  },
                 );
-                final tapped = (sura: sura, ayah: ayah);
-                notifier.state = notifier.state == tapped ? null : tapped;
               },
             );
           },
@@ -145,65 +398,78 @@ class MushafPageDisplay extends ConsumerWidget {
   Widget _error(String msg) => Center(child: Text(msg));
 }
 
-// ... (Your existing imports and class definitions)
-
-class _MushafPageContent extends StatelessWidget {
+class _MushafPageContent extends ConsumerWidget {
   final Uint8List imageBytes;
   final List<GlyphPosition> glyphs;
   final ({int sura, int ayah})? highlighted;
+  final MushafPageInfo pageInfo;
+  final double topOffset;
   final void Function(int sura, int ayah) onTap;
 
   const _MushafPageContent({
+    super.key,
     required this.imageBytes,
     required this.glyphs,
     required this.highlighted,
+    required this.pageInfo,
+    required this.topOffset,
     required this.onTap,
   });
 
+  static const double FILE_IMG_WIDTH = 1080.0;
+  static const double FILE_IMG_HEIGHT = 1747.0;
+  static const double GLYPH_SOURCE_WIDTH = 1920.0;
+  static const double GLYPH_SOURCE_HEIGHT = 3106.0;
+
   @override
-  Widget build(BuildContext context) {
-    // final rustEngineService = RustEngineService();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isAppBarVisible = ref.watch(appBarVisibilityProvider);
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final scale = constraints.maxWidth / 1920.0;
+        final screenWidth = constraints.maxWidth;
+        final screenHeight = constraints.maxHeight;
 
-        final ayahMap = <({int sura, int ayah}), List<GlyphPosition>>{};
-        for (final glyph in glyphs) {
-          final key = (sura: glyph.sura, ayah: glyph.ayah);
-          ayahMap.putIfAbsent(key, () => []).add(glyph);
+        final double aspectRatioFileImg = FILE_IMG_WIDTH / FILE_IMG_HEIGHT;
+        final double aspectRatioScreen = screenWidth / screenHeight;
+
+        double renderedImageWidth;
+        double renderedImageHeight;
+        double imageOffsetX = 0;
+        double imageOffsetY = 0;
+
+        if (aspectRatioScreen > aspectRatioFileImg) {
+          renderedImageHeight = screenHeight;
+          renderedImageWidth = renderedImageHeight * aspectRatioFileImg;
+          imageOffsetX = (screenWidth - renderedImageWidth) / 2;
+        } else {
+          renderedImageWidth = screenWidth;
+          renderedImageHeight = renderedImageWidth / aspectRatioFileImg;
+          imageOffsetY = (screenHeight - renderedImageHeight) / 2;
         }
 
-        List<Widget> highlightLayers = [];
-        if (highlighted != null && ayahMap.containsKey(highlighted)) {
-          final ayahGlyphs = ayahMap[highlighted]!;
+        final double adjustedTopOffset = 2.0;
+        final double totalContentOffsetY = imageOffsetY + adjustedTopOffset;
+        final double uniformScale = renderedImageWidth / GLYPH_SOURCE_WIDTH;
 
-          final lineGroups = <int, List<GlyphPosition>>{};
-          for (var glyph in ayahGlyphs) {
-            lineGroups.putIfAbsent(glyph.lineNumber, () => []).add(glyph);
-          }
+        final List<Widget> highlightWidgets = [];
 
-          for (var entry in lineGroups.entries) {
-            final lineGlyphs = entry.value;
-            final minX =
-                lineGlyphs.map((g) => g.minX).reduce((a, b) => a < b ? a : b) *
-                scale;
-            final maxX =
-                lineGlyphs.map((g) => g.maxX).reduce((a, b) => a > b ? a : b) *
-                scale;
-            final minY =
-                lineGlyphs.map((g) => g.minY).reduce((a, b) => a < b ? a : b) *
-                scale;
-            final maxY =
-                lineGlyphs.map((g) => g.maxY).reduce((a, b) => a > b ? a : b) *
-                scale;
+        if (highlighted != null) {
+          final matchedGlyphs = glyphs.where(
+            (g) => g.sura == highlighted!.sura && g.ayah == highlighted!.ayah,
+          );
+          for (final glyph in matchedGlyphs) {
+            final left = glyph.minX * uniformScale + imageOffsetX;
+            final top = glyph.minY * uniformScale + totalContentOffsetY;
+            final width = (glyph.maxX - glyph.minX) * uniformScale;
+            final height = (glyph.maxY - glyph.minY) * uniformScale;
 
-            highlightLayers.add(
+            highlightWidgets.add(
               Positioned(
-                left: minX,
-                top: minY,
-                width: maxX - minX,
-                height: maxY - minY,
+                left: left,
+                top: top,
+                width: width,
+                height: height,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.yellow.withOpacity(0.35),
@@ -215,163 +481,74 @@ class _MushafPageContent extends StatelessWidget {
           }
         }
 
-        return Stack(
-          children: [
-            Image.memory(
-              imageBytes,
-              width: constraints.maxWidth,
-              fit: BoxFit.contain,
-            ),
-            ...highlightLayers,
-            ...ayahMap.entries.map((entry) {
-              final ayahKey = entry.key;
-              final glyphsInAyah = entry.value;
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            final notifier = ref.read(appBarVisibilityProvider.notifier);
+            final current = ref.read(appBarVisibilityProvider);
 
-              final minX =
-                  glyphsInAyah
-                      .map((g) => g.minX)
-                      .reduce((a, b) => a < b ? a : b) *
-                  scale;
-              final maxX =
-                  glyphsInAyah
-                      .map((g) => g.maxX)
-                      .reduce((a, b) => a > b ? a : b) *
-                  scale;
-              final minY =
-                  glyphsInAyah
-                      .map((g) => g.minY)
-                      .reduce((a, b) => a < b ? a : b) *
-                  scale;
-              final maxY =
-                  glyphsInAyah
-                      .map((g) => g.maxY)
-                      .reduce((a, b) => a > b ? a : b) *
-                  scale;
+            if (current) {
+              debugPrint("🔻 AppBar is visible, hiding it.");
+              notifier.state = false;
+            } else {
+              debugPrint("🔺 AppBar is hidden, showing it and starting timer.");
+              notifier.state = true;
 
-              return Positioned(
-                left: minX,
-                top: minY,
-                width: maxX - minX,
-                height: maxY - minY,
-                child: GestureDetector(
-                  onTap: () => onTap(ayahKey.sura, ayahKey.ayah),
-                  behavior: HitTestBehavior.translucent,
-                  child: ContextMenuWidget(
-                    menuProvider: (_) {
-                      return Menu(
-                        children: [
-                          MenuAction(
-                            title: '📖 Lihat Detail Ayah Ini',
-                            image: MenuImage.icon(Icons.visibility),
-                            callback: () {
-                              onTap(ayahKey.sura, ayahKey.ayah);
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (_) => VerseDetailBottomSheet(
-                                  verseKey: "${ayahKey.sura}:${ayahKey.ayah}",
-                                ),
-                              );
-                            },
-                          ),
-                          MenuAction(
-                            title: '📋 Salin Ayah Ini',
-                            image: MenuImage.icon(Icons.copy),
-                            callback: () async {
-                              // This already uses await correctly
-                              // final verseText = await rustEngineService.getVerseTextUthmani(
-                              //   "${ayahKey.sura}:${ayahKey.ayah}",
-                              // );
+              Future.microtask(() {
+                Timer(const Duration(milliseconds: 1500), () {
+                  if (context.mounted) {
+                    final stillVisible = ref.read(appBarVisibilityProvider);
+                    if (stillVisible) {
+                      ref.read(appBarVisibilityProvider.notifier).state = false;
+                      debugPrint("⏱️ Auto-hiding AppBar after delay.");
+                    }
+                  }
+                });
+              });
+            }
+          },
+          onTapDown: (details) {
+            if (ref.read(appBarVisibilityProvider)) {
+              final localPos = details.localPosition;
+              final dx = localPos.dx;
+              final dy = localPos.dy;
+              debugPrint("📍 Tap at: x=$dx, y=$dy");
 
-                              final Verse? verse =
-                                  await getVerseByChapterAndVerseNumber(
-                                    chapterNumber: ayahKey.sura,
-                                    verseNumber: ayahKey.ayah,
-                                  );
-                              if (verse != null &&
-                                  verse.words.isNotEmpty) {
-                                Clipboard.setData(
-                                  ClipboardData(
-                                    text: verse.words
-                                        .map((word) => word.textUthmani)
-                                        .join(' '),
-                                  ),
-                                );
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Ayat tersalin: ${verse.words.map((word) => word.textUthmani).join(' ')}",
-                                      ),
-                                    ),
-                                  );
-                                }
-                              } else {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        "Gagal menyalin ayat atau teks kosong.",
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                    child: Container(
-                      color:
-                          Colors.transparent, // Interactive area is transparent
-                    ),
-                    deferredPreviewBuilder: (context, child, cancellationToken) {
-  final verseFuture = getVerseByChapterAndVerseNumber(
-    chapterNumber: ayahKey.sura,
-    verseNumber: ayahKey.ayah,
-  );
+              for (final g in glyphs) {
+                final left = g.minX * uniformScale + imageOffsetX;
+                final right = g.maxX * uniformScale + imageOffsetX;
+                final top = g.minY * uniformScale + totalContentOffsetY;
+                final bottom = g.maxY * uniformScale + totalContentOffsetY;
 
-  return DeferredMenuPreview(
-    const Size(300, 100),
-    verseFuture.then((verse) {
-      if (verse == null || verse.words.isEmpty) {
-        return const Text(
-          'Gagal memuat teks',
-          style: TextStyle(color: Colors.red),
-        );
-      }
-
-      final displayText = verse.words.map((w) => w.textUthmani).join(' ');
-
-      return Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            displayText,
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontFamily: 'UthmaniHafs',
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+                if (dx >= left && dx <= right && dy >= top && dy <= bottom) {
+                  debugPrint(
+                    "🌟 MATCH: ${g.sura}:${g.ayah} (line ${g.lineNumber})",
+                  );
+                  onTap(g.sura, g.ayah);
+                  break;
+                }
+              }
+            }
+          },
+          child: Stack(
+            children: [
+              Image.memory(
+                imageBytes,
+                width: screenWidth,
+                height: screenHeight,
+                fit: BoxFit.contain,
+              ),
+              ...highlightWidgets,
+            ],
           ),
-        ),
-      );
-    }),
-  );
-},
-
-                  ),
-                ),
-              );
-            }),
-          ],
         );
       },
     );
   }
 }
+
+
+
+
+
+// --- END BAGIAN MushafDetailPage --- 

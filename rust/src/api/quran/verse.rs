@@ -60,7 +60,7 @@ pub fn get_verse_by_chapter_and_verse_number(
             .find(|v| v.verse_number == verse_number)
             .cloned()
         {
-            debug!("✅ Ayat ditemukan: {:?}", verse);
+            // debug!("✅ Ayat ditemukan: {:?}", verse);
             return Some(verse);
         } else {
             warn!("⚠️ Ayat {} tidak ditemukan dalam surah {}", verse_number, chapter_number);

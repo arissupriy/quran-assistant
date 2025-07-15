@@ -19,6 +19,7 @@ import 'dart:ffi' as ffi;
 import 'data_loader/ayah_texts.dart';
 import 'data_loader/chapters.dart';
 import 'data_loader/juzs.dart';
+import 'data_loader/mushaf_page_info.dart';
 import 'data_loader/quiz_models.dart';
 import 'data_loader/search_models.dart';
 import 'data_loader/valid_matching_ayah.dart';
@@ -89,6 +90,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   GlyphPosition dco_decode_glyph_position(dynamic raw);
 
   @protected
+  int dco_decode_i_32(dynamic raw);
+
+  @protected
   Juz dco_decode_juz(dynamic raw);
 
   @protected
@@ -149,6 +153,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MatchedAyah dco_decode_matched_ayah(dynamic raw);
+
+  @protected
+  MushafPageInfo dco_decode_mushaf_page_info(dynamic raw);
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
@@ -310,6 +317,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   GlyphPosition sse_decode_glyph_position(SseDeserializer deserializer);
 
   @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
   Juz sse_decode_juz(SseDeserializer deserializer);
 
   @protected
@@ -380,6 +390,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MatchedAyah sse_decode_matched_ayah(SseDeserializer deserializer);
+
+  @protected
+  MushafPageInfo sse_decode_mushaf_page_info(SseDeserializer deserializer);
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
@@ -496,9 +509,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
-
-  @protected
   void sse_encode_AnyhowException(
     AnyhowException self,
     SseSerializer serializer,
@@ -566,6 +576,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_glyph_position(GlyphPosition self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_juz(Juz self, SseSerializer serializer);
@@ -665,6 +678,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_matched_ayah(MatchedAyah self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_mushaf_page_info(
+    MushafPageInfo self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
@@ -800,9 +819,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     WordTransliteration self,
     SseSerializer serializer,
   );
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
 }
 
 // Section: wire_class

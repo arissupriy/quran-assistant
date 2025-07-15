@@ -9,11 +9,11 @@ use zstd::stream::read::Decoder;
 use bincode::config;
 use crate::models::{MushafPackIndex, GlyphPosition};
 
-static PACK_STATE: Lazy<Mutex<Option<MushafBundle>>> = Lazy::new(|| Mutex::new(None));
+pub static PACK_STATE: Lazy<Mutex<Option<MushafBundle>>> = Lazy::new(|| Mutex::new(None));
 
-struct MushafBundle {
-    index: MushafPackIndex,
-    images_blob: Vec<u8>,
+pub struct MushafBundle {
+    pub index: MushafPackIndex,
+    pub images_blob: Vec<u8>,
 }
 
 #[frb]

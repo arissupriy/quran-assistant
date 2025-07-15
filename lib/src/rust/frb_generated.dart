@@ -18,6 +18,7 @@ import 'dart:convert';
 import 'data_loader/ayah_texts.dart';
 import 'data_loader/chapters.dart';
 import 'data_loader/juzs.dart';
+import 'data_loader/mushaf_page_info.dart';
 import 'data_loader/quiz_models.dart';
 import 'data_loader/search_models.dart';
 import 'data_loader/valid_matching_ayah.dart';
@@ -83,7 +84,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -943102505;
+  int get rustContentHash => -1287803988;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -140,6 +141,10 @@ abstract class RustLibApi extends BaseApi {
 
   Future<int?> crateApiQuranVerseGetJuzNumberForVerse({
     required String verseKey,
+  });
+
+  Future<MushafPageInfo> crateApiQuranMetadataGetMushafPageContextInfo({
+    required int pageNumber,
   });
 
   Future<int> crateApiQuranMetadataGetPageFromVerseId({required int verseId});
@@ -616,6 +621,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<MushafPageInfo> crateApiQuranMetadataGetMushafPageContextInfo({
+    required int pageNumber,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_32(pageNumber, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_mushaf_page_info,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiQuranMetadataGetMushafPageContextInfoConstMeta,
+        argValues: [pageNumber],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiQuranMetadataGetMushafPageContextInfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_mushaf_page_context_info",
+        argNames: ["pageNumber"],
+      );
+
+  @override
   Future<int> crateApiQuranMetadataGetPageFromVerseId({required int verseId}) {
     return handler.executeNormal(
       NormalTask(
@@ -625,7 +663,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 14,
+            funcId: 15,
             port: port_,
           );
         },
@@ -656,7 +694,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 16,
             port: port_,
           );
         },
@@ -686,7 +724,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 17,
             port: port_,
           );
         },
@@ -716,7 +754,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 18,
             port: port_,
           );
         },
@@ -751,7 +789,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 19,
             port: port_,
           );
         },
@@ -786,7 +824,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 20,
             port: port_,
           );
         },
@@ -820,7 +858,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 21,
             port: port_,
           );
         },
@@ -857,7 +895,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 21,
+            funcId: 22,
             port: port_,
           );
         },
@@ -885,7 +923,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -910,7 +948,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 23,
+            funcId: 24,
             port: port_,
           );
         },
@@ -940,7 +978,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 24,
+            funcId: 25,
             port: port_,
           );
         },
@@ -973,7 +1011,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 25,
+            funcId: 26,
             port: port_,
           );
         },
@@ -1003,7 +1041,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 26,
+            funcId: 27,
             port: port_,
           );
         },
@@ -1175,6 +1213,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int dco_decode_i_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
   Juz dco_decode_juz(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1322,6 +1366,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       coverage: dco_decode_u_32(arr[2]),
       score: dco_decode_u_32(arr[3]),
       matchWords: dco_decode_list_list_prim_u_32_strict(arr[4]),
+    );
+  }
+
+  @protected
+  MushafPageInfo dco_decode_mushaf_page_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return MushafPageInfo(
+      surahNameArabic: dco_decode_String(arr[0]),
+      juzNumber: dco_decode_u_32(arr[1]),
+      pageNumber: dco_decode_u_32(arr[2]),
+      nextPageRouteText: dco_decode_String(arr[3]),
     );
   }
 
@@ -1834,6 +1892,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int sse_decode_i_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getInt32();
+  }
+
+  @protected
   Juz sse_decode_juz(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_u_32(deserializer);
@@ -2082,6 +2146,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       coverage: var_coverage,
       score: var_score,
       matchWords: var_matchWords,
+    );
+  }
+
+  @protected
+  MushafPageInfo sse_decode_mushaf_page_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_surahNameArabic = sse_decode_String(deserializer);
+    var var_juzNumber = sse_decode_u_32(deserializer);
+    var var_pageNumber = sse_decode_u_32(deserializer);
+    var var_nextPageRouteText = sse_decode_String(deserializer);
+    return MushafPageInfo(
+      surahNameArabic: var_surahNameArabic,
+      juzNumber: var_juzNumber,
+      pageNumber: var_pageNumber,
+      nextPageRouteText: var_nextPageRouteText,
     );
   }
 
@@ -2502,12 +2581,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  int sse_decode_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getInt32();
-  }
-
-  @protected
   void sse_encode_AnyhowException(
     AnyhowException self,
     SseSerializer serializer,
@@ -2652,6 +2725,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.maxX, serializer);
     sse_encode_u_32(self.minY, serializer);
     sse_encode_u_32(self.maxY, serializer);
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
   }
 
   @protected
@@ -2871,6 +2950,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.coverage, serializer);
     sse_encode_u_32(self.score, serializer);
     sse_encode_list_list_prim_u_32_strict(self.matchWords, serializer);
+  }
+
+  @protected
+  void sse_encode_mushaf_page_info(
+    MushafPageInfo self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.surahNameArabic, serializer);
+    sse_encode_u_32(self.juzNumber, serializer);
+    sse_encode_u_32(self.pageNumber, serializer);
+    sse_encode_String(self.nextPageRouteText, serializer);
   }
 
   @protected
@@ -3216,11 +3307,5 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.text, serializer);
     sse_encode_String(self.languageName, serializer);
-  }
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putInt32(self);
   }
 }

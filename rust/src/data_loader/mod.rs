@@ -19,3 +19,4 @@ pub mod search_models; // Tambahkan baris ini
 // pub mod inverted_index; // Tambahkan baris ini
 pub mod arabic_stop_words;
 // pub mod mushaf_pack;
+pub mod mushaf_page_info;
