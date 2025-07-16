@@ -96,6 +96,7 @@ flutter:
   assets:
     - assets/quran_assets/
     - assets/quran_assets/verse-by-chapter/
+    - assets/images/
   fonts:
     - family: UthmaniHafs
       fonts:

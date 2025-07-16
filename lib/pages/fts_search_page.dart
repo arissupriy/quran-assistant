@@ -1,22 +1,21 @@
-// lib/features/search/fts_search_page.dart
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // <-- Gunakan flutter_riverpod
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quran_assistant/core/themes/app_theme.dart'; // Import AppTheme
+// Hapus import CustomAppBar karena tidak lagi digunakan di sini
+// import 'package:quran_assistant/widgets/custom_navigation_widgets.dart';
 
 import 'package:quran_assistant/core/models/fts_search_model.dart_'; // Model hasil pencarian Anda
 import 'package:quran_assistant/providers/fts_search_provider.dart';
 import 'package:quran_assistant/src/rust/data_loader/search_models.dart'; // Provider pencarian Anda
 
 class FtsSearchPage extends ConsumerStatefulWidget {
-  // <-- Ganti menjadi ConsumerStatefulWidget
   const FtsSearchPage({super.key});
 
   @override
-  ConsumerState<FtsSearchPage> createState() => _FtsSearchPageState(); // <-- Ganti menjadi ConsumerState
+  ConsumerState<FtsSearchPage> createState() => _FtsSearchPageState();
 }
 
 class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
-  // <-- Ganti menjadi ConsumerState
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -27,125 +26,119 @@ class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Mengakses state dari provider menggunakan ref.watch
-    final ftsSearchState = ref.watch(ftsSearchProvider); // <-- Akses state
-    // Mengakses notifier (untuk memanggil metode) menggunakan ref.read
-    final ftsSearchNotifier = ref.read(
-      ftsSearchProvider.notifier,
-    ); // <-- Akses notifier
+    final ftsSearchState = ref.watch(ftsSearchProvider);
+    final ftsSearchNotifier = ref.read(ftsSearchProvider.notifier);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pencarian Al-Qur\'an'),
-        actions: [
-          // --- TOMBOL PENGATURAN ---
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              _showSettingsDialog(context, ref);
+    // Hapus Scaffold dan AppBar di sini.
+    // Konten FtsSearchPage akan menjadi body dari Scaffold di MainScreen.
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0), // Padding lebih besar
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Cari ayat...',
+              // Gaya input decoration sudah diatur di AppTheme
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.clear, color: AppTheme.secondaryTextColor), // Warna ikon clear
+                      onPressed: () {
+                        _searchController.clear();
+                        ftsSearchNotifier.clearSearchResults();
+                      },
+                    )
+                  : null,
+              prefixIcon: Icon(Icons.search, color: AppTheme.primaryColor), // Ikon search di awal
+            ),
+            onSubmitted: (query) {
+              if (query.isNotEmpty) {
+                ftsSearchNotifier.search(query);
+              } else {
+                ftsSearchNotifier.clearSearchResults();
+              }
+            },
+            onChanged: (query) {
+              // Memperbarui UI untuk menampilkan/menyembunyikan tombol clear
+              setState(() {});
             },
           ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Cari ayat...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    ftsSearchNotifier
-                        .clearSearchResults(); // Panggil dari notifier
-                  },
-                ),
-              ),
-              onSubmitted: (query) {
-                if (query.isNotEmpty) {
-                  ftsSearchNotifier.search(query); // Panggil dari notifier
-                } else {
-                  ftsSearchNotifier.clearSearchResults();
-                }
-              },
-            ),
+        ),
+        Expanded(
+          child: _buildBody(
+            ftsSearchState,
+            ftsSearchNotifier,
           ),
         ),
-      ),
-      body: _buildBody(
-        ftsSearchState,
-        ftsSearchNotifier,
-      ), // Teruskan state dan notifier
+      ],
     );
   }
 
   Widget _buildBody(FtsSearchState state, FtsSearchNotifier notifier) {
-    // Terima state dan notifier
     if (state.isLoading) {
-      // Akses state
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)); // Warna loading
     } else if (state.errorMessage != null) {
-      // Akses state
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            'Error: ${state.errorMessage}', // Akses state
+            'Error: ${state.errorMessage}',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.red),
+            style: TextStyle(color: Theme.of(context).colorScheme.error), // Warna error dari tema
           ),
         ),
       );
-    } else if (state.searchResults.isEmpty &&
-        _searchController.text.isNotEmpty) {
-      // Akses state
-      return const Center(
+    } else if (state.searchResults.isEmpty && _searchController.text.isNotEmpty) {
+      return Center(
         child: Text(
           'Tidak ada hasil ditemukan.',
-          style: TextStyle(fontSize: 16.0, color: Colors.grey),
+          style: TextStyle(fontSize: 16.0, color: AppTheme.secondaryTextColor), // Warna teks
         ),
       );
     } else if (state.searchResults.isEmpty && _searchController.text.isEmpty) {
-      // Akses state
-      return const Center(
+      return Center(
         child: Text(
           'Masukkan kueri untuk mencari ayat.',
-          style: TextStyle(fontSize: 16.0, color: Colors.grey),
+          style: TextStyle(fontSize: 16.0, color: AppTheme.secondaryTextColor), // Warna teks
         ),
       );
     } else {
       return ListView.builder(
-        itemCount: state.searchResults.length, // Akses state
+        itemCount: state.searchResults.length,
         itemBuilder: (context, index) {
-          final result = state.searchResults[index]; // Akses state
+          final result = state.searchResults[index];
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            // Gaya Card sudah diatur di AppTheme
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Margin disesuaikan
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${result.verseKey} (Skor: ${result.score.toStringAsFixed(2)})',
-                    style: const TextStyle(
+                    '${result.verseKey}', // Hapus skor jika tidak diperlukan di UI
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16.0,
+                      fontSize: 18.0, // Ukuran font lebih besar
+                      color: AppTheme.textColor, // Warna teks
                     ),
                   ),
                   const SizedBox(height: 8.0),
                   _buildVerseWords(
                     result.words,
                     state,
-                  ), // Fungsi untuk me-render kata-kata ayat
+                  ),
                   const SizedBox(height: 8.0),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      'Skor: ${result.score.toStringAsFixed(2)}', // Skor di pojok kanan bawah
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: AppTheme.secondaryTextColor,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -163,115 +156,102 @@ class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
       textDirection: TextDirection.rtl, // Mengatur arah teks ke kanan
       children: words.map((word) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.0), // Padding disesuaikan
           decoration: BoxDecoration(
             color: word.highlighted
-                ? Colors.yellow.withOpacity(0.5)
+                ? AppTheme.secondaryColor.withOpacity(0.3) // Warna sorotan dari tema
                 : Colors.transparent, // Warna sorotan
-            borderRadius: BorderRadius.circular(4.0),
+            borderRadius: BorderRadius.circular(8.0), // Sudut membulat
           ),
           child: Builder(
             builder: (context) {
-              if (state.showTranslation) {
-                return Column(
-                  // textDirection: TextDirection.rtl,
-                  children: [
-                    Text(
-                      word.textUthmani,
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontFamily: 'UthmaniHafs',
-                        color: word.highlighted
-                            ? Colors.blue.shade900
-                            : Colors.black,
-                        fontWeight: word.highlighted
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.end, // Teks Arab ke kanan
+                children: [
+                  Text(
+                    word.textUthmani,
+                    style: TextStyle(
+                      fontSize: 20.0, // Ukuran font Arab lebih besar
+                      fontFamily: 'UthmanicHafs',
+                      color: word.highlighted
+                          ? AppTheme.primaryColor // Warna teks sorotan dari tema
+                          : AppTheme.textColor, // Warna teks normal dari tema
+                      fontWeight: word.highlighted
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
-                    Text(
-                      word.translationText,
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                );
-              } else {
-                return Text(
-                  word.textUthmani,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontFamily: 'UthmaniHafs',
-                    color: word.highlighted
-                        ? Colors.blue.shade900
-                        : Colors.black,
-                    fontWeight: word.highlighted
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
                   ),
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
-                );
-              }
+                  if (state.showTranslation && word.translationText != null && word.translationText!.isNotEmpty)
+                    Text(
+                      word.translationText!,
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: AppTheme.secondaryTextColor, // Warna terjemahan dari tema
+                      ),
+                      textAlign: TextAlign.right, // Terjemahan juga ke kanan
+                      textDirection: TextDirection.rtl, // Terjemahan juga ke kanan
+                    ),
+                ],
+              );
             },
           ),
         );
       }).toList(),
     );
   }
-}
 
-void _showSettingsDialog(BuildContext context, WidgetRef ref) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Pengaturan Tampilan'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Consumer agar UI switch otomatis update
-            Consumer(
-              builder: (context, ref, child) {
-                final showTranslation = ref
-                    .watch(ftsSearchProvider)
-                    .showTranslation;
-                return SwitchListTile(
-                  title: const Text('Tampilkan Terjemahan'),
-                  value: showTranslation,
-                  // -- TAMBAHKAN PROPERTI WARNA DI SINI --
-                  activeColor: Theme.of(context)
-                      .colorScheme
-                      .primary, // Warna saat aktif (misal: warna utama tema)
-                  inactiveThumbColor: Colors.grey, // Warna tombol saat nonaktif
-                  inactiveTrackColor: Colors.grey.withOpacity(
-                    0.5,
-                  ), // Warna track saat nonaktif
+  void _showSettingsDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.cardColor, // Latar belakang dialog dari tema
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // Sudut membulat
+          ),
+          title: Text(
+            'Pengaturan Tampilan',
+            style: TextStyle(color: AppTheme.textColor), // Warna judul dialog
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Consumer(
+                builder: (context, ref, child) {
+                  final showTranslation = ref.watch(ftsSearchProvider).showTranslation;
+                  return SwitchListTile(
+                    title: Text(
+                      'Tampilkan Terjemahan',
+                      style: TextStyle(color: AppTheme.textColor), // Warna teks switch
+                    ),
+                    value: showTranslation,
+                    activeColor: AppTheme.primaryColor, // Warna aktif dari tema
+                    inactiveThumbColor: AppTheme.secondaryTextColor.withOpacity(0.5), // Warna tombol nonaktif
+                    inactiveTrackColor: AppTheme.secondaryTextColor.withOpacity(0.2), // Warna track nonaktif
 
-                  onChanged: (bool value) {
-                    ref
-                        .read(ftsSearchProvider.notifier)
-                        .toggleShowTranslation();
-                  },
-                );
+                    onChanged: (bool value) {
+                      ref.read(ftsSearchProvider.notifier).toggleShowTranslation();
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Tutup',
+                style: TextStyle(color: AppTheme.primaryColor), // Warna teks tombol dialog
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
               },
             ),
           ],
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Tutup'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
+        );
+      },
+    );
+  }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quran_assistant/src/rust/data_loader/quiz_models.dart'
-    as RustModels;
+import 'package:quran_assistant/src/rust/data_loader/quiz_models.dart' as RustModels;
 import 'package:quran_assistant/providers/quiz_provider.dart';
 import 'package:quran_assistant/pages/quiz/quiz_summary_page.dart';
+import 'package:quran_assistant/core/themes/app_theme.dart'; // Import AppTheme
 
 class QuizPlay extends ConsumerStatefulWidget {
   const QuizPlay({super.key});
@@ -20,7 +20,7 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
 
   void _onOptionSelected(int index) {
     final isAnswerChecked = ref.read(answerCheckedProvider);
-    if (isAnswerChecked) return;
+    if (isAnswerChecked) return; // Jangan izinkan perubahan jika sudah dicek
 
     ref.read(selectedOptionIndexProvider.notifier).state = index;
   }
@@ -29,7 +29,13 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
     final selectedIndex = ref.read(selectedOptionIndexProvider);
     if (selectedIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Silakan pilih jawaban terlebih dahulu.')),
+        SnackBar(
+          content: Text(
+            'Silakan pilih jawaban terlebih dahulu.',
+            style: TextStyle(color: Theme.of(context).colorScheme.onError),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
       return;
     }
@@ -44,45 +50,16 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
     final totalQuestions = ref.read(currentQuizQuestionsProvider).length;
 
     if (currentIndex + 1 >= totalQuestions) {
+      // Navigasi ke QuizSummaryPage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const QuizSummaryPage()),
-      ).then((_) {
-        ref.read(quizSessionControllerProvider).endQuizSession();
-      });
+      );
+      // PENTING: endQuizSession() TIDAK dipanggil di sini lagi
+      // karena akan dipanggil di QuizSummaryPage saat kembali ke menu utama.
     } else {
       quizController.nextQuestion();
     }
-  }
-
-  Future<bool> _onWillPop() async {
-    // Metode ini tidak lagi digunakan oleh PopScope
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Akhiri Sesi Kuis?'),
-          content: const Text(
-            'Anda akan keluar dari sesi kuis saat ini. Apakah Anda yakin?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Lanjutkan Kuis'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Akhiri Sesi'),
-            ),
-          ],
-        );
-      },
-    );
-    if (confirm == true) {
-      await ref.read(quizSessionControllerProvider).endQuizSession();
-      return true;
-    }
-    return false;
   }
 
   @override
@@ -95,36 +72,47 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
 
     if (currentQuestion == null) {
       return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: AppBar(title: Text('Memuat Kuis...')),
+        backgroundColor: AppTheme.backgroundColor,
+        appBar: AppBar(
+          title: Text(
+            'Memuat Kuis...',
+            style: TextStyle(color: AppTheme.textColor),
+          ),
+          centerTitle: true,
+          backgroundColor: AppTheme.backgroundColor,
+          elevation: 0,
         ),
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
       );
     }
 
     return PopScope(
-      // Menggunakan PopScope untuk Flutter 3.16+
-      canPop: false, // Secara default tidak mengizinkan pop
+      canPop: false,
       onPopInvoked: (didPop) async {
-        if (didPop) return; // Jika sistem sudah menangani pop, abaikan
+        if (didPop) return;
 
         final confirm = await showDialog<bool>(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: const Text('Akhiri Sesi Kuis?'),
-              content: const Text(
+              backgroundColor: AppTheme.cardColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                'Akhiri Sesi Kuis?',
+                style: TextStyle(color: AppTheme.textColor),
+              ),
+              content: Text(
                 'Anda akan keluar dari sesi kuis saat ini. Apakah Anda yakin? Progres sesi ini akan disimpan.',
+                style: TextStyle(color: AppTheme.secondaryTextColor),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Lanjutkan Kuis'),
+                  child: Text('Lanjutkan Kuis', style: TextStyle(color: AppTheme.primaryColor)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Akhiri Sesi'),
+                  child: Text('Akhiri Sesi', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                 ),
               ],
             );
@@ -139,17 +127,26 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
         }
       },
       child: Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
-          title: const Text('Kuis'),
+          title: Text(
+            'Kuis',
+            style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: AppTheme.backgroundColor,
+          elevation: 0,
+          iconTheme: IconThemeData(color: AppTheme.iconColor),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: Center(
                 child: Text(
-                  '${currentIndex + 1}/${questions.length}',
-                  style: const TextStyle(
+                  '${currentIndex + 1}/${questions.length}', // Progres soal di AppBar
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: AppTheme.textColor,
                   ),
                 ),
               ),
@@ -159,97 +156,133 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Tetap start untuk widget lain
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Progres soal (tetap rata kiri)
+              // Progres soal (fixed top)
               Text(
                 'Soal ${currentIndex + 1}/${questions.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.secondaryTextColor,
                 ),
               ),
               const SizedBox(height: 16),
 
-              // --- TEKS PERTANYAAN (RATA KANAN) ---
-              // Menggunakan Directionality untuk memastikan teks Arab rata kanan
-              Directionality(
-                textDirection: TextDirection.rtl, // Penting untuk teks Arab
-                child: Text(
-                  '${currentQuestion.questionTextPart1} _____ ${currentQuestion.questionTextPart2}',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    height: 1.5,
-                  ), // Perbesar ukuran font agar lebih jelas
-                  textAlign: TextAlign.right, // Rata kanan
-                ),
-              ),
-              const SizedBox(height: 24),
-
+              // Bagian yang dapat di-scroll: Pertanyaan dan Opsi Jawaban
               Expanded(
-                child: ListView.builder(
-                  itemCount: currentQuestion.options.length,
-                  itemBuilder: (context, index) {
-                    final option = currentQuestion.options[index];
-                    final isSelected = index == selectedIndex;
-                    final isCorrect =
-                        (index == currentQuestion.correctAnswerIndex);
-
-                    Color color = Colors.grey[200]!;
-                    if (isAnswerChecked) {
-                      if (isCorrect) {
-                        color = Colors.green[300]!;
-                      } else if (isSelected) {
-                        color = Colors.red[300]!;
-                      }
-                    } else if (isSelected) {
-                      color = Colors.blue[200]!;
-                    }
-
-                    return GestureDetector(
-                      onTap: () => _onOptionSelected(index),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected
-                                ? Theme.of(context).primaryColor
-                                : Colors.transparent,
-                            width: 2,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // TEKS PERTANYAAN (RATA KANAN) dengan latar belakang Card
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Card(
+                          color: AppTheme.backgroundColor,
+                          margin: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: AppTheme.primaryColor.withOpacity(0.2), width: 1),
+                          ),
+                          elevation: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: Text(
+                                '${currentQuestion.questionTextPart1} _____ ${currentQuestion.questionTextPart2}',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  height: 1.5,
+                                  fontFamily: 'UthmanicHafs',
+                                  color: AppTheme.textColor,
+                                ),
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
                           ),
                         ),
-                        // --- TEKS OPSI (RATA KANAN) ---
-                        // Menggunakan Directionality untuk memastikan teks Arab rata kanan
-                        child: Directionality(
-                          textDirection:
-                              TextDirection.rtl, // Penting untuk teks Arab
-                          child: Text(
-                            option.text,
-                            style: const TextStyle(
-                              fontSize: 18,
-                            ), // Perbesar ukuran font
-                            textAlign: TextAlign.right, // Rata kanan
-                          ),
-                        ),
-                        // --- AKHIR TEKS OPSI ---
                       ),
-                    );
-                  },
+                      const SizedBox(height: 24),
+
+                      // Opsi Jawaban
+                      ...currentQuestion.options.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        RustModels.QuizOption option = entry.value;
+
+                        final isSelected = index == selectedIndex;
+                        final isCorrect = (index == currentQuestion.correctAnswerIndex);
+
+                        Color cardColor = AppTheme.cardColor;
+                        Color textColor = AppTheme.textColor;
+                        Color borderColor = Colors.grey.shade300;
+
+                        if (isAnswerChecked) {
+                          if (isCorrect) {
+                            cardColor = Colors.green.shade100;
+                            textColor = Colors.green.shade800;
+                            borderColor = Colors.green.shade500;
+                          } else if (isSelected) {
+                            cardColor = Colors.red.shade100;
+                            textColor = Colors.red.shade800;
+                            borderColor = Colors.red.shade500;
+                          }
+                        } else if (isSelected) {
+                          cardColor = AppTheme.primaryColor.withOpacity(0.1);
+                          textColor = AppTheme.primaryColor;
+                          borderColor = AppTheme.primaryColor;
+                        }
+
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: Card(
+                            color: cardColor,
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: borderColor, width: 2),
+                            ),
+                            elevation: 2,
+                            child: InkWell(
+                              onTap: () => _onOptionSelected(index),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                child: Directionality(
+                                  textDirection: TextDirection.rtl,
+                                  child: Text(
+                                    option.text,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'UthmanicHafs',
+                                      color: textColor,
+                                      fontWeight: isSelected && !isAnswerChecked ? FontWeight.bold : FontWeight.normal,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ),
               ),
+
               const SizedBox(height: 24),
+
+              // Tombol (fixed bottom)
               SizedBox(
                 width: double.infinity,
                 child: !isAnswerChecked
                     ? ElevatedButton(
-                        onPressed: selectedIndex == null
-                            ? null
-                            : _onCheckAnswer,
+                        onPressed: selectedIndex == null ? null : _onCheckAnswer,
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           textStyle: const TextStyle(
                             fontSize: 18,
@@ -264,13 +297,13 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
                     : ElevatedButton(
                         onPressed: _onNextQuestion,
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.secondaryColor,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           textStyle: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
-                          backgroundColor: Theme.of(context).primaryColor,
-                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

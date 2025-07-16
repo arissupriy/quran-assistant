@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quran_assistant/core/themes/app_theme.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/mushaf_provider.dart';
 import 'package:quran_assistant/src/rust/api/quran/verse.dart';
@@ -15,7 +16,6 @@ import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:quran_assistant/widgets/ayah_context_menu.dart';
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
 import 'package:super_context_menu/super_context_menu.dart';
-
 class MushafDetailPage extends ConsumerStatefulWidget {
   final int pageNumber;
 
@@ -55,8 +55,6 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
       }
     });
     _startHideAppBarTimer();
-    // Panggilan _loadInitialPageInfo() dipindahkan dari sini
-    // agar hanya dipanggil setelah mushaf pack berhasil dimuat.
   }
 
   void _loadInitialPageInfo() {
@@ -167,6 +165,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
             _loadInitialPageInfo();
 
             return Scaffold(
+              backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
               body: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
@@ -186,22 +185,22 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                   vertical: 6,
                                 ),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       currentPageInfo.surahNameArabic,
-                                      style: const TextStyle(
+                                      style: TextStyle( // Menggunakan TextStyle dari tema
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
+                                        color: AppTheme.textColor, // Warna teks dari tema
                                       ),
                                     ),
                                     Text(
                                       'Juz ${currentPageInfo.juzNumber}',
-                                      style: const TextStyle(
+                                      style: TextStyle( // Menggunakan TextStyle dari tema
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.grey,
+                                        color: AppTheme.secondaryTextColor, // Warna teks dari tema
                                       ),
                                     ),
                                   ],
@@ -215,6 +214,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                 onPageChanged: _onPageChanged,
                                 itemBuilder: (context, index) {
                                   final currentPage = index + 1;
+                                  // Tidak mengubah apapun di sini terkait MushafPageDisplay
                                   return MushafPageDisplay(
                                     pageNumber: currentPage,
                                     topOffset: totalTopOffset,
@@ -229,14 +229,13 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                   vertical: 8,
                                 ),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       currentPageInfo.nextPageRouteText,
-                                      style: const TextStyle(
+                                      style: TextStyle( // Menggunakan TextStyle dari tema
                                         fontSize: 16,
-                                        color: Colors.black,
+                                        color: AppTheme.textColor, // Warna teks dari tema
                                       ),
                                     ),
                                     Container(
@@ -244,12 +243,16 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
+                                      decoration: BoxDecoration( // Menambahkan dekorasi untuk nomor halaman
+                                        color: AppTheme.primaryColor.withOpacity(0.1), // Latar belakang
+                                        borderRadius: BorderRadius.circular(8), // Sudut membulat
+                                      ),
                                       child: Text(
                                         '${currentPageInfo.pageNumber}',
-                                        style: const TextStyle(
+                                        style: TextStyle( // Menggunakan TextStyle dari tema
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                          color: AppTheme.primaryColor, // Warna teks dari tema
                                         ),
                                       ),
                                     ),
@@ -259,6 +262,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                           ],
                         ),
                       ),
+                      // Custom AppBar yang muncul/hilang
                       Positioned(
                         top: 0,
                         left: 0,
@@ -267,24 +271,34 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                           opacity: isAppBarVisible ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
                           child: AppBar(
-                            title: const Text('Quran Assistant'),
+                            title: Text( // Menggunakan Text widget untuk judul
+                              'Quran Assistant',
+                              style: TextStyle(
+                                color: AppTheme.textColor, // Warna teks judul dari tema
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             centerTitle: true,
-                            backgroundColor:
-                                Theme.of(context).appBarTheme.backgroundColor ??
-                                Theme.of(context).primaryColor,
-                            foregroundColor:
-                                Theme.of(context).appBarTheme.foregroundColor ??
-                                Colors.white,
+                            backgroundColor: AppTheme.backgroundColor, // Warna latar belakang AppBar dari tema
+                            elevation: 0, // Menghilangkan bayangan
+                            iconTheme: IconThemeData(color: AppTheme.iconColor), // Warna ikon back button dari tema
+                            // Tambahkan leading jika Anda ingin tombol kembali di sini
+                            leading: Navigator.of(context).canPop()
+                                ? IconButton(
+                                    icon: Icon(Icons.arrow_back, color: AppTheme.iconColor),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  )
+                                : null,
                             actions: [
                               Padding(
                                 padding: const EdgeInsets.only(right: 16.0),
                                 child: Center(
                                   child: Text(
                                     '$_currentPageNumber / 604',
-                                    style: const TextStyle(
+                                    style: TextStyle( // Menggunakan TextStyle dari tema
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: AppTheme.textColor, // Warna teks progres halaman dari tema
                                     ),
                                   ),
                                 ),
@@ -320,10 +334,21 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   }
 
   Widget _buildLoading() =>
-      const Scaffold(body: Center(child: CircularProgressIndicator()));
+      Scaffold(
+        backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)), // Warna indikator
+      );
 
   Widget _buildError(String message) =>
-      Scaffold(body: Center(child: Text(message)));
+      Scaffold(
+        backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+        body: Center(
+          child: Text(
+            message,
+            style: TextStyle(color: Theme.of(context).colorScheme.error), // Warna teks error
+          ),
+        ),
+      );
 }
 
 class MushafPageDisplay extends ConsumerWidget {
@@ -425,6 +450,7 @@ class MushafPageDisplay extends ConsumerWidget {
 
   Widget _error(String msg) => Center(child: Text(msg));
 }
+
 
 class AyahTapInfo {
   final int sura;
