@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:quran_assistant/pages/mushaf_detail_page%20copy%202.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/mushaf_provider.dart';
 import 'package:quran_assistant/src/rust/api/quran/verse.dart';
@@ -16,15 +15,6 @@ import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:quran_assistant/widgets/ayah_context_menu.dart';
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
 import 'package:super_context_menu/super_context_menu.dart';
-
-// extension StringExtension on String {
-//   String toCapitalized() =>
-//       length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
-//   String toTitleCase() => replaceAll(
-//     RegExp(' +'),
-//     ' ',
-//   ).split(' ').map((str) => str.toCapitalized()).join(' ');
-// }
 
 class MushafDetailPage extends ConsumerStatefulWidget {
   final int pageNumber;
@@ -42,6 +32,9 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
   Timer? _hideAppBarTimer;
   int _currentPageNumber = 0;
+
+  // Flag baru untuk memastikan _loadInitialPageInfo hanya dipanggil sekali
+  bool _isInitialPageInfoLoaded = false;
 
   @override
   void deactivate() {
@@ -62,17 +55,22 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
       }
     });
     _startHideAppBarTimer();
-    _loadInitialPageInfo();
+    // Panggilan _loadInitialPageInfo() dipindahkan dari sini
+    // agar hanya dipanggil setelah mushaf pack berhasil dimuat.
   }
 
   void _loadInitialPageInfo() {
-    ref.read(mushafPageInfoProvider(_currentPageNumber).future).then((
-      pageInfo,
-    ) {
-      if (mounted) {
-        ref.read(currentPageInfoProvider.notifier).state = pageInfo;
-      }
-    });
+    // Pastikan hanya dipanggil sekali
+    if (!_isInitialPageInfoLoaded) {
+      ref.read(mushafPageInfoProvider(_currentPageNumber).future).then((
+        pageInfo,
+      ) {
+        if (mounted) {
+          ref.read(currentPageInfoProvider.notifier).state = pageInfo;
+          _isInitialPageInfoLoaded = true; // Setel flag menjadi true
+        }
+      });
+    }
   }
 
   @override
@@ -80,7 +78,6 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
     _pageController.dispose();
     _hideAppBarTimer?.cancel();
 
-    // Jadwalkan invalidate di frame berikutnya (tidak crash meski dispose)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         // ref.invalidate(highlightedAyahProvider);
@@ -121,6 +118,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
     ref.invalidate(highlightedAyahProvider);
 
+    // Tetap panggil mushafPageInfoProvider di sini untuk halaman berikutnya
     ref.read(mushafPageInfoProvider(nextPage).future).then((pageInfo) {
       if (mounted) {
         ref.read(currentPageInfoProvider.notifier).state = pageInfo;
@@ -163,6 +161,10 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
             if (!loaded) {
               return _buildError('Gagal membuka mushaf.');
             }
+
+            // PENTING: Panggil _loadInitialPageInfo() DI SINI,
+            // setelah mushafLoadProvider telah sukses memuat data.
+            _loadInitialPageInfo();
 
             return Scaffold(
               body: GestureDetector(
@@ -242,10 +244,6 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
-                                      // decoration: BoxDecoration(
-                                      //   color: Theme.of(context).primaryColor,
-                                      //   borderRadius: BorderRadius.circular(20),
-                                      // ),
                                       child: Text(
                                         '${currentPageInfo.pageNumber}',
                                         style: const TextStyle(
@@ -330,13 +328,11 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
 class MushafPageDisplay extends ConsumerWidget {
   final int pageNumber;
-  // final bool isAppBarVisible;
   final double topOffset;
 
   const MushafPageDisplay({
     super.key,
     required this.pageNumber,
-    // required this.isAppBarVisible,
     required this.topOffset,
   });
 
@@ -345,7 +341,7 @@ class MushafPageDisplay extends ConsumerWidget {
     final imageAsync = ref.watch(mushafImageProvider(pageNumber));
     final glyphAsync = ref.watch(mushafGlyphProvider(pageNumber));
     final highlighted = ref.watch(highlightedAyahProvider(pageNumber));
-    final pageInfoAsync = ref.watch(mushafPageInfoProvider(pageNumber));
+    final pageInfoAsync = ref.watch(mushafPageInfoProvider(pageNumber)); // Mengambil page info
 
     return imageAsync.when(
       loading: _loading,
@@ -360,15 +356,17 @@ class MushafPageDisplay extends ConsumerWidget {
             if (glyphs == null || glyphs.isEmpty)
               return _error('Glyph tidak ditemukan.');
 
-            return pageInfoAsync.when(
+            return pageInfoAsync.when( // Menambahkan FutureBuilder untuk pageInfo
               loading: _loading,
               error: (e, _) => _error('Gagal memuat info halaman: $e'),
               data: (pageInfo) {
+                // Pastikan pageInfo tidak null sebelum digunakan
+                if (pageInfo == null) return _error('Info halaman tidak ditemukan.');
+
                 return _MushafPageContent(
                   imageBytes: imageBytes,
                   glyphs: glyphs,
                   highlighted: highlighted,
-                  // isAppBarVisible: isAppBarVisible,
                   pageInfo: pageInfo,
                   topOffset: topOffset,
                   onTap: (info) {
@@ -523,8 +521,6 @@ class _MushafPageContent extends ConsumerWidget {
           }
         }
 
-        // final List<Widget> contextMenuGlyphWidgets = [];
-
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () {
@@ -555,7 +551,6 @@ class _MushafPageContent extends ConsumerWidget {
             final localPos = details.localPosition;
             final dx = localPos.dx;
             final dy = localPos.dy;
-            // debugPrint("📍 Tap at: x=$dx, y=$dy");
 
             for (final g in glyphs) {
               final left = g.minX * uniformScale + imageOffsetX;
@@ -564,9 +559,6 @@ class _MushafPageContent extends ConsumerWidget {
               final bottom = g.maxY * uniformScale + totalContentOffsetY;
 
               if (dx >= left && dx <= right && dy >= top && dy <= bottom) {
-                // debugPrint(
-                //   "🌟 MATCH: ${g.sura}:${g.ayah} (line ${g.lineNumber})",
-                // );
                 onTap(
                   AyahTapInfo(
                     sura: g.sura,
@@ -587,23 +579,6 @@ class _MushafPageContent extends ConsumerWidget {
                 fit: BoxFit.contain,
               ),
               ...highlightWidgets,
-              // AyahContextMenuOverlay(
-              //   glyphs: glyphs,
-              //   scale: uniformScale,
-              //   offsetX: imageOffsetX,
-              //   offsetY: totalContentOffsetY,
-              //   pageNumber: pageInfo.pageNumber,
-              //   onHighlight: (sura, ayah) {
-              //     ref
-              //         .read(
-              //           highlightedAyahProvider(pageInfo.pageNumber).notifier,
-              //         )
-              //         .state = (
-              //       sura: sura,
-              //       ayah: ayah,
-              //     );
-              //   },
-              // ),
             ],
           ),
         );
@@ -611,9 +586,3 @@ class _MushafPageContent extends ConsumerWidget {
     );
   }
 }
-
-
-
-
-
-// --- END BAGIAN MushafDetailPage --- 

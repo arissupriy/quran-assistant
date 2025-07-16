@@ -1,6 +1,8 @@
 // The original content is temporarily commented out to allow generating a self-contained demo - feel free to uncomment later.
 
 // // lib/main.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +23,7 @@ void main() async {
   await RustLib.init();
 
   await Hive.initFlutter();
+  
 
   // Daftarkan TypeAdapters yang digenerate oleh hive_generator
   Hive.registerAdapter(QuizSessionAdapter());
@@ -30,6 +33,7 @@ void main() async {
   // Buka "boxes" (mirip tabel)
   await Hive.openBox<QuizSession>('quizSessions');
   await Hive.openBox<QuizAttempt>('quizAttempts');
+  // await Hi
 
  
 
@@ -40,7 +44,16 @@ void main() async {
   await initQuranEngine(); // Inisialisasi Quran Engine
   // RustEngineService().initEngine();
   // await GlyphCache().preloadAllGlyphs(); // Preload saat awal
-  runApp(const ProviderScope(child: MyApp()));
+
+   FlutterError.onError = FlutterError.dumpErrorToConsole;
+
+  runZonedGuarded(() {
+    runApp(const ProviderScope(child: MyApp()));
+  }, (Object error, StackTrace stack) {
+    debugPrint("❗ Global error caught: $error");
+    debugPrint("🧵 Stacktrace:\n$stack");
+  });
+  
 }
 
 class MyApp extends StatelessWidget {

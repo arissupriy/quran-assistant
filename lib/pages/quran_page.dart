@@ -6,31 +6,81 @@ import 'package:quran_assistant/providers/quran_provider.dart';
 import 'package:quran_assistant/src/rust/data_loader/juzs.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
 
-class QuranPage extends ConsumerWidget {
+class QuranPage extends ConsumerStatefulWidget {
   const QuranPage({super.key});
 
-  Future<void> _handleJuzTap(BuildContext context, int startPage) async {
-    final file = await getMushafDownloadedFile('data.mushafpack');
+  @override
+  ConsumerState<QuranPage> createState() => _QuranPageState();
+}
 
+class _QuranPageState extends ConsumerState<QuranPage> {
+  bool _isLoading = true; // State untuk menunjukkan sedang memeriksa data
+  bool _hasMushafData = false; // State untuk menunjukkan apakah data mushaf ada
+
+  @override
+  void initState() {
+    super.initState();
+    // Memastikan context tersedia sebelum melakukan pengecekan
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkMushafData();
+    });
+  }
+
+  Future<void> _checkMushafData() async {
+    final file = await getMushafDownloadedFile('data.mushafpack');
     if (file == null || !await file.exists()) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MushafDownloadPage(initialPage: startPage),
-        ),
-      );
+      // Data tidak ditemukan, navigasi ke halaman download
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MushafDownloadPage(), // Tidak perlu initialPage di sini
+          ),
+        );
+      }
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MushafDetailPage(pageNumber: startPage),
-        ),
-      );
+      // Data ditemukan, perbarui state untuk menampilkan konten halaman
+      if (mounted) {
+        setState(() {
+          _hasMushafData = true;
+          _isLoading = false;
+        });
+      }
     }
   }
 
+  Future<void> _handleJuzTap(BuildContext context, int startPage) async {
+    // Metode ini hanya akan dipanggil jika _hasMushafData sudah true,
+    // jadi bisa langsung menavigasi ke MushafDetailPage.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MushafDetailPage(pageNumber: startPage),
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      // Tampilkan indikator loading saat pemeriksaan data
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Jika _hasMushafData false, ini seharusnya tidak tercapai karena pushReplacement,
+    // tapi sebagai fallback atau untuk kejelasan:
+    if (!_hasMushafData) {
+      return const Scaffold(
+        body: Center(
+          child: Text('Data Mushaf tidak tersedia. Silakan unduh.'),
+        ),
+      );
+    }
+
     final juzListAsync = ref.watch(juzListProvider);
 
     return Scaffold(
