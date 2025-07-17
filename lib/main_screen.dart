@@ -75,10 +75,11 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: CustomAppBar(
         title: _appBarTitles[_selectedIndex],
-        showSearch: _selectedIndex == 1,
+        // showSearch: _selectedIndex == 1,
         // showMenu: _selectedIndex == 0,
       ),
       body: SafeArea(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:quran_assistant/core/models/prayer_data_model.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
-import 'package:quran_assistant/widgets/prayer_times_widget.dart'; // Import dummyPrayerTimesProvider
+import 'package:quran_assistant/core/models/prayer_data_model.dart';
+import 'package:quran_assistant/providers/prayer_api_time_provider.dart'; // Perbarui import ini
 
 class PrayerSchedulePage extends ConsumerWidget {
   const PrayerSchedulePage({super.key});
@@ -11,12 +11,35 @@ class PrayerSchedulePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Mengawasi provider data sholat
-    final ParsedPrayerData prayerData = ref.watch(dummyPrayerTimesProvider);
+    final ParsedPrayerData? prayerData = ref.watch(dummyPrayerTimesProvider); // Bisa null
+
+    if (prayerData == null) {
+      return Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        appBar: AppBar(
+          title: Text(
+            'Jadwal Sholat',
+            style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: AppTheme.backgroundColor,
+          elevation: 0,
+          iconTheme: IconThemeData(color: AppTheme.iconColor),
+        ),
+        body: Center(
+          child: Text(
+            'Data jadwal sholat tidak tersedia.',
+            style: TextStyle(fontSize: 16.0, color: AppTheme.secondaryTextColor),
+          ),
+        ),
+      );
+    }
+
     final List<PrayerTime> prayers = prayerData.prayerTimesList;
     final String locationName = '${prayerData.location.lokasi}, ${prayerData.location.daerah}';
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor, // Latar belakang dari tema
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: Text(
           'Jadwal Sholat',
@@ -28,7 +51,7 @@ class PrayerSchedulePage extends ConsumerWidget {
         centerTitle: true,
         backgroundColor: AppTheme.backgroundColor,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.iconColor), // Warna ikon back button
+        iconTheme: IconThemeData(color: AppTheme.iconColor),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -112,7 +135,7 @@ class PrayerSchedulePage extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryColor, // Warna primary untuk waktu
+                            color: AppTheme.primaryColor,
                           ),
                         ),
                       ],

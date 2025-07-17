@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:quran_assistant/core/models/quiz_history.dart';
+import 'package:quran_assistant/core/models/reading_session.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
 import 'package:quran_assistant/engine/init_quran_engine.dart';
 import 'package:quran_assistant/main_screen.dart';
@@ -20,6 +21,7 @@ void main() async {
   Hive.registerAdapter(QuizSessionAdapter());
   Hive.registerAdapter(QuizAttemptAdapter());
   Hive.registerAdapter(HiveQuizOptionAdapter()); // Pastikan ini ada jika Anda menggunakannya
+  Hive.registerAdapter(ReadingSessionAdapter());
 
   // Buka "boxes" (mirip tabel)
   await Hive.openBox<QuizSession>('quizSessions');

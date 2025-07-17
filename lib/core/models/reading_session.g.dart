@@ -8,7 +8,7 @@ part of 'reading_session.dart';
 
 class ReadingSessionAdapter extends TypeAdapter<ReadingSession> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
   ReadingSession read(BinaryReader reader) {

@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'reading_session.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 3)
 class ReadingSession extends HiveObject {
   @HiveField(0)
   final int page;

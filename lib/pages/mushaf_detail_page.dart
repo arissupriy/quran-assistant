@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/mushaf_provider.dart';
+import 'package:quran_assistant/providers/reading_session_provider.dart';
 import 'package:quran_assistant/src/rust/api/quran/verse.dart';
 import 'package:quran_assistant/src/rust/data_loader/mushaf_page_info.dart';
 import 'package:quran_assistant/src/rust/data_loader/verse_by_chapter.dart';
@@ -16,6 +17,7 @@ import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:quran_assistant/widgets/ayah_context_menu.dart';
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
 import 'package:super_context_menu/super_context_menu.dart';
+
 class MushafDetailPage extends ConsumerStatefulWidget {
   final int pageNumber;
 
@@ -35,19 +37,25 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
   // Flag baru untuk memastikan _loadInitialPageInfo hanya dipanggil sekali
   bool _isInitialPageInfoLoaded = false;
+  int? _previousPageNumber; // Akan diinisialisasi sebagai 0 untuk sesi pertama
 
   @override
   void deactivate() {
     // ref.invalidate(highlightedAyahProvider);
+    _endReadingSession();
     super.deactivate();
   }
 
   @override
   void initState() {
     super.initState();
+
+    _startReadingSession(widget.pageNumber);
     _currentPageNumber = widget.pageNumber;
     _pageController = PageController(initialPage: widget.pageNumber - 1);
     _mushafPathFuture = getMushafFilePathIfExists();
+
+    _previousPageNumber = 0;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -55,6 +63,36 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
       }
     });
     _startHideAppBarTimer();
+  }
+
+  // Memulai sesi membaca
+  void _startReadingSession(int page) async{
+    debugPrint('Memulai sesi membaca di halaman $page');
+    await ref
+        .read(readingSessionRecorderProvider.notifier)
+        .startSession(
+          page: page,
+          previousPage:
+              _previousPageNumber, // Menggunakan nilai _previousPageNumber saat ini
+        );
+    _previousPageNumber =
+        page; // Set halaman saat ini sebagai halaman sebelumnya untuk sesi berikutnya
+  }
+
+  // Mengakhiri sesi membaca
+  Future<void> _endReadingSession() async {
+    // debugPrint('Mengakhiri sesi membaca');
+
+    // debugPrint(ref.read(readingSessionRecorderProvider.notifier).activeSession
+    //     ?.toString());
+    await ref.read(readingSessionRecorderProvider.notifier).endSession();
+
+    // PENTING: Invalidate providers statistik setelah sesi diakhiri
+    // ref.invalidate(allReadingSessionsStreamProvider); // Untuk daftar sesi
+    // ref.invalidate(
+    //   dailyReadingDurationsProvider,
+    // ); // Untuk durasi harian (perbandingan)
+    
   }
 
   void _loadInitialPageInfo() {
@@ -79,6 +117,8 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         // ref.invalidate(highlightedAyahProvider);
+        // Akhiri sesi membaca saat widget dibuang
+        _endReadingSession();
       }
     });
 
@@ -110,6 +150,11 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
   void _onPageChanged(int index) {
     final nextPage = index + 1;
+
+    _endReadingSession().then((_) {
+      _startReadingSession(nextPage);
+    });
+
     _currentPageNumber = nextPage;
 
     if (!mounted) return;
@@ -165,7 +210,8 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
             _loadInitialPageInfo();
 
             return Scaffold(
-              backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+              backgroundColor:
+                  AppTheme.backgroundColor, // Warna latar belakang dari tema
               body: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
@@ -185,22 +231,27 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                   vertical: 6,
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       currentPageInfo.surahNameArabic,
-                                      style: TextStyle( // Menggunakan TextStyle dari tema
+                                      style: TextStyle(
+                                        // Menggunakan TextStyle dari tema
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        color: AppTheme.textColor, // Warna teks dari tema
+                                        color: AppTheme
+                                            .textColor, // Warna teks dari tema
                                       ),
                                     ),
                                     Text(
                                       'Juz ${currentPageInfo.juzNumber}',
-                                      style: TextStyle( // Menggunakan TextStyle dari tema
+                                      style: TextStyle(
+                                        // Menggunakan TextStyle dari tema
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
-                                        color: AppTheme.secondaryTextColor, // Warna teks dari tema
+                                        color: AppTheme
+                                            .secondaryTextColor, // Warna teks dari tema
                                       ),
                                     ),
                                   ],
@@ -229,13 +280,16 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                   vertical: 8,
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       currentPageInfo.nextPageRouteText,
-                                      style: TextStyle( // Menggunakan TextStyle dari tema
+                                      style: TextStyle(
+                                        // Menggunakan TextStyle dari tema
                                         fontSize: 16,
-                                        color: AppTheme.textColor, // Warna teks dari tema
+                                        color: AppTheme
+                                            .textColor, // Warna teks dari tema
                                       ),
                                     ),
                                     Container(
@@ -243,16 +297,22 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
-                                      decoration: BoxDecoration( // Menambahkan dekorasi untuk nomor halaman
-                                        color: AppTheme.primaryColor.withOpacity(0.1), // Latar belakang
-                                        borderRadius: BorderRadius.circular(8), // Sudut membulat
+                                      decoration: BoxDecoration(
+                                        // Menambahkan dekorasi untuk nomor halaman
+                                        color: AppTheme.primaryColor
+                                            .withOpacity(0.1), // Latar belakang
+                                        borderRadius: BorderRadius.circular(
+                                          8,
+                                        ), // Sudut membulat
                                       ),
                                       child: Text(
                                         '${currentPageInfo.pageNumber}',
-                                        style: TextStyle( // Menggunakan TextStyle dari tema
+                                        style: TextStyle(
+                                          // Menggunakan TextStyle dari tema
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: AppTheme.primaryColor, // Warna teks dari tema
+                                          color: AppTheme
+                                              .primaryColor, // Warna teks dari tema
                                         ),
                                       ),
                                     ),
@@ -271,22 +331,35 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                           opacity: isAppBarVisible ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
                           child: AppBar(
-                            title: Text( // Menggunakan Text widget untuk judul
+                            title: Text(
+                              // Menggunakan Text widget untuk judul
                               'Quran Assistant',
                               style: TextStyle(
-                                color: AppTheme.textColor, // Warna teks judul dari tema
+                                color: AppTheme
+                                    .textColor, // Warna teks judul dari tema
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             centerTitle: true,
-                            backgroundColor: AppTheme.backgroundColor, // Warna latar belakang AppBar dari tema
+                            backgroundColor: AppTheme
+                                .backgroundColor, // Warna latar belakang AppBar dari tema
                             elevation: 0, // Menghilangkan bayangan
-                            iconTheme: IconThemeData(color: AppTheme.iconColor), // Warna ikon back button dari tema
+                            iconTheme: IconThemeData(
+                              color: AppTheme.iconColor,
+                            ), // Warna ikon back button dari tema
                             // Tambahkan leading jika Anda ingin tombol kembali di sini
                             leading: Navigator.of(context).canPop()
                                 ? IconButton(
-                                    icon: Icon(Icons.arrow_back, color: AppTheme.iconColor),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    icon: Icon(
+                                      Icons.arrow_back,
+                                      color: AppTheme.iconColor,
+                                    ),
+                                    onPressed: () async {
+                                      await _endReadingSession();
+                                      if (mounted) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
                                   )
                                 : null,
                             actions: [
@@ -295,10 +368,12 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                                 child: Center(
                                   child: Text(
                                     '$_currentPageNumber / 604',
-                                    style: TextStyle( // Menggunakan TextStyle dari tema
+                                    style: TextStyle(
+                                      // Menggunakan TextStyle dari tema
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: AppTheme.textColor, // Warna teks progres halaman dari tema
+                                      color: AppTheme
+                                          .textColor, // Warna teks progres halaman dari tema
                                     ),
                                   ),
                                 ),
@@ -333,22 +408,24 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
     });
   }
 
-  Widget _buildLoading() =>
-      Scaffold(
-        backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
-        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)), // Warna indikator
-      );
+  Widget _buildLoading() => Scaffold(
+    backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+    body: Center(
+      child: CircularProgressIndicator(color: AppTheme.primaryColor),
+    ), // Warna indikator
+  );
 
-  Widget _buildError(String message) =>
-      Scaffold(
-        backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
-        body: Center(
-          child: Text(
-            message,
-            style: TextStyle(color: Theme.of(context).colorScheme.error), // Warna teks error
-          ),
-        ),
-      );
+  Widget _buildError(String message) => Scaffold(
+    backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+    body: Center(
+      child: Text(
+        message,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.error,
+        ), // Warna teks error
+      ),
+    ),
+  );
 }
 
 class MushafPageDisplay extends ConsumerWidget {
@@ -366,7 +443,9 @@ class MushafPageDisplay extends ConsumerWidget {
     final imageAsync = ref.watch(mushafImageProvider(pageNumber));
     final glyphAsync = ref.watch(mushafGlyphProvider(pageNumber));
     final highlighted = ref.watch(highlightedAyahProvider(pageNumber));
-    final pageInfoAsync = ref.watch(mushafPageInfoProvider(pageNumber)); // Mengambil page info
+    final pageInfoAsync = ref.watch(
+      mushafPageInfoProvider(pageNumber),
+    ); // Mengambil page info
 
     return imageAsync.when(
       loading: _loading,
@@ -381,12 +460,14 @@ class MushafPageDisplay extends ConsumerWidget {
             if (glyphs == null || glyphs.isEmpty)
               return _error('Glyph tidak ditemukan.');
 
-            return pageInfoAsync.when( // Menambahkan FutureBuilder untuk pageInfo
+            return pageInfoAsync.when(
+              // Menambahkan FutureBuilder untuk pageInfo
               loading: _loading,
               error: (e, _) => _error('Gagal memuat info halaman: $e'),
               data: (pageInfo) {
                 // Pastikan pageInfo tidak null sebelum digunakan
-                if (pageInfo == null) return _error('Info halaman tidak ditemukan.');
+                if (pageInfo == null)
+                  return _error('Info halaman tidak ditemukan.');
 
                 return _MushafPageContent(
                   imageBytes: imageBytes,
@@ -450,7 +531,6 @@ class MushafPageDisplay extends ConsumerWidget {
 
   Widget _error(String msg) => Center(child: Text(msg));
 }
-
 
 class AyahTapInfo {
   final int sura;

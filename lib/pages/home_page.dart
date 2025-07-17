@@ -5,7 +5,9 @@ import 'package:quran_assistant/pages/prayer/prayer_detail_page.dart';
 import 'package:quran_assistant/pages/statistics/quran_statistic_page.dart';
 import 'package:quran_assistant/core/models/reading_session.dart';
 import 'package:intl/intl.dart';
-import 'package:quran_assistant/widgets/prayer_times_widget.dart'; // Import PrayerTimesWidget
+import 'package:quran_assistant/providers/reading_session_provider.dart';
+import 'package:quran_assistant/widgets/prayer_times_widget.dart';
+import 'package:quran_assistant/widgets/reading_statistics_card.dart'; // Import ReadingStatisticsCard yang baru
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -16,17 +18,20 @@ class HomePage extends ConsumerWidget {
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     if (duration.inHours > 0) {
-      return "${twoDigits(duration.inHours)}j ${twoDigitMinutes}m"; // Hanya jam dan menit
+      return "${twoDigits(duration.inHours)}j ${twoDigitMinutes}m";
     } else if (duration.inMinutes > 0) {
       return "${twoDigitMinutes}m ${twoDigitSeconds}d";
     } else {
-      return "${twoDigits(duration.inSeconds)}d"; // Hanya detik
+      return "${twoDigits(duration.inSeconds)}d";
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Dummy Data untuk Mockup
+
+    // ref.watch(readingSessionRecorderProvider);
+    
+    // Dummy Data untuk Mockup (selain statistik bacaan)
     final String userName = "Tanvir Ahassan";
     final String lastReadSurah = "Al-Baqarah 1";
     final double completionPercentage = 0.83;
@@ -70,16 +75,21 @@ class HomePage extends ConsumerWidget {
       },
     ];
 
-    final readingSessions = ref.watch(dummyReadingSessionsProvider);
+    // Variabel ini tidak lagi perlu dihitung di sini karena sudah di dalam ReadingStatisticsCard
+    // Duration totalDuration = Duration.zero;
+    // int totalPagesRead = 0;
+    // Duration averageSessionDuration = Duration.zero;
 
-    final totalDuration = readingSessions.fold(
-      Duration.zero,
-      (sum, session) => sum + session.duration,
-    );
-    final totalPagesRead = readingSessions.map((s) => s.page).toSet().length;
-    final averageSessionDuration = readingSessions.isNotEmpty
-        ? totalDuration ~/ readingSessions.length
-        : Duration.zero;
+    // readingSessionsAsync.whenData((readingSessions) {
+    //   totalDuration = readingSessions.fold(
+    //     Duration.zero,
+    //     (sum, session) => sum + session.duration,
+    //   );
+    //   totalPagesRead = readingSessions.map((s) => s.page).toSet().length;
+    //   averageSessionDuration = readingSessions.isNotEmpty
+    //       ? totalDuration ~/ readingSessions.length
+    //       : Duration.zero;
+    // });
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -105,8 +115,7 @@ class HomePage extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Jadwal Sholat (Widget yang baru dan didesain ulang)
-          // Menambahkan GestureDetector untuk navigasi
+          // Jadwal Sholat
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -115,7 +124,7 @@ class HomePage extends ConsumerWidget {
               );
             },
             child: SizedBox(
-              height: 265, // Tinggi yang sudah disesuaikan
+              height: 265,
               child: const PrayerTimesWidget(),
             ),
           ),
@@ -201,65 +210,8 @@ class HomePage extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Bagian "Reading Statistics"
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Reading Statistics',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textColor,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const QuranStatisticPage()),
-                  );
-                },
-                child: Text(
-                  'See All',
-                  style: TextStyle(color: AppTheme.primaryColor),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Card(
-            color: AppTheme.cardColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  _buildCompactStatRow(
-                    context,
-                    Icons.timer_rounded,
-                    'Waktu Baca Total:',
-                    _formatDuration(totalDuration),
-                  ),
-                  _buildCompactStatRow(
-                    context,
-                    Icons.auto_stories_rounded,
-                    'Halaman Unik Dibaca:',
-                    '$totalPagesRead',
-                  ),
-                  _buildCompactStatRow(
-                    context,
-                    Icons.av_timer_rounded,
-                    'Durasi Sesi Rata-rata:',
-                    _formatDuration(averageSessionDuration),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Bagian "Reading Statistics" (sekarang adalah widget terpisah)
+          const ReadingStatisticsCard(), // <--- Panggil widget baru di sini
           const SizedBox(height: 24),
 
           // Bagian "My Schedule"
@@ -390,26 +342,26 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  // Helper widget baru untuk membangun baris statistik ringkas
-  Widget _buildCompactStatRow(BuildContext context, IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, color: AppTheme.primaryColor, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(fontSize: 16, color: AppTheme.textColor),
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
-          ),
-        ],
-      ),
-    );
-  }
+  // Helper widget _buildCompactStatRow dipindahkan ke ReadingStatisticsCard
+  // Widget _buildCompactStatRow(BuildContext context, IconData icon, String label, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+  //     child: Row(
+  //       children: [
+  //         Icon(icon, color: AppTheme.primaryColor, size: 24),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: Text(
+  //             label,
+  //             style: TextStyle(fontSize: 16, color: AppTheme.textColor),
+  //           ),
+  //         ),
+  //         Text(
+  //           value,
+  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
