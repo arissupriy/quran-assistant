@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_assistant/pages/mushaf_detail_page.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
-// import 'package:quran_assistant/pages/quiz/quiz_history_page.dart'; // Tidak perlu lagi diimpor jika hanya placeholder
-import 'package:quran_assistant/providers/quran_provider.dart'; // Import quran_provider.dart untuk chaptersProvider dan juzListProvider
+import 'package:quran_assistant/providers/quran_provider.dart';
 import 'package:quran_assistant/src/rust/data_loader/chapters.dart';
-import 'package:quran_assistant/src/rust/data_loader/juzs.dart'; // Untuk JuzWithPage, Juz
-import 'package:quran_assistant/src/rust/api/quran/chapter.dart'; // Untuk model Chapter
+import 'package:quran_assistant/src/rust/data_loader/juzs.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
-import 'package:quran_assistant/core/themes/app_theme.dart'; // Import AppTheme
+import 'package:quran_assistant/core/themes/app_theme.dart';
+import 'package:quran_assistant/providers/reading_session_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:quran_assistant/widgets/last_read_card.dart'; // BARU: Import widget baru
 
 class QuranPage extends ConsumerStatefulWidget {
   const QuranPage({super.key});
@@ -18,17 +19,15 @@ class QuranPage extends ConsumerStatefulWidget {
 }
 
 class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProviderStateMixin {
-  bool _isLoading = true; // State untuk menunjukkan sedang memeriksa data
-  bool _hasMushafData = false; // State untuk menunjukkan apakah data mushaf ada
-  late TabController _tabController; // Controller untuk TabBar
+  bool _isLoading = true;
+  bool _hasMushafData = false;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    // Mengubah panjang TabController menjadi 3 (Juz, Surah, History)
     _tabController = TabController(length: 3, vsync: this);
 
-    // Memastikan context tersedia sebelum melakukan pengecekan
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkMushafData();
     });
@@ -36,14 +35,13 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
 
   @override
   void dispose() {
-    _tabController.dispose(); // Buang controller saat widget dibuang
+    _tabController.dispose();
     super.dispose();
   }
 
   Future<void> _checkMushafData() async {
     final file = await getMushafDownloadedFile('data.mushafpack');
     if (file == null || !await file.exists()) {
-      // Data tidak ditemukan, navigasi ke halaman download
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -53,7 +51,6 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
         );
       }
     } else {
-      // Data ditemukan, perbarui state untuk menampilkan konten halaman
       if (mounted) {
         setState(() {
           _hasMushafData = true;
@@ -75,99 +72,40 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      // Tampilkan indikator loading saat pemeriksaan data
-      return Container( // Menggunakan Container sebagai pengganti Scaffold karena Scaffold sudah ada di MainScreen
-        color: AppTheme.backgroundColor, // Gunakan warna latar belakang dari tema
+      return Container(
+        color: AppTheme.backgroundColor,
         child: Center(
-          child: CircularProgressIndicator(color: AppTheme.primaryColor), // Gunakan warna primer dari tema
+          child: CircularProgressIndicator(color: AppTheme.primaryColor),
         ),
       );
     }
 
     if (!_hasMushafData) {
-      return Container( // Menggunakan Container sebagai pengganti Scaffold
+      return Container(
         color: AppTheme.backgroundColor,
         child: Center(
           child: Text(
             'Data Mushaf tidak tersedia. Silakan unduh.',
-            style: TextStyle(color: AppTheme.textColor), // Gunakan warna teks dari tema
+            style: TextStyle(color: AppTheme.textColor),
           ),
         ),
       );
     }
 
-    // Jika data mushaf sudah ada, tampilkan konten utama QuranPage
-    // Menggunakan Riverpod untuk mengawasi chaptersProvider dan juzListProvider
     final chaptersAsync = ref.watch(chaptersProvider);
     final juzListAsync = ref.watch(juzListProvider);
 
     return Column(
       children: [
-        // Bagian "Last Read"
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            color: AppTheme.primaryColor, // Warna kartu sesuai tema
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16), // Sudut membulat
-            ),
-            elevation: 8, // Bayangan
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Last Read',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8), // Warna teks sedikit transparan
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Al-Fatihah', // Contoh data
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Ayah No: 1', // Contoh data
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // 
-                  Image.network(
-                    'https://placehold.co/100x100/00796B/FFFFFF?text=Quran', // Placeholder image
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.menu_book_rounded, size: 80, color: Colors.white.withOpacity(0.7)); // Fallback icon
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        // Card "Last Read" (sekarang menggunakan LastReadCard)
+        const LastReadCard(isHomePage: false), // Beri tahu widget bahwa ini bukan home_page
         // TabBar
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: AppTheme.cardColor, // Latar belakang tab bar
-              borderRadius: BorderRadius.circular(12), // Sudut membulat
+              color: AppTheme.cardColor,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: AppTheme.shadowColor.withOpacity(0.05),
@@ -179,17 +117,16 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
-                borderRadius: BorderRadius.circular(12), // Sudut membulat pada indikator
-                color: AppTheme.primaryColor, // Menggunakan primaryColor untuk indikator aktif
+                borderRadius: BorderRadius.circular(12),
+                color: AppTheme.primaryColor,
               ),
-              indicatorSize: TabBarIndicatorSize.tab, // Membuat indikator mengisi seluruh tab
-              labelColor: Colors.white, // Warna teks tab yang dipilih
-              unselectedLabelColor: AppTheme.secondaryTextColor, // Warna teks tab yang tidak dipilih
-              // Mengubah tab menjadi Juz, Surah, dan History
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: Colors.white,
+              unselectedLabelColor: AppTheme.secondaryTextColor,
               tabs: const [
                 Tab(text: 'Juz'),
                 Tab(text: 'Surah'),
-                Tab(text: 'History'), // Tab History
+                Tab(text: 'History'),
               ],
             ),
           ),
@@ -198,17 +135,10 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            // Mengubah urutan dan menambahkan tab baru
             children: [
-              _buildJuzList(juzListAsync), // Tab Juz
-              _buildSurahList(chaptersAsync), // Tab Surah
-              // Placeholder untuk tab History
-              Center(
-                child: Text(
-                  'Belum ada riwayat baca.',
-                  style: TextStyle(fontSize: 16.0, color: AppTheme.secondaryTextColor),
-                ),
-              ),
+              _buildJuzList(juzListAsync),
+              _buildSurahList(chaptersAsync),
+              _buildHistoryList(),
             ],
           ),
         ),
@@ -216,7 +146,11 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
     );
   }
 
-  // Widget untuk membangun daftar Surah
+  // Helper widgets _buildNoReadSessionWidget, _buildLoadingLastReadWidget,
+  // _buildErrorLastReadWidget, _buildLastReadContent,
+  // _buildLoadingLastReadContent, _buildErrorLastReadContent
+  // telah dipindahkan ke last_read_card.dart
+
   Widget _buildSurahList(AsyncValue<List<Chapter>> chaptersAsync) {
     return chaptersAsync.when(
       data: (chapters) {
@@ -236,30 +170,29 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
               elevation: 2,
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppTheme.primaryColor.withOpacity(0.1), // Latar belakang avatar
+                  backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
                   child: Text(
-                    '${chapter.id}', // Nomor Surah
+                    '${chapter.id}',
                     style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
                   ),
                 ),
                 title: Text(
-                  chapter.nameSimple, // Nama Surah sederhana
+                  chapter.nameSimple,
                   style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  '${chapter.revelationPlace} - ${chapter.versesCount} verses', // Tempat wahyu dan jumlah ayat
+                  '${chapter.revelationPlace} - ${chapter.versesCount} verses',
                   style: TextStyle(color: AppTheme.secondaryTextColor),
                 ),
                 trailing: Text(
-                  chapter.nameArabic, // Nama Surah Arab
+                  chapter.nameArabic,
                   style: TextStyle(
-                    fontFamily: 'UthmanicHafs', // Font Arab
+                    fontFamily: 'UthmanicHafs',
                     fontSize: 20,
                     color: AppTheme.primaryColor,
                   ),
                 ),
                 onTap: () {
-                  // Navigasi ke MushafDetailPage dengan nomor halaman pertama dari daftar chapter.pages
                   if (chapter.pages.isNotEmpty) {
                     Navigator.push(
                       context,
@@ -268,7 +201,6 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                       ),
                     );
                   } else {
-                    // Opsional: Tampilkan pesan jika pages kosong
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Nomor halaman untuk Surah ini tidak tersedia.')),
                     );
@@ -289,7 +221,6 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
     );
   }
 
-  // Widget untuk membangun daftar Juz (Para)
   Widget _buildJuzList(AsyncValue<List<JuzWithPage>> juzListAsync) {
     return juzListAsync.when(
       data: (juzList) {
@@ -327,7 +258,7 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                   style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
                 ),
                 subtitle: Text(
-                  'Total: ${juz.versesCount} ayat', // Hanya menampilkan total ayat
+                  'Total: ${juz.versesCount} ayat',
                   style: TextStyle(fontSize: 12, color: AppTheme.secondaryTextColor),
                 ),
                 trailing: Icon(Icons.chevron_right, color: AppTheme.secondaryTextColor),
@@ -346,22 +277,71 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
     );
   }
 
-  // Widget placeholder untuk Tab Page (tidak digunakan lagi di TabBarView)
-  Widget _buildPageList() {
-    return Center(
-      child: Text(
-        'Halaman akan ditampilkan di sini.',
-        style: TextStyle(color: AppTheme.secondaryTextColor),
-      ),
-    );
-  }
+  Widget _buildHistoryList() {
+    final readingSessionsAsync = ref.watch(allReadingSessionsStreamProvider);
 
-  // Widget placeholder untuk Tab Hijb (tidak digunakan lagi di TabBarView)
-  Widget _buildHijbList() {
-    return Center(
-      child: Text(
-        'Hijb akan ditampilkan di sini.',
-        style: TextStyle(color: AppTheme.secondaryTextColor),
+    return readingSessionsAsync.when(
+      data: (sessions) {
+        if (sessions.isEmpty) {
+          return Center(
+            child: Text(
+              'Belum ada riwayat baca.',
+              style: TextStyle(fontSize: 16.0, color: AppTheme.secondaryTextColor),
+            ),
+          );
+        }
+
+        final last10Sessions = sessions.take(10).toList();
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16.0),
+          itemCount: last10Sessions.length,
+          itemBuilder: (context, index) {
+            final session = last10Sessions[index];
+            final formattedDate = DateFormat('dd MMM yyyy HH:mm').format(session.openedAt);
+            final durationText = '${session.duration.inMinutes} min ${session.duration.inSeconds % 60} sec';
+
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+                  child: Text(
+                    '${session.page}',
+                    style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                title: Text(
+                  'Page ${session.page}',
+                  style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  'Read on: $formattedDate\nDuration: $durationText',
+                  style: TextStyle(color: AppTheme.secondaryTextColor),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MushafDetailPage(pageNumber: session.page),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+      loading: () => Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
+      error: (error, stack) => Center(
+        child: Text(
+          'Gagal memuat riwayat baca: $error',
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
       ),
     );
   }

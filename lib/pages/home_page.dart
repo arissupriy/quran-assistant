@@ -7,7 +7,8 @@ import 'package:quran_assistant/core/models/reading_session.dart';
 import 'package:intl/intl.dart';
 import 'package:quran_assistant/providers/reading_session_provider.dart';
 import 'package:quran_assistant/widgets/prayer_times_widget.dart';
-import 'package:quran_assistant/widgets/reading_statistics_card.dart'; // Import ReadingStatisticsCard yang baru
+import 'package:quran_assistant/widgets/reading_statistics_card.dart';
+import 'package:quran_assistant/widgets/last_read_card.dart'; // BARU: Import widget baru
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -28,13 +29,9 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    // ref.watch(readingSessionRecorderProvider);
-    
     // Dummy Data untuk Mockup (selain statistik bacaan)
     final String userName = "Tanvir Ahassan";
-    final String lastReadSurah = "Al-Baqarah 1";
-    final double completionPercentage = 0.83;
+    final double completionPercentage = 0.83; // This can be dynamic later
 
     final List<Map<String, dynamic>> readingSchedule = [
       {
@@ -75,45 +72,13 @@ class HomePage extends ConsumerWidget {
       },
     ];
 
-    // Variabel ini tidak lagi perlu dihitung di sini karena sudah di dalam ReadingStatisticsCard
-    // Duration totalDuration = Duration.zero;
-    // int totalPagesRead = 0;
-    // Duration averageSessionDuration = Duration.zero;
-
-    // readingSessionsAsync.whenData((readingSessions) {
-    //   totalDuration = readingSessions.fold(
-    //     Duration.zero,
-    //     (sum, session) => sum + session.duration,
-    //   );
-    //   totalPagesRead = readingSessions.map((s) => s.page).toSet().length;
-    //   averageSessionDuration = readingSessions.isNotEmpty
-    //       ? totalDuration ~/ readingSessions.length
-    //       : Duration.zero;
-    // });
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Bagian Salam dan Nama Pengguna
-          Text(
-            'Assalamualaikum',
-            style: TextStyle(
-              fontSize: 16,
-              color: AppTheme.secondaryTextColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            userName,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textColor,
-            ),
-          ),
-          const SizedBox(height: 24),
+          
 
           // Jadwal Sholat
           GestureDetector(
@@ -130,88 +95,15 @@ class HomePage extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Card "Quran Completion"
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.shadowColor.withOpacity(0.4),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Card(
-              color: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 0,
-              margin: EdgeInsets.zero,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Quran Completion',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Last Read $lastReadSurah',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          LinearProgressIndicator(
-                            value: completionPercentage,
-                            backgroundColor: Colors.white.withOpacity(0.3),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                            borderRadius: BorderRadius.circular(5),
-                            minHeight: 8,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${(completionPercentage * 100).toInt()}%',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Image.network(
-                      'https://placehold.co/100x100/00796B/FFFFFF?text=Quran',
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.menu_book_rounded, size: 80, color: Colors.white.withOpacity(0.7));
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          // Card "Quran Completion" (sekarang menggunakan LastReadCard)
+          LastReadCard(
+            // completionPercentage: completionPercentage,
+            isHomePage: true, // Beri tahu widget bahwa ini digunakan di home_page
           ),
           const SizedBox(height: 24),
 
           // Bagian "Reading Statistics" (sekarang adalah widget terpisah)
-          const ReadingStatisticsCard(), // <--- Panggil widget baru di sini
+          const ReadingStatisticsCard(),
           const SizedBox(height: 24),
 
           // Bagian "My Schedule"
@@ -341,27 +233,4 @@ class HomePage extends ConsumerWidget {
       ),
     );
   }
-
-  // Helper widget _buildCompactStatRow dipindahkan ke ReadingStatisticsCard
-  // Widget _buildCompactStatRow(BuildContext context, IconData icon, String label, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 8.0),
-  //     child: Row(
-  //       children: [
-  //         Icon(icon, color: AppTheme.primaryColor, size: 24),
-  //         const SizedBox(width: 12),
-  //         Expanded(
-  //           child: Text(
-  //             label,
-  //             style: TextStyle(fontSize: 16, color: AppTheme.textColor),
-  //           ),
-  //         ),
-  //         Text(
-  //           value,
-  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }

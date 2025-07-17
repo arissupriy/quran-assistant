@@ -1,7 +1,4 @@
-import 'dart:math';
-import 'dart:typed_data';
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,14 +6,108 @@ import 'package:quran_assistant/core/themes/app_theme.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/mushaf_provider.dart';
 import 'package:quran_assistant/providers/reading_session_provider.dart';
-import 'package:quran_assistant/src/rust/api/quran/verse.dart';
 import 'package:quran_assistant/src/rust/data_loader/mushaf_page_info.dart';
-import 'package:quran_assistant/src/rust/data_loader/verse_by_chapter.dart';
 import 'package:quran_assistant/src/rust/models.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:quran_assistant/widgets/ayah_context_menu.dart';
-import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
-import 'package:super_context_menu/super_context_menu.dart';
+
+// Optimized Session Manager
+class _SessionManager {
+  static const Duration _sessionDebounceDelay = Duration(milliseconds: 700);
+  static const Duration _sessionTransitionDelay = Duration(milliseconds: 100);
+  
+  Timer? _sessionDebounceTimer;
+  Timer? _sessionTransitionTimer;
+  Completer<void>? _activeSessionTransition;
+  int? _currentSessionPage;
+  bool _isTransitioning = false;
+
+  Future<void> handlePageChange({
+    required WidgetRef ref,
+    required int newPage,
+    required int? previousPage,
+  }) async {
+    // Cancel any pending session operations
+    _sessionDebounceTimer?.cancel();
+    _sessionTransitionTimer?.cancel();
+
+    // Wait for any active transition to complete
+    if (_activeSessionTransition != null && !_activeSessionTransition!.isCompleted) {
+      await _activeSessionTransition!.future;
+    }
+
+    // Debounce rapid page changes
+    _sessionDebounceTimer = Timer(_sessionDebounceDelay, () {
+      _executeSessionTransition(ref, newPage, previousPage);
+    });
+  }
+
+  Future<void> _executeSessionTransition(
+    WidgetRef ref,
+    int newPage,
+    int? previousPage,
+  ) async {
+    if (_isTransitioning) return;
+
+    _isTransitioning = true;
+    _activeSessionTransition = Completer<void>();
+
+    try {
+      // End current session if exists
+      if (_currentSessionPage != null) {
+        await _endSession(ref);
+      }
+
+      // Small delay to ensure clean transition
+      await Future.delayed(_sessionTransitionDelay);
+
+      // Start new session
+      await _startSession(ref, newPage, previousPage);
+      _currentSessionPage = newPage;
+
+      debugPrint('📖 Session transition completed: $previousPage → $newPage');
+    } catch (e) {
+      debugPrint('❌ Session transition error: $e');
+    } finally {
+      _isTransitioning = false;
+      _activeSessionTransition?.complete();
+      _activeSessionTransition = null;
+    }
+  }
+
+  Future<void> _startSession(WidgetRef ref, int page, int? previousPage) async {
+    try {
+      await ref
+          .read(readingSessionRecorderProvider.notifier)
+          .startSession(page: page, previousPage: previousPage);
+    } catch (e) {
+      debugPrint('❌ Failed to start session: $e');
+    }
+  }
+
+  Future<void> _endSession(WidgetRef ref) async {
+    try {
+      await ref.read(readingSessionRecorderProvider.notifier).endSession();
+    } catch (e) {
+      debugPrint('❌ Failed to end session: $e');
+    }
+  }
+
+  Future<void> forceEndSession(WidgetRef ref) async {
+    _sessionDebounceTimer?.cancel();
+    _sessionTransitionTimer?.cancel();
+    
+    if (_currentSessionPage != null) {
+      await _endSession(ref);
+      _currentSessionPage = null;
+    }
+  }
+
+  void dispose() {
+    _sessionDebounceTimer?.cancel();
+    _sessionTransitionTimer?.cancel();
+  }
+}
 
 class MushafDetailPage extends ConsumerStatefulWidget {
   final int pageNumber;
@@ -31,18 +122,18 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   Future<String?>? _mushafPathFuture;
   bool _navigated = false;
   late final PageController _pageController;
+  late final _SessionManager _sessionManager;
 
   Timer? _hideAppBarTimer;
   int _currentPageNumber = 0;
 
-  // Flag baru untuk memastikan _loadInitialPageInfo hanya dipanggil sekali
+  // Optimized session tracking
   bool _isInitialPageInfoLoaded = false;
-  int? _previousPageNumber; // Akan diinisialisasi sebagai 0 untuk sesi pertama
+  int? _previousPageNumber;
 
   @override
   void deactivate() {
-    // ref.invalidate(highlightedAyahProvider);
-    _endReadingSession();
+    _sessionManager.forceEndSession(ref);
     super.deactivate();
   }
 
@@ -50,12 +141,18 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   void initState() {
     super.initState();
 
-    _startReadingSession(widget.pageNumber);
+    _sessionManager = _SessionManager();
     _currentPageNumber = widget.pageNumber;
     _pageController = PageController(initialPage: widget.pageNumber - 1);
     _mushafPathFuture = getMushafFilePathIfExists();
-
     _previousPageNumber = 0;
+
+    // Start initial session with optimized manager
+    _sessionManager.handlePageChange(
+      ref: ref,
+      newPage: widget.pageNumber,
+      previousPage: _previousPageNumber,
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -65,45 +162,14 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
     _startHideAppBarTimer();
   }
 
-  // Memulai sesi membaca
-  void _startReadingSession(int page) async{
-    debugPrint('Memulai sesi membaca di halaman $page');
-    await ref
-        .read(readingSessionRecorderProvider.notifier)
-        .startSession(
-          page: page,
-          previousPage:
-              _previousPageNumber, // Menggunakan nilai _previousPageNumber saat ini
-        );
-    _previousPageNumber =
-        page; // Set halaman saat ini sebagai halaman sebelumnya untuk sesi berikutnya
-  }
-
-  // Mengakhiri sesi membaca
-  Future<void> _endReadingSession() async {
-    // debugPrint('Mengakhiri sesi membaca');
-
-    // debugPrint(ref.read(readingSessionRecorderProvider.notifier).activeSession
-    //     ?.toString());
-    await ref.read(readingSessionRecorderProvider.notifier).endSession();
-
-    // PENTING: Invalidate providers statistik setelah sesi diakhiri
-    // ref.invalidate(allReadingSessionsStreamProvider); // Untuk daftar sesi
-    // ref.invalidate(
-    //   dailyReadingDurationsProvider,
-    // ); // Untuk durasi harian (perbandingan)
-    
-  }
-
   void _loadInitialPageInfo() {
-    // Pastikan hanya dipanggil sekali
     if (!_isInitialPageInfoLoaded) {
       ref.read(mushafPageInfoProvider(_currentPageNumber).future).then((
         pageInfo,
       ) {
         if (mounted) {
           ref.read(currentPageInfoProvider.notifier).state = pageInfo;
-          _isInitialPageInfoLoaded = true; // Setel flag menjadi true
+          _isInitialPageInfoLoaded = true;
         }
       });
     }
@@ -113,13 +179,13 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   void dispose() {
     _pageController.dispose();
     _hideAppBarTimer?.cancel();
+    
+    // Properly dispose session manager
+    _sessionManager.dispose();
 
+    // Force end session on dispose
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        // ref.invalidate(highlightedAyahProvider);
-        // Akhiri sesi membaca saat widget dibuang
-        _endReadingSession();
-      }
+      _sessionManager.forceEndSession(ref);
     });
 
     super.dispose();
@@ -138,7 +204,6 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
     final current = ref.read(appBarVisibilityProvider);
     final newValue = !current;
 
-    debugPrint("🔺 Toggling app bar visibility: $current → $newValue");
     ref.read(appBarVisibilityProvider.notifier).state = newValue;
 
     if (newValue) {
@@ -150,24 +215,31 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
 
   void _onPageChanged(int index) {
     final nextPage = index + 1;
+    final prevPage = _currentPageNumber;
 
-    _endReadingSession().then((_) {
-      _startReadingSession(nextPage);
-    });
-
+    // Update current page immediately
     _currentPageNumber = nextPage;
 
     if (!mounted) return;
 
+    // Optimized session handling
+    _sessionManager.handlePageChange(
+      ref: ref,
+      newPage: nextPage,
+      previousPage: prevPage,
+    );
+
+    // Clear highlights
     ref.invalidate(highlightedAyahProvider);
 
-    // Tetap panggil mushafPageInfoProvider di sini untuk halaman berikutnya
+    // Update page info
     ref.read(mushafPageInfoProvider(nextPage).future).then((pageInfo) {
       if (mounted) {
         ref.read(currentPageInfoProvider.notifier).state = pageInfo;
       }
     });
 
+    // Handle app bar timer
     if (ref.read(appBarVisibilityProvider)) {
       _startHideAppBarTimer();
     }
@@ -205,184 +277,54 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
               return _buildError('Gagal membuka mushaf.');
             }
 
-            // PENTING: Panggil _loadInitialPageInfo() DI SINI,
-            // setelah mushafLoadProvider telah sukses memuat data.
             _loadInitialPageInfo();
 
-            return Scaffold(
-              backgroundColor:
-                  AppTheme.backgroundColor, // Warna latar belakang dari tema
-              body: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  debugPrint('🟢 TAP DETECTED!');
-                  _toggleAppBarVisibility();
-                },
-                child: SafeArea(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Column(
-                          children: [
-                            if (currentPageInfo != null)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 6,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      currentPageInfo.surahNameArabic,
-                                      style: TextStyle(
-                                        // Menggunakan TextStyle dari tema
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppTheme
-                                            .textColor, // Warna teks dari tema
+            return RepaintBoundary(
+              child: Scaffold(
+                backgroundColor: AppTheme.backgroundColor,
+                body: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _toggleAppBarVisibility,
+                  child: SafeArea(
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Column(
+                            children: [
+                              // Header info
+                              if (currentPageInfo != null)
+                                _buildHeaderInfo(currentPageInfo),
+                              
+                              // Main PageView
+                              Expanded(
+                                child: PageView.builder(
+                                  controller: _pageController,
+                                  reverse: true,
+                                  itemCount: 604,
+                                  onPageChanged: _onPageChanged,
+                                  itemBuilder: (context, index) {
+                                    final currentPage = index + 1;
+                                    return RepaintBoundary(
+                                      child: MushafPageDisplay(
+                                        pageNumber: currentPage,
+                                        topOffset: totalTopOffset,
                                       ),
-                                    ),
-                                    Text(
-                                      'Juz ${currentPageInfo.juzNumber}',
-                                      style: TextStyle(
-                                        // Menggunakan TextStyle dari tema
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppTheme
-                                            .secondaryTextColor, // Warna teks dari tema
-                                      ),
-                                    ),
-                                  ],
+                                    );
+                                  },
                                 ),
                               ),
-                            Expanded(
-                              child: PageView.builder(
-                                controller: _pageController,
-                                reverse: true,
-                                itemCount: 604,
-                                onPageChanged: _onPageChanged,
-                                itemBuilder: (context, index) {
-                                  final currentPage = index + 1;
-                                  // Tidak mengubah apapun di sini terkait MushafPageDisplay
-                                  return MushafPageDisplay(
-                                    pageNumber: currentPage,
-                                    topOffset: totalTopOffset,
-                                  );
-                                },
-                              ),
-                            ),
-                            if (currentPageInfo != null)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      currentPageInfo.nextPageRouteText,
-                                      style: TextStyle(
-                                        // Menggunakan TextStyle dari tema
-                                        fontSize: 16,
-                                        color: AppTheme
-                                            .textColor, // Warna teks dari tema
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 14,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        // Menambahkan dekorasi untuk nomor halaman
-                                        color: AppTheme.primaryColor
-                                            .withOpacity(0.1), // Latar belakang
-                                        borderRadius: BorderRadius.circular(
-                                          8,
-                                        ), // Sudut membulat
-                                      ),
-                                      child: Text(
-                                        '${currentPageInfo.pageNumber}',
-                                        style: TextStyle(
-                                          // Menggunakan TextStyle dari tema
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTheme
-                                              .primaryColor, // Warna teks dari tema
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      // Custom AppBar yang muncul/hilang
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: AnimatedOpacity(
-                          opacity: isAppBarVisible ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
-                          child: AppBar(
-                            title: Text(
-                              // Menggunakan Text widget untuk judul
-                              'Quran Assistant',
-                              style: TextStyle(
-                                color: AppTheme
-                                    .textColor, // Warna teks judul dari tema
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            centerTitle: true,
-                            backgroundColor: AppTheme
-                                .backgroundColor, // Warna latar belakang AppBar dari tema
-                            elevation: 0, // Menghilangkan bayangan
-                            iconTheme: IconThemeData(
-                              color: AppTheme.iconColor,
-                            ), // Warna ikon back button dari tema
-                            // Tambahkan leading jika Anda ingin tombol kembali di sini
-                            leading: Navigator.of(context).canPop()
-                                ? IconButton(
-                                    icon: Icon(
-                                      Icons.arrow_back,
-                                      color: AppTheme.iconColor,
-                                    ),
-                                    onPressed: () async {
-                                      await _endReadingSession();
-                                      if (mounted) {
-                                        Navigator.of(context).pop();
-                                      }
-                                    },
-                                  )
-                                : null,
-                            actions: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: Center(
-                                  child: Text(
-                                    '$_currentPageNumber / 604',
-                                    style: TextStyle(
-                                      // Menggunakan TextStyle dari tema
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTheme
-                                          .textColor, // Warna teks progres halaman dari tema
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              
+                              // Footer info
+                              if (currentPageInfo != null)
+                                _buildFooterInfo(currentPageInfo),
                             ],
                           ),
                         ),
-                      ),
-                    ],
+                        
+                        // Animated AppBar
+                        _buildAnimatedAppBar(isAppBarVisible),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -390,6 +332,117 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildHeaderInfo(MushafPageInfo pageInfo) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            pageInfo.surahNameArabic,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textColor,
+            ),
+          ),
+          Text(
+            'Juz ${pageInfo.juzNumber}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.secondaryTextColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooterInfo(MushafPageInfo pageInfo) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            pageInfo.nextPageRouteText,
+            style: TextStyle(
+              fontSize: 16,
+              color: AppTheme.textColor,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${pageInfo.pageNumber}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedAppBar(bool isVisible) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: AnimatedOpacity(
+        opacity: isVisible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 300),
+        child: AppBar(
+          title: Text(
+            'Quran Assistant',
+            style: TextStyle(
+              color: AppTheme.textColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: AppTheme.backgroundColor,
+          elevation: 0,
+          iconTheme: IconThemeData(color: AppTheme.iconColor),
+          leading: Navigator.of(context).canPop()
+              ? IconButton(
+                  icon: Icon(Icons.arrow_back, color: AppTheme.iconColor),
+                  onPressed: () async {
+                    await _sessionManager.forceEndSession(ref);
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                )
+              : null,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Center(
+                child: Text(
+                  '$_currentPageNumber / 604',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textColor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -409,25 +462,24 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
   }
 
   Widget _buildLoading() => Scaffold(
-    backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+    backgroundColor: AppTheme.backgroundColor,
     body: Center(
       child: CircularProgressIndicator(color: AppTheme.primaryColor),
-    ), // Warna indikator
+    ),
   );
 
   Widget _buildError(String message) => Scaffold(
-    backgroundColor: AppTheme.backgroundColor, // Warna latar belakang dari tema
+    backgroundColor: AppTheme.backgroundColor,
     body: Center(
       child: Text(
         message,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.error,
-        ), // Warna teks error
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
       ),
     ),
   );
 }
 
+// Keep existing classes unchanged for now
 class MushafPageDisplay extends ConsumerWidget {
   final int pageNumber;
   final double topOffset;
@@ -443,9 +495,7 @@ class MushafPageDisplay extends ConsumerWidget {
     final imageAsync = ref.watch(mushafImageProvider(pageNumber));
     final glyphAsync = ref.watch(mushafGlyphProvider(pageNumber));
     final highlighted = ref.watch(highlightedAyahProvider(pageNumber));
-    final pageInfoAsync = ref.watch(
-      mushafPageInfoProvider(pageNumber),
-    ); // Mengambil page info
+    final pageInfoAsync = ref.watch(mushafPageInfoProvider(pageNumber));
 
     return imageAsync.when(
       loading: _loading,
@@ -457,17 +507,17 @@ class MushafPageDisplay extends ConsumerWidget {
           loading: _loading,
           error: (e, _) => _error('Gagal memuat glyph: $e'),
           data: (glyphs) {
-            if (glyphs == null || glyphs.isEmpty)
+            if (glyphs == null || glyphs.isEmpty) {
               return _error('Glyph tidak ditemukan.');
+            }
 
             return pageInfoAsync.when(
-              // Menambahkan FutureBuilder untuk pageInfo
               loading: _loading,
               error: (e, _) => _error('Gagal memuat info halaman: $e'),
               data: (pageInfo) {
-                // Pastikan pageInfo tidak null sebelum digunakan
-                if (pageInfo == null)
+                if (pageInfo == null) {
                   return _error('Info halaman tidak ditemukan.');
+                }
 
                 return _MushafPageContent(
                   imageBytes: imageBytes,
@@ -493,13 +543,8 @@ class MushafPageDisplay extends ConsumerWidget {
                         ayah: info.ayah,
                         onDismiss: () {
                           ref
-                                  .read(
-                                    highlightedAyahProvider(
-                                      pageNumber,
-                                    ).notifier,
-                                  )
-                                  .state =
-                              null;
+                              .read(highlightedAyahProvider(pageNumber).notifier)
+                              .state = null;
                         },
                       );
                     }
@@ -513,22 +558,7 @@ class MushafPageDisplay extends ConsumerWidget {
     );
   }
 
-  Offset calculateGlyphGlobalPosition({
-    required BuildContext context,
-    required GlyphPosition glyph,
-    required double scale,
-    required double offsetX,
-    required double offsetY,
-  }) {
-    final left = glyph.minX * scale + offsetX;
-    final top = glyph.minY * scale + offsetY;
-
-    final box = context.findRenderObject() as RenderBox;
-    return box.localToGlobal(Offset(left, top));
-  }
-
   Widget _loading() => const Center(child: CircularProgressIndicator());
-
   Widget _error(String msg) => Center(child: Text(msg));
 }
 
@@ -569,8 +599,6 @@ class _MushafPageContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isAppBarVisible = ref.watch(appBarVisibilityProvider);
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
@@ -632,26 +660,7 @@ class _MushafPageContent extends ConsumerWidget {
           onTap: () {
             final notifier = ref.read(appBarVisibilityProvider.notifier);
             final current = ref.read(appBarVisibilityProvider);
-
-            if (current) {
-              debugPrint("🔻 AppBar is visible, hiding it.");
-              notifier.state = false;
-            } else {
-              debugPrint("🔺 AppBar is hidden, showing it and starting timer.");
-              notifier.state = true;
-
-              Future.microtask(() {
-                Timer(const Duration(milliseconds: 1500), () {
-                  if (context.mounted) {
-                    final stillVisible = ref.read(appBarVisibilityProvider);
-                    if (stillVisible) {
-                      ref.read(appBarVisibilityProvider.notifier).state = false;
-                      debugPrint("⏱️ Auto-hiding AppBar after delay.");
-                    }
-                  }
-                });
-              });
-            }
+            notifier.state = !current;
           },
           onLongPressStart: (details) {
             final localPos = details.localPosition;
@@ -676,16 +685,18 @@ class _MushafPageContent extends ConsumerWidget {
               }
             }
           },
-          child: Stack(
-            children: [
-              Image.memory(
-                imageBytes,
-                width: screenWidth,
-                height: screenHeight,
-                fit: BoxFit.contain,
-              ),
-              ...highlightWidgets,
-            ],
+          child: RepaintBoundary(
+            child: Stack(
+              children: [
+                Image.memory(
+                  imageBytes,
+                  width: screenWidth,
+                  height: screenHeight,
+                  fit: BoxFit.contain,
+                ),
+                ...highlightWidgets,
+              ],
+            ),
           ),
         );
       },

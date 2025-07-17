@@ -13,7 +13,7 @@ import 'package:quran_assistant/src/rust/models.dart'; // Untuk Verse, GlyphPosi
 import 'package:quran_assistant/utils/quran_utils.dart';
 // import 'package:quran_assistant/core/models/mushaf_info.dart'; // Model MushafPageInfo
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart'; // Bottom sheet detail ayat
-import 'package:super_context_menu/super_context_menu.dart'; // Untuk ContextMenuWidget
+// import 'package:super_context_menu/super_context_menu.dart'; // Untuk ContextMenuWidget
 
 // Helper extension untuk kapitalisasi string (jika tidak ada di file lain)
 extension StringExtension on String {

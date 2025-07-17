@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // Daftar judul untuk AppBar
   final List<String> _appBarTitles = [
-    'Quran App', // Untuk Beranda
+    'Quran Assistant', // Untuk Beranda
     'Pencarian', // Untuk Pencarian
     'Quran',      // Untuk Quran
     'Kuis',       // Untuk Kuis

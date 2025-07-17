@@ -11,7 +11,7 @@ import 'package:quran_assistant/src/rust/data_loader/verse_by_chapter.dart';
 import 'package:quran_assistant/src/rust/models.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart';
-import 'package:super_context_menu/super_context_menu.dart';
+// import 'package:super_context_menu/super_context_menu.dart';
 
 class MushafDetailPage extends ConsumerStatefulWidget {
   final int pageNumber;

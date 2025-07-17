@@ -57,3 +57,14 @@ pub fn get_ayahs_by_surah(chapter_id: u32) -> Vec<AyahText> {
         .cloned()
         .collect()
 }
+
+// #[frb]
+// pub fn get_chapter_by_page(page_number: u32) -> Option<Chapter> {
+//     let engine_data = &GLOBAL_DATA; // Akses GLOBAL_DATA
+//     for chapter in engine_data.chapters.chapters.iter() {
+//         if chapter.pages.contains(&page_number) {
+//             return Some(chapter.clone());
+//         }
+//     }
+//     None
+// }

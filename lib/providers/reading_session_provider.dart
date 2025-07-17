@@ -4,58 +4,68 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:quran_assistant/core/models/reading_session.dart';
+import 'package:quran_assistant/src/rust/api/quran/chapter.dart'; // Import getChapterByPage
+import 'package:quran_assistant/src/rust/api/quran/metadata.dart';
+import 'package:quran_assistant/src/rust/frb_generated.dart'; // Import api
 
 // Provider tidak berubah, tetap menggunakan NotifierProvider
 final readingSessionRecorderProvider =
-    NotifierProvider<ReadingSessionRecorder, void>(
-  ReadingSessionRecorder.new,
-);
+    NotifierProvider<ReadingSessionRecorder, void>(ReadingSessionRecorder.new);
 
 class ReadingSessionRecorder extends Notifier<void> {
-  // BARU: Gunakan Completer untuk memastikan box hanya diinisialisasi sekali.
-  // Ini adalah pola yang umum untuk menangani inisialisasi asinkron dalam sebuah kelas.
   final _boxCompleter = Completer<Box<ReadingSession>>();
-
-  // BARU: Getter privat untuk mendapatkan box yang sudah diinisialisasi.
-  // Semua metode lain akan menggunakan `await _box` untuk memastikan box siap.
   Future<Box<ReadingSession>> get _box => _boxCompleter.future;
 
   ReadingSession? _activeSession;
 
   @override
   void build() {
-    // BARU: Tambahkan baris ini di paling atas.
     ref.keepAlive();
-
     _initBox();
-
     ref.onDispose(() {
       debugPrint('🧼 Provider disposed, mengakhiri sesi aktif jika ada...');
-      // Walaupun ada keepAlive, onDispose tetap berguna jika Anda
-      // me-refresh provider secara manual.
       endSession();
     });
   }
 
-  // DIUBAH: Metode inisialisasi sekarang hanya dipanggil sekali dari `build`.
   Future<void> _initBox() async {
-    // Hindari membuka box yang sudah dalam proses pembukaan.
     if (_boxCompleter.isCompleted) return;
     
-    final box = await Hive.openBox<ReadingSession>('reading_sessions');
-    _boxCompleter.complete(box);
+    try {
+      // Check if box is already open
+      if (Hive.isBoxOpen('reading_sessions')) {
+        debugPrint('📦 Box reading_sessions already open, using existing box');
+        final box = Hive.box<ReadingSession>('reading_sessions');
+        _boxCompleter.complete(box);
+      } else {
+        debugPrint('📦 Opening new reading_sessions box');
+        final box = await Hive.openBox<ReadingSession>('reading_sessions');
+        _boxCompleter.complete(box);
+      }
+    } catch (e) {
+      debugPrint('❌ Error initializing box: $e');
+      
+      // If there's a type mismatch, close and reopen with correct type
+      if (e.toString().contains('already open')) {
+        try {
+          await Hive.close();
+          debugPrint('🔄 Closed all Hive boxes, reopening with correct type');
+          final box = await Hive.openBox<ReadingSession>('reading_sessions');
+          _boxCompleter.complete(box);
+        } catch (retryError) {
+          debugPrint('❌ Failed to reopen box: $retryError');
+          rethrow;
+        }
+      } else {
+        rethrow;
+      }
+    }
   }
 
   Future<void> startSession({required int page, int? previousPage}) async {
-
-    // debugPrint(_activeSession.toString());
-    // Pastikan tidak ada sesi yang sudah aktif
     if (_activeSession != null) {
-      // Mungkin akhiri sesi sebelumnya atau lempar error
-      // await endSession();
-      _activeSession = null; // Reset sesi aktif jika ada
+      _activeSession = null;
     }
-    
     final now = DateTime.now();
     _activeSession = ReadingSession(
       page: page,
@@ -64,118 +74,218 @@ class ReadingSessionRecorder extends Notifier<void> {
       previousPage: previousPage,
       date: DateTime(now.year, now.month, now.day),
     );
-    debugPrint('Sesi dimulai untuk halaman $page');
+    debugPrint('DEBUG_SESSION: Sesi dimulai untuk halaman $page');
   }
 
   Future<void> endSession() async {
-    debugPrint('Mengakhiri sesi membaca...');
-
-    debugPrint(_activeSession?.toString() ?? 'Tidak ada sesi aktif.');
+    debugPrint('DEBUG_SESSION: Mengakhiri sesi membaca...');
+    debugPrint(
+      'DEBUG_SESSION: Sesi aktif sebelum berakhir: ${_activeSession?.toString() ?? "Tidak ada sesi aktif."}',
+    );
     if (_activeSession == null) return;
 
-    final box = await _box;
-    _activeSession = _activeSession!.copyWith(closedAt: DateTime.now());
+    try {
+      final box = await _box;
+      _activeSession = _activeSession!.copyWith(closedAt: DateTime.now());
 
+      debugPrint(
+        'DEBUG_SESSION: Sesi aktif setelah diperbarui: ${_activeSession!.toString()}',
+      );
 
-    debugPrint(_activeSession!.toString());
+      if (_activeSession!.duration.inSeconds > 2) {
+        await box.add(_activeSession!);
+        debugPrint('DEBUG_SESSION: Sesi ditambahkan ke Hive.');
+      } else {
+        debugPrint('DEBUG_SESSION: Durasi sesi terlalu pendek, tidak disimpan.');
+      }
+      _activeSession = null;
 
-    if (_activeSession!.duration.inSeconds > 2) {
-      await box.add(_activeSession!);
+      ref.invalidate(dailyReadingDurationsProvider);
+      ref.invalidate(allReadingSessionsStreamProvider);
+      ref.invalidate(lastReadInfoProvider);
+      ref.invalidate(lastReadDisplayDataProvider);
+      debugPrint('DEBUG_SESSION: Providers statistik di-invalidate.');
+    } catch (e) {
+      debugPrint('❌ Error ending session: $e');
     }
-    _activeSession = null;
-
-    // Panggilan ini sekarang akan selalu aman karena provider tidak akan di-dispose.
-    ref.invalidate(dailyReadingDurationsProvider);
-    ref.invalidate(allReadingSessionsStreamProvider);
-
-    debugPrint('Providers statistik di-invalidate.');
   }
-  
+
   ReadingSession? get activeSession => _activeSession;
 
   Future<List<ReadingSession>> getAllSessions() async {
-    final box = await _box; // DIUBAH: Gunakan getter
-    final sessions = box.values.toList();
-    // DIUBAH: Ekstrak logika sorting ke fungsi helper untuk reusabilitas
-    return _sortSessions(sessions);
+    try {
+      final box = await _box;
+      final sessions = box.values.toList();
+      return _sortSessions(sessions);
+    } catch (e) {
+      debugPrint('❌ Error getting all sessions: $e');
+      return [];
+    }
   }
 
-  // DIUBAH: Implementasi stream yang jauh lebih sederhana menggunakan box.watch()
   Stream<List<ReadingSession>> getAllSessionsStream() async* {
-    final box = await _box;
-    // 1. Langsung emit data awal
-    yield _sortSessions(box.values.toList());
-
-    // 2. Dengarkan perubahan pada box dan emit data baru setiap ada perubahan
-    await for (final event in box.watch()) {
+    try {
+      final box = await _box;
       yield _sortSessions(box.values.toList());
+      await for (final event in box.watch()) {
+        debugPrint(
+          'DEBUG_SESSION: Hive box changed. Refreshing sessions stream.',
+        );
+        yield _sortSessions(box.values.toList());
+      }
+    } catch (e) {
+      debugPrint('❌ Error in sessions stream: $e');
+      yield [];
     }
   }
 
   Future<Map<DateTime, Duration>> getDailyDurations() async {
-    final sessions = await getAllSessions(); // Ini sudah menggunakan box yang diinisialisasi
-    final Map<DateTime, Duration> summary = {};
+    try {
+      final sessions = await getAllSessions();
+      final Map<DateTime, Duration> summary = {};
 
-    for (final session in sessions) {
-      final sessionDate = session.date;
-      summary.update(
-        sessionDate,
-        (existing) => existing + session.duration,
-        ifAbsent: () => session.duration,
-      );
+      for (final session in sessions) {
+        final sessionDate = session.date;
+        summary.update(
+          sessionDate,
+          (existing) => existing + session.duration,
+          ifAbsent: () => session.duration,
+        );
+      }
+      return summary;
+    } catch (e) {
+      debugPrint('❌ Error getting daily durations: $e');
+      return {};
     }
-    return summary;
   }
-  
-  // BARU: Fungsi helper untuk menghindari duplikasi kode sorting
+
   List<ReadingSession> _sortSessions(List<ReadingSession> sessions) {
     sessions.sort((a, b) => b.openedAt.compareTo(a.openedAt));
     return sessions;
   }
 
   Future<void> clearAllSessions() async {
-    final box = await _box; // DIUBAH: Gunakan getter
-    await box.clear();
-    // Invalidate provider setelah data dibersihkan
-    ref.invalidate(dailyReadingDurationsProvider);
-    ref.invalidate(allReadingSessionsStreamProvider);
+    try {
+      final box = await _box;
+      await box.clear();
+      debugPrint('DEBUG_SESSION: Semua sesi dihapus dari Hive.');
+      ref.invalidate(dailyReadingDurationsProvider);
+      ref.invalidate(allReadingSessionsStreamProvider);
+      ref.invalidate(lastReadInfoProvider);
+      ref.invalidate(lastReadDisplayDataProvider);
+    } catch (e) {
+      debugPrint('❌ Error clearing sessions: $e');
+    }
   }
 }
 
-// === DEFINISI PROVIDER (Disederhanakan) ===
+// === DEFINISI PROVIDER ===
 
-// Provider ini tetap sama, mengambil data durasi harian.
-final dailyReadingDurationsProvider = FutureProvider<Map<DateTime, Duration>>((ref) {
-  // DIUBAH: Gunakan watch jika Anda ingin provider ini otomatis refresh jika dependensinya berubah.
-  // Tapi dalam kasus ini, `read` sudah cukup karena kita me-refresh-nya secara manual dengan `invalidate`.
+final dailyReadingDurationsProvider = FutureProvider<Map<DateTime, Duration>>((
+  ref,
+) {
   final recorder = ref.read(readingSessionRecorderProvider.notifier);
   return recorder.getDailyDurations();
 });
 
-// Provider ini menjadi lebih sederhana.
-final allReadingSessionsStreamProvider = StreamProvider<List<ReadingSession>>((ref) {
+final allReadingSessionsStreamProvider = StreamProvider<List<ReadingSession>>((
+  ref,
+) {
   final recorder = ref.read(readingSessionRecorderProvider.notifier);
-  // Langsung kembalikan stream dari recorder. Riverpod akan menanganinya.
   return recorder.getAllSessionsStream();
 });
 
-
-// Provider ini mungkin tidak lagi diperlukan jika Anda memproses data stream secara langsung di UI.
-// Namun jika tetap dibutuhkan, implementasinya sudah benar.
 final readingSessionsGroupedByDateProvider =
     FutureProvider<Map<DateTime, List<ReadingSession>>>((ref) async {
-  // Anda bisa memilih untuk menggunakan stream atau future.
-  // Menggunakan stream akan lebih reaktif.
-  final sessions = await ref.watch(allReadingSessionsStreamProvider.future);
+      final sessions = await ref.watch(allReadingSessionsStreamProvider.future);
+      final Map<DateTime, List<ReadingSession>> grouped = {};
+      for (final session in sessions) {
+        grouped.putIfAbsent(session.date, () => []).add(session);
+      }
+      return Map.fromEntries(
+        grouped.entries.toList()..sort((a, b) => b.key.compareTo(a.key)),
+      );
+    });
 
-  final Map<DateTime, List<ReadingSession>> grouped = {};
-  for (final session in sessions) {
-    grouped.putIfAbsent(session.date, () => []).add(session);
+// Provider untuk mengambil informasi sesi bacaan terakhir
+final lastReadInfoProvider = FutureProvider<ReadingSession?>((ref) async {
+  debugPrint(
+    'DEBUG_PROVIDER: lastReadInfoProvider: Memulai pengambilan sesi terakhir...',
+  );
+  final sessions = await ref.watch(allReadingSessionsStreamProvider.future);
+  if (sessions.isEmpty) {
+    debugPrint(
+      'DEBUG_PROVIDER: lastReadInfoProvider: Tidak ada sesi ditemukan.',
+    );
+    return null;
+  }
+  debugPrint(
+    'DEBUG_PROVIDER: lastReadInfoProvider: Sesi terakhir ditemukan untuk halaman ${sessions.first.page}',
+  );
+  return sessions.first;
+});
+
+// DIUBAH: Derived provider untuk menggabungkan data sesi terakhir dan data chapters
+final lastReadDisplayDataProvider = FutureProvider<Map<String, dynamic>>((
+  ref,
+) async {
+  debugPrint('DEBUG_PROVIDER: lastReadDisplayDataProvider: Memulai proses.');
+  final lastReadSession = await ref.watch(lastReadInfoProvider.future);
+
+  debugPrint(
+    'DEBUG_PROVIDER: Last Read Session (dari lastReadInfoProvider): ${lastReadSession?.toString()}',
+  );
+  if (lastReadSession == null) {
+    debugPrint(
+      'DEBUG_PROVIDER: lastReadDisplayDataProvider: lastReadSession adalah null, mengembalikan isAvailable: false.',
+    );
+    return {'isAvailable': false};
   }
 
-  // Sorting map berdasarkan key (tanggal)
-  return Map.fromEntries(
-    grouped.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key)), // Descending by date
+  debugPrint(
+    'DEBUG_PROVIDER: lastReadDisplayDataProvider: Memanggil getChapterByPage untuk halaman ${lastReadSession.page}',
   );
+  
+  try {
+    final pageInfo = await getChapterByPageNumber(
+      pageNumber: lastReadSession.page,
+    );
+
+    // Calculate percentage of current page position in surah range
+    final currentPage = lastReadSession.page;
+    final surahPageRange = pageInfo!.pages; // [startPage, endPage]
+
+    double progressPercentage = 0.0;
+
+    if (surahPageRange.length >= 2) {
+      final startPage = surahPageRange[0];
+      final endPage = surahPageRange[1];
+      final totalPages = endPage - startPage + 1;
+      final currentPosition = currentPage - startPage + 1;
+
+      progressPercentage = (currentPosition / totalPages) * 100;
+
+      debugPrint(
+        '📊 Page $currentPage in range [$startPage, $endPage]: ${progressPercentage.toStringAsFixed(1)}%',
+      );
+    } else if (surahPageRange.length == 1) {
+      // Single page surah
+      progressPercentage = currentPage == surahPageRange[0] ? 100.0 : 0.0;
+      debugPrint(
+        '📊 Single page surah: ${progressPercentage.toStringAsFixed(1)}%',
+      );
+    }
+
+    debugPrint(progressPercentage.toString());
+
+    return {
+      'isAvailable': true,
+      'session': lastReadSession,
+      'surahName': pageInfo.nameSimple,
+      'progressPercentage': progressPercentage,
+    };
+  } catch (e) {
+    debugPrint('❌ Error in lastReadDisplayDataProvider: $e');
+    return {'isAvailable': false, 'error': e.toString()};
+  }
 });

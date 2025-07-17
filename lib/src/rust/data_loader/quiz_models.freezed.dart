@@ -12,7 +12,8 @@ part of 'quiz_models.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$QuizGenerationError {
@@ -21,59 +22,54 @@ mixin _$QuizGenerationError {
     required TResult Function() noVersesInScope,
     required TResult Function() noValidQuestionFound,
     required TResult Function(String field0) internalError,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? noVersesInScope,
     TResult? Function()? noValidQuestionFound,
     TResult? Function(String field0)? internalError,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? noVersesInScope,
     TResult Function()? noValidQuestionFound,
     TResult Function(String field0)? internalError,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(QuizGenerationError_NoVersesInScope value)
-        noVersesInScope,
+    noVersesInScope,
     required TResult Function(QuizGenerationError_NoValidQuestionFound value)
-        noValidQuestionFound,
+    noValidQuestionFound,
     required TResult Function(QuizGenerationError_InternalError value)
-        internalError,
-  }) =>
-      throw _privateConstructorUsedError;
+    internalError,
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult? Function(QuizGenerationError_InternalError value)? internalError,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult Function(QuizGenerationError_InternalError value)? internalError,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $QuizGenerationErrorCopyWith<$Res> {
   factory $QuizGenerationErrorCopyWith(
-          QuizGenerationError value, $Res Function(QuizGenerationError) then) =
-      _$QuizGenerationErrorCopyWithImpl<$Res, QuizGenerationError>;
+    QuizGenerationError value,
+    $Res Function(QuizGenerationError) then,
+  ) = _$QuizGenerationErrorCopyWithImpl<$Res, QuizGenerationError>;
 }
 
 /// @nodoc
@@ -90,20 +86,23 @@ class _$QuizGenerationErrorCopyWithImpl<$Res, $Val extends QuizGenerationError>
 /// @nodoc
 abstract class _$$QuizGenerationError_NoVersesInScopeImplCopyWith<$Res> {
   factory _$$QuizGenerationError_NoVersesInScopeImplCopyWith(
-          _$QuizGenerationError_NoVersesInScopeImpl value,
-          $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) then) =
-      __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>;
+    _$QuizGenerationError_NoVersesInScopeImpl value,
+    $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) then,
+  ) = __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>
-    extends _$QuizGenerationErrorCopyWithImpl<$Res,
-        _$QuizGenerationError_NoVersesInScopeImpl>
+    extends
+        _$QuizGenerationErrorCopyWithImpl<
+          $Res,
+          _$QuizGenerationError_NoVersesInScopeImpl
+        >
     implements _$$QuizGenerationError_NoVersesInScopeImplCopyWith<$Res> {
   __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl(
-      _$QuizGenerationError_NoVersesInScopeImpl _value,
-      $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) _then)
-      : super(_value, _then);
+    _$QuizGenerationError_NoVersesInScopeImpl _value,
+    $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) _then,
+  ) : super(_value, _then);
 }
 
 /// @nodoc
@@ -165,11 +164,11 @@ class _$QuizGenerationError_NoVersesInScopeImpl
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(QuizGenerationError_NoVersesInScope value)
-        noVersesInScope,
+    noVersesInScope,
     required TResult Function(QuizGenerationError_NoValidQuestionFound value)
-        noValidQuestionFound,
+    noValidQuestionFound,
     required TResult Function(QuizGenerationError_InternalError value)
-        internalError,
+    internalError,
   }) {
     return noVersesInScope(this);
   }
@@ -178,9 +177,9 @@ class _$QuizGenerationError_NoVersesInScopeImpl
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult? Function(QuizGenerationError_InternalError value)? internalError,
   }) {
     return noVersesInScope?.call(this);
@@ -190,9 +189,9 @@ class _$QuizGenerationError_NoVersesInScopeImpl
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult Function(QuizGenerationError_InternalError value)? internalError,
     required TResult orElse(),
   }) {
@@ -212,20 +211,23 @@ abstract class QuizGenerationError_NoVersesInScope extends QuizGenerationError {
 /// @nodoc
 abstract class _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith<$Res> {
   factory _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith(
-          _$QuizGenerationError_NoValidQuestionFoundImpl value,
-          $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) then) =
-      __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>;
+    _$QuizGenerationError_NoValidQuestionFoundImpl value,
+    $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) then,
+  ) = __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>
-    extends _$QuizGenerationErrorCopyWithImpl<$Res,
-        _$QuizGenerationError_NoValidQuestionFoundImpl>
+    extends
+        _$QuizGenerationErrorCopyWithImpl<
+          $Res,
+          _$QuizGenerationError_NoValidQuestionFoundImpl
+        >
     implements _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith<$Res> {
   __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl(
-      _$QuizGenerationError_NoValidQuestionFoundImpl _value,
-      $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) _then)
-      : super(_value, _then);
+    _$QuizGenerationError_NoValidQuestionFoundImpl _value,
+    $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) _then,
+  ) : super(_value, _then);
 }
 
 /// @nodoc
@@ -287,11 +289,11 @@ class _$QuizGenerationError_NoValidQuestionFoundImpl
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(QuizGenerationError_NoVersesInScope value)
-        noVersesInScope,
+    noVersesInScope,
     required TResult Function(QuizGenerationError_NoValidQuestionFound value)
-        noValidQuestionFound,
+    noValidQuestionFound,
     required TResult Function(QuizGenerationError_InternalError value)
-        internalError,
+    internalError,
   }) {
     return noValidQuestionFound(this);
   }
@@ -300,9 +302,9 @@ class _$QuizGenerationError_NoValidQuestionFoundImpl
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult? Function(QuizGenerationError_InternalError value)? internalError,
   }) {
     return noValidQuestionFound?.call(this);
@@ -312,9 +314,9 @@ class _$QuizGenerationError_NoValidQuestionFoundImpl
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult Function(QuizGenerationError_InternalError value)? internalError,
     required TResult orElse(),
   }) {
@@ -335,34 +337,37 @@ abstract class QuizGenerationError_NoValidQuestionFound
 /// @nodoc
 abstract class _$$QuizGenerationError_InternalErrorImplCopyWith<$Res> {
   factory _$$QuizGenerationError_InternalErrorImplCopyWith(
-          _$QuizGenerationError_InternalErrorImpl value,
-          $Res Function(_$QuizGenerationError_InternalErrorImpl) then) =
-      __$$QuizGenerationError_InternalErrorImplCopyWithImpl<$Res>;
+    _$QuizGenerationError_InternalErrorImpl value,
+    $Res Function(_$QuizGenerationError_InternalErrorImpl) then,
+  ) = __$$QuizGenerationError_InternalErrorImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String field0});
 }
 
 /// @nodoc
 class __$$QuizGenerationError_InternalErrorImplCopyWithImpl<$Res>
-    extends _$QuizGenerationErrorCopyWithImpl<$Res,
-        _$QuizGenerationError_InternalErrorImpl>
+    extends
+        _$QuizGenerationErrorCopyWithImpl<
+          $Res,
+          _$QuizGenerationError_InternalErrorImpl
+        >
     implements _$$QuizGenerationError_InternalErrorImplCopyWith<$Res> {
   __$$QuizGenerationError_InternalErrorImplCopyWithImpl(
-      _$QuizGenerationError_InternalErrorImpl _value,
-      $Res Function(_$QuizGenerationError_InternalErrorImpl) _then)
-      : super(_value, _then);
+    _$QuizGenerationError_InternalErrorImpl _value,
+    $Res Function(_$QuizGenerationError_InternalErrorImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$QuizGenerationError_InternalErrorImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$QuizGenerationError_InternalErrorImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
   }
 }
 
@@ -395,9 +400,12 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @pragma('vm:prefer-inline')
   _$$QuizGenerationError_InternalErrorImplCopyWith<
-          _$QuizGenerationError_InternalErrorImpl>
-      get copyWith => __$$QuizGenerationError_InternalErrorImplCopyWithImpl<
-          _$QuizGenerationError_InternalErrorImpl>(this, _$identity);
+    _$QuizGenerationError_InternalErrorImpl
+  >
+  get copyWith =>
+      __$$QuizGenerationError_InternalErrorImplCopyWithImpl<
+        _$QuizGenerationError_InternalErrorImpl
+      >(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -437,11 +445,11 @@ class _$QuizGenerationError_InternalErrorImpl
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(QuizGenerationError_NoVersesInScope value)
-        noVersesInScope,
+    noVersesInScope,
     required TResult Function(QuizGenerationError_NoValidQuestionFound value)
-        noValidQuestionFound,
+    noValidQuestionFound,
     required TResult Function(QuizGenerationError_InternalError value)
-        internalError,
+    internalError,
   }) {
     return internalError(this);
   }
@@ -450,9 +458,9 @@ class _$QuizGenerationError_InternalErrorImpl
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult? Function(QuizGenerationError_InternalError value)? internalError,
   }) {
     return internalError?.call(this);
@@ -462,9 +470,9 @@ class _$QuizGenerationError_InternalErrorImpl
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(QuizGenerationError_NoVersesInScope value)?
-        noVersesInScope,
+    noVersesInScope,
     TResult Function(QuizGenerationError_NoValidQuestionFound value)?
-        noValidQuestionFound,
+    noValidQuestionFound,
     TResult Function(QuizGenerationError_InternalError value)? internalError,
     required TResult orElse(),
   }) {
@@ -483,8 +491,9 @@ abstract class QuizGenerationError_InternalError extends QuizGenerationError {
   String get field0;
   @JsonKey(ignore: true)
   _$$QuizGenerationError_InternalErrorImplCopyWith<
-          _$QuizGenerationError_InternalErrorImpl>
-      get copyWith => throw _privateConstructorUsedError;
+    _$QuizGenerationError_InternalErrorImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -494,45 +503,39 @@ mixin _$QuizScope {
     required TResult Function() all,
     required TResult Function(Uint32List juzNumbers) byJuz,
     required TResult Function(int surahId) bySurah,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? all,
     TResult? Function(Uint32List juzNumbers)? byJuz,
     TResult? Function(int surahId)? bySurah,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? all,
     TResult Function(Uint32List juzNumbers)? byJuz,
     TResult Function(int surahId)? bySurah,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(QuizScope_All value) all,
     required TResult Function(QuizScope_ByJuz value) byJuz,
     required TResult Function(QuizScope_BySurah value) bySurah,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(QuizScope_All value)? all,
     TResult? Function(QuizScope_ByJuz value)? byJuz,
     TResult? Function(QuizScope_BySurah value)? bySurah,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(QuizScope_All value)? all,
     TResult Function(QuizScope_ByJuz value)? byJuz,
     TResult Function(QuizScope_BySurah value)? bySurah,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -555,8 +558,9 @@ class _$QuizScopeCopyWithImpl<$Res, $Val extends QuizScope>
 /// @nodoc
 abstract class _$$QuizScope_AllImplCopyWith<$Res> {
   factory _$$QuizScope_AllImplCopyWith(
-          _$QuizScope_AllImpl value, $Res Function(_$QuizScope_AllImpl) then) =
-      __$$QuizScope_AllImplCopyWithImpl<$Res>;
+    _$QuizScope_AllImpl value,
+    $Res Function(_$QuizScope_AllImpl) then,
+  ) = __$$QuizScope_AllImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -564,8 +568,9 @@ class __$$QuizScope_AllImplCopyWithImpl<$Res>
     extends _$QuizScopeCopyWithImpl<$Res, _$QuizScope_AllImpl>
     implements _$$QuizScope_AllImplCopyWith<$Res> {
   __$$QuizScope_AllImplCopyWithImpl(
-      _$QuizScope_AllImpl _value, $Res Function(_$QuizScope_AllImpl) _then)
-      : super(_value, _then);
+    _$QuizScope_AllImpl _value,
+    $Res Function(_$QuizScope_AllImpl) _then,
+  ) : super(_value, _then);
 }
 
 /// @nodoc
@@ -663,9 +668,10 @@ abstract class QuizScope_All extends QuizScope {
 
 /// @nodoc
 abstract class _$$QuizScope_ByJuzImplCopyWith<$Res> {
-  factory _$$QuizScope_ByJuzImplCopyWith(_$QuizScope_ByJuzImpl value,
-          $Res Function(_$QuizScope_ByJuzImpl) then) =
-      __$$QuizScope_ByJuzImplCopyWithImpl<$Res>;
+  factory _$$QuizScope_ByJuzImplCopyWith(
+    _$QuizScope_ByJuzImpl value,
+    $Res Function(_$QuizScope_ByJuzImpl) then,
+  ) = __$$QuizScope_ByJuzImplCopyWithImpl<$Res>;
   @useResult
   $Res call({Uint32List juzNumbers});
 }
@@ -675,20 +681,21 @@ class __$$QuizScope_ByJuzImplCopyWithImpl<$Res>
     extends _$QuizScopeCopyWithImpl<$Res, _$QuizScope_ByJuzImpl>
     implements _$$QuizScope_ByJuzImplCopyWith<$Res> {
   __$$QuizScope_ByJuzImplCopyWithImpl(
-      _$QuizScope_ByJuzImpl _value, $Res Function(_$QuizScope_ByJuzImpl) _then)
-      : super(_value, _then);
+    _$QuizScope_ByJuzImpl _value,
+    $Res Function(_$QuizScope_ByJuzImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? juzNumbers = null,
-  }) {
-    return _then(_$QuizScope_ByJuzImpl(
-      juzNumbers: null == juzNumbers
-          ? _value.juzNumbers
-          : juzNumbers // ignore: cast_nullable_to_non_nullable
-              as Uint32List,
-    ));
+  $Res call({Object? juzNumbers = null}) {
+    return _then(
+      _$QuizScope_ByJuzImpl(
+        juzNumbers: null == juzNumbers
+            ? _value.juzNumbers
+            : juzNumbers // ignore: cast_nullable_to_non_nullable
+                  as Uint32List,
+      ),
+    );
   }
 }
 
@@ -710,8 +717,10 @@ class _$QuizScope_ByJuzImpl extends QuizScope_ByJuz {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QuizScope_ByJuzImpl &&
-            const DeepCollectionEquality()
-                .equals(other.juzNumbers, juzNumbers));
+            const DeepCollectionEquality().equals(
+              other.juzNumbers,
+              juzNumbers,
+            ));
   }
 
   @override
@@ -723,7 +732,9 @@ class _$QuizScope_ByJuzImpl extends QuizScope_ByJuz {
   @pragma('vm:prefer-inline')
   _$$QuizScope_ByJuzImplCopyWith<_$QuizScope_ByJuzImpl> get copyWith =>
       __$$QuizScope_ByJuzImplCopyWithImpl<_$QuizScope_ByJuzImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -807,9 +818,10 @@ abstract class QuizScope_ByJuz extends QuizScope {
 
 /// @nodoc
 abstract class _$$QuizScope_BySurahImplCopyWith<$Res> {
-  factory _$$QuizScope_BySurahImplCopyWith(_$QuizScope_BySurahImpl value,
-          $Res Function(_$QuizScope_BySurahImpl) then) =
-      __$$QuizScope_BySurahImplCopyWithImpl<$Res>;
+  factory _$$QuizScope_BySurahImplCopyWith(
+    _$QuizScope_BySurahImpl value,
+    $Res Function(_$QuizScope_BySurahImpl) then,
+  ) = __$$QuizScope_BySurahImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int surahId});
 }
@@ -818,21 +830,22 @@ abstract class _$$QuizScope_BySurahImplCopyWith<$Res> {
 class __$$QuizScope_BySurahImplCopyWithImpl<$Res>
     extends _$QuizScopeCopyWithImpl<$Res, _$QuizScope_BySurahImpl>
     implements _$$QuizScope_BySurahImplCopyWith<$Res> {
-  __$$QuizScope_BySurahImplCopyWithImpl(_$QuizScope_BySurahImpl _value,
-      $Res Function(_$QuizScope_BySurahImpl) _then)
-      : super(_value, _then);
+  __$$QuizScope_BySurahImplCopyWithImpl(
+    _$QuizScope_BySurahImpl _value,
+    $Res Function(_$QuizScope_BySurahImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? surahId = null,
-  }) {
-    return _then(_$QuizScope_BySurahImpl(
-      surahId: null == surahId
-          ? _value.surahId
-          : surahId // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? surahId = null}) {
+    return _then(
+      _$QuizScope_BySurahImpl(
+        surahId: null == surahId
+            ? _value.surahId
+            : surahId // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
@@ -865,7 +878,9 @@ class _$QuizScope_BySurahImpl extends QuizScope_BySurah {
   @pragma('vm:prefer-inline')
   _$$QuizScope_BySurahImplCopyWith<_$QuizScope_BySurahImpl> get copyWith =>
       __$$QuizScope_BySurahImplCopyWithImpl<_$QuizScope_BySurahImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs

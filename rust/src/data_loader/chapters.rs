@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use bincode::{Decode, Encode};
 
-#[derive(Debug, Serialize, Deserialize, Encode, Decode, Clone)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Clone, Default)]
 pub struct Chapter {
     pub id: u32,
     #[serde(rename = "revelationPlace")]
@@ -25,7 +25,7 @@ pub struct Chapter {
     pub translated_name: TranslatedName,
 }
 
-#[derive(Debug, Serialize, Deserialize, Encode, Decode, Clone)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Clone, Default)]
 pub struct TranslatedName {
     #[serde(rename = "languageName")]
     pub language_name: String,

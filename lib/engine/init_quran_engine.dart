@@ -8,7 +8,7 @@ Future<Map<String, Uint8List>> loadQuranEngineAssetData() async {
     "chapters.bin",
     "all_verse_keys.bin",
     "ayah_texts.bin",
-    "juzs.bin",
+    "juzs.bin", 
     "phrase_index.bin",
     "translation_metadata.bin",
     "translations_33.bin",
@@ -19,18 +19,53 @@ Future<Map<String, Uint8List>> loadQuranEngineAssetData() async {
   ];
 
   final result = <String, Uint8List>{};
-
-  for (final asset in assets) {
-    final data = await rootBundle.load('assets/quran_assets/$asset');
-    result[asset] = data.buffer.asUint8List();
+  
+  debugPrint('🔄 Loading ${assets.length} Quran engine assets...');
+  
+  for (int i = 0; i < assets.length; i++) {
+    final asset = assets[i];
+    try {
+      final data = await rootBundle.load('assets/quran_assets/$asset');
+      result[asset] = data.buffer.asUint8List();
+      
+      // Progress indicator
+      if (kDebugMode) {
+        debugPrint('📄 Loaded ${i + 1}/${assets.length}: $asset (${data.lengthInBytes} bytes)');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to load asset: $asset');
+      debugPrint('   Error: $e');
+      
+      // Rethrow untuk critical assets
+      if (asset == "chapters.bin" || asset == "ayah_texts.bin") {
+        throw Exception('Critical asset missing: $asset');
+      }
+      
+      // Untuk non-critical assets, log tapi lanjutkan
+      debugPrint('⚠️ Non-critical asset skipped: $asset');
+    }
   }
-
+  
+  debugPrint('✅ Successfully loaded ${result.length} assets');
   return result;
 }
 
 Future<void> initQuranEngine() async {
-  final mapData = await loadQuranEngineAssetData();
-
-  await loadEngineDataFromFlutterAssets(map: mapData);
+  try {
+    debugPrint('🔄 Initializing Quran Engine...');
+    
+    // Load asset data
+    final mapData = await loadQuranEngineAssetData();
+    
+    debugPrint('🔄 Loading data into Rust engine...');
+    
+    // Load ke Rust engine
+    await loadEngineDataFromFlutterAssets(map: mapData);
+    
+    debugPrint('✅ Quran Engine initialized successfully');
+    
+  } catch (e) {
+    debugPrint('❌ Failed to initialize Quran Engine: $e');
+    rethrow;
+  }
 }
-

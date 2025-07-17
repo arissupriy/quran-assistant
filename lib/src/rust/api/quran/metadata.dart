@@ -3,6 +3,7 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
+import '../../data_loader/chapters.dart';
 import '../../data_loader/juzs.dart';
 import '../../data_loader/mushaf_page_info.dart';
 import '../../frb_generated.dart';
@@ -28,3 +29,8 @@ Future<MushafPageInfo> getMushafPageContextInfo({required int pageNumber}) =>
     RustLib.instance.api.crateApiQuranMetadataGetMushafPageContextInfo(
       pageNumber: pageNumber,
     );
+
+Future<Chapter?> getChapterByPageNumber({required int pageNumber}) => RustLib
+    .instance
+    .api
+    .crateApiQuranMetadataGetChapterByPageNumber(pageNumber: pageNumber);

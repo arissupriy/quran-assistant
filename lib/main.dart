@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -11,32 +12,106 @@ import 'package:quran_assistant/main_screen.dart';
 import 'package:quran_assistant/src/rust/frb_generated.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // WAJIB
+  // Set untuk membuat zone errors menjadi non-fatal untuk mengatasi zone mismatch
+  BindingBase.debugZoneErrorsAreFatal = false;
+  
+  // Enhanced error handling untuk Flutter errors
+  FlutterError.onError = (FlutterErrorDetails details) {
+    debugPrint('🐛 Flutter Error: ${details.exception}');
+    debugPrint('🧵 Stack trace: ${details.stack}');
+    
+    // Handle image decoding errors specifically
+    if (details.exception.toString().contains('Failed to decode image') ||
+        details.exception.toString().contains('ImageDecoder')) {
+      debugPrint('🖼️ Image decoding error - this is likely due to corrupted image data');
+    }
+    
+    FlutterError.dumpErrorToConsole(details);
+  };
 
-  await RustLib.init();
+  runZonedGuarded(() async {
+    // Pastikan binding diinisialisasi dalam zone yang sama
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    try {
+      await RustLib.init();
+      debugPrint('✅ RustLib initialized successfully');
+    } catch (e) {
+      debugPrint('❌ Failed to initialize RustLib: $e');
+      rethrow;
+    }
 
-  await Hive.initFlutter();
+    try {
+      await initQuranEngine(); // Inisialisasi Quran Engine
+      debugPrint('✅ Quran Engine initialized successfully');
+    } catch (e) {
+      debugPrint('❌ Failed to initialize Quran Engine: $e');
+      rethrow;
+    }
 
-  // Daftarkan TypeAdapters yang digenerate oleh hive_generator
-  Hive.registerAdapter(QuizSessionAdapter());
-  Hive.registerAdapter(QuizAttemptAdapter());
-  Hive.registerAdapter(HiveQuizOptionAdapter()); // Pastikan ini ada jika Anda menggunakannya
-  Hive.registerAdapter(ReadingSessionAdapter());
+    try {
+      await Hive.initFlutter();
+      debugPrint('✅ Hive initialized successfully');
+    } catch (e) {
+      debugPrint('❌ Failed to initialize Hive: $e');
+      rethrow;
+    }
 
-  // Buka "boxes" (mirip tabel)
-  await Hive.openBox<QuizSession>('quizSessions');
-  await Hive.openBox<QuizAttempt>('quizAttempts');
+    try {
+      // Daftarkan TypeAdapters yang digenerate oleh hive_generator
+      Hive.registerAdapter(QuizSessionAdapter());
+      Hive.registerAdapter(QuizAttemptAdapter());
+      Hive.registerAdapter(HiveQuizOptionAdapter()); // Pastikan ini ada jika Anda menggunakannya
+      Hive.registerAdapter(ReadingSessionAdapter());
+      debugPrint('✅ Hive adapters registered successfully');
+    } catch (e) {
+      debugPrint('❌ Failed to register Hive adapters: $e');
+      rethrow;
+    }
 
-  // Load Data
-  await initQuranEngine(); // Inisialisasi Quran Engine
+    try {
+      // Buka "boxes" (mirip tabel) with error handling
+      await Hive.openBox<QuizSession>('quizSessions');
+      await Hive.openBox<QuizAttempt>('quizAttempts');
+      await Hive.openBox('reading_sessions'); // Add reading sessions box
+      debugPrint('✅ Hive boxes opened successfully');
+    } catch (e) {
+      debugPrint('❌ Failed to open Hive boxes: $e');
+      // Try to recover by clearing corrupted boxes
+      try {
+        await Hive.deleteBoxFromDisk('quizSessions');
+        await Hive.deleteBoxFromDisk('quizAttempts');
+        await Hive.deleteBoxFromDisk('reading_sessions');
+        debugPrint('🔄 Cleared corrupted Hive boxes, retrying...');
+        
+        await Hive.openBox<QuizSession>('quizSessions');
+        await Hive.openBox<QuizAttempt>('quizAttempts');
+        await Hive.openBox('reading_sessions');
+        debugPrint('✅ Hive boxes recreated successfully');
+      } catch (recoveryError) {
+        debugPrint('❌ Failed to recover Hive boxes: $recoveryError');
+        rethrow;
+      }
+    }
 
-  FlutterError.onError = FlutterError.dumpErrorToConsole;
-
-  runZonedGuarded(() {
+    debugPrint('🚀 Starting app...');
     runApp(const ProviderScope(child: MyApp()));
+    
   }, (Object error, StackTrace stack) {
     debugPrint("❗ Global error caught: $error");
     debugPrint("🧵 Stacktrace:\n$stack");
+    
+    // Log additional context
+    debugPrint("🔍 Error type: ${error.runtimeType}");
+    if (error is FlutterError) {
+      debugPrint("🔍 Flutter error details: ${error.toStringShort()}");
+    }
+    
+    // Handle specific error types
+    if (error.toString().contains('ImageDecoder') || 
+        error.toString().contains('Failed to decode image')) {
+      debugPrint("🖼️ Image decoding error detected - app will continue running");
+    }
   });
 }
 
@@ -50,6 +125,85 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme, // Menggunakan tema dari AppTheme
       home: const MainScreen(),
+      
+      // Enhanced error handling untuk build context
+      builder: (context, child) {
+        ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+          debugPrint('🚨 Widget Error: ${errorDetails.exception}');
+          
+          // Handle image errors gracefully
+          if (errorDetails.exception.toString().contains('Failed to decode image') ||
+              errorDetails.exception.toString().contains('ImageDecoder')) {
+            return Material(
+              child: Container(
+                color: Colors.grey.shade100,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.broken_image, size: 48, color: Colors.grey.shade600),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Image loading error',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          
+          // Default error widget for other errors
+          return Material(
+            child: Container(
+              color: Colors.red.shade100,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Colors.red.shade700),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Oops! Something went wrong',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please restart the app',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.red.shade600,
+                    ),
+                  ),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        'Debug info: ${errorDetails.exception}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.red.shade500,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        };
+        return child ?? const SizedBox();
+      },
     );
   }
 }
