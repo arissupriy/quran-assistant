@@ -3,19 +3,25 @@
 use serde::{Deserialize, Serialize};
 use bincode::{Decode, Encode};
 use std::collections::HashMap;
-use anyhow::{Result, Context, bail}; // <--- TAMBAHKAN 'Context' DI SINI
+use anyhow::{Result, Context, bail};
+
+// #[path = "highlight_index_combined.rs"]
+// mod highlight_index_combined_types; // Pastikan Anda punya path yang benar ke file ini
+
+
+use crate::data_loader::highlight_index_combined; // <--- TAMBAHKAN 'Context' DI SINI
 
 // Re-use HighlightMap from highlight_index_combined.rs
 // Assuming highlight_index_combined.rs defines 'pub type HighlightMap = HashMap<String, Vec<u32>>;'.
 // Jika tidak, Anda bisa mendefinisikannya di sini sebagai: pub type VerseHighlightMap = HashMap<String, Vec<u32>>;
-#[path = "highlight_index_combined.rs"]
-mod highlight_index_combined_types; // Pastikan Anda punya path yang benar ke file ini
+// #[path = "highlight_index_combined.rs"]
+// mod highlight_index_combined_types; // Pastikan Anda punya path yang benar ke file ini
 
-pub type VerseHighlightMap = highlight_index_combined_types::HighlightMap;
+pub type VerseHighlightMap = highlight_index_combined::HighlightMap;
 
 
 // Represents the top-level structure of phrase_highlight_map.json
-#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone)]
 pub struct PhraseHighlightMap {
     #[serde(flatten)] // Mengizinkan HashMap langsung menjadi struct root
     pub map: HashMap<String, VerseHighlightMap>, // Kunci adalah Phrase ID sebagai String

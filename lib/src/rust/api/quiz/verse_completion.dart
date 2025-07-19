@@ -7,14 +7,21 @@ import '../../data_loader/quiz_models.dart';
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<QuizGenerationResult> generateVerseCompletionQuiz({
+QuizGenerationResult generateVerseCompletionQuiz({
   required QuizFilter filter,
 }) => RustLib.instance.api
     .crateApiQuizVerseCompletionGenerateVerseCompletionQuiz(filter: filter);
 
-Future<QuizQuestions> generateVerseCompletionQuizBatch({
+Future<QuizQuestions> generateBatchVerseCompletionQuizzes({
   required QuizFilter filter,
 }) => RustLib.instance.api
-    .crateApiQuizVerseCompletionGenerateVerseCompletionQuizBatch(
+    .crateApiQuizVerseCompletionGenerateBatchVerseCompletionQuizzes(
+      filter: filter,
+    );
+
+Future<QuizGenerationResult> innerGenerateVerseCompletionQuiz({
+  required QuizFilter filter,
+}) => RustLib.instance.api
+    .crateApiQuizVerseCompletionInnerGenerateVerseCompletionQuiz(
       filter: filter,
     );

@@ -10,12 +10,25 @@ Future<Map<String, Uint8List>> loadQuranEngineAssetData() async {
     "ayah_texts.bin",
     "juzs.bin", 
     "phrase_index.bin",
-    "translation_metadata.bin",
-    "translations_33.bin",
+    // "translation_metadata.bin",
+    // "translations_33.bin",
     "valid-matching-ayah.bin",
     "stop_words_arabic.bin",
     "inverted_index.bin",
-    for (int i = 1; i <= 114; i++) "verse-by-chapter/chapter-$i.bin",
+    "ayah_phrase_map.bin",
+    "highlight_index_combined.bin",
+    "lemma_index_arab.bin",
+    "phrase_highlight_map.bin",
+    "semantic_index_arab.bin",
+    "stem_index_arab.bin",
+    "words.bin",
+    "page_first_verse.bin",
+    "tajweed_meta.bin",
+    "tajweed_index.bin",
+    "translation.bin",
+    
+
+    for (int i = 1; i <= 114; i++) "verse-by-chapter/verses-chapter-$i.bin",
   ];
 
   final result = <String, Uint8List>{};

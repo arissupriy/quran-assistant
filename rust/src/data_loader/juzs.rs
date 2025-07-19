@@ -34,6 +34,24 @@ pub struct JuzWithPage {
     pub page_number: u32,
 }
 
+impl Juz {
+    pub fn all_verse_keys(&self) -> Vec<String> {
+        let mut keys = Vec::new();
+        for (chapter, range) in &self.verse_mapping {
+            let chapter_id: u32 = chapter.parse().unwrap_or(0);
+            let parts: Vec<&str> = range.split('-').collect();
+            if parts.len() == 2 {
+                let start: u32 = parts[0].parse().unwrap_or(0);
+                let end: u32 = parts[1].parse().unwrap_or(0);
+                for verse_number in start..=end {
+                    keys.push(format!("{}:{}", chapter_id, verse_number));
+                }
+            }
+        }
+        keys
+    }
+}
+
 
 // Tambahkan di AKHIR FILE src/data-loader/juzs.rs
 

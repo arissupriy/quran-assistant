@@ -1,0 +1,92 @@
+{
+  "ham_wasl": {
+    "name": "ham_wasl",
+    "description": "",
+    "alias": ""
+  },
+  "laam_shamsiyah": {
+    "name": "laam_shamsiyah",
+    "description": "",
+    "alias": ""
+  },
+  "madda_normal": {
+    "name": "madda_normal",
+    "description": "",
+    "alias": ""
+  },
+  "madda_permissible": {
+    "name": "madda_permissible",
+    "description": "",
+    "alias": ""
+  },
+  "madda_necessary": {
+    "name": "madda_necessary",
+    "description": "",
+    "alias": ""
+  },
+  "idgham_wo_ghunnah": {
+    "name": "idgham_wo_ghunnah",
+    "description": "",
+    "alias": ""
+  },
+  "slnt": {
+    "name": "slnt",
+    "description": "",
+    "alias": ""
+  },
+  "ghunnah": {
+    "name": "ghunnah",
+    "description": "",
+    "alias": ""
+  },
+  "qalaqah": {
+    "name": "qalaqah",
+    "description": "",
+    "alias": ""
+  },
+  "ikhafa": {
+    "name": "ikhafa",
+    "description": "",
+    "alias": ""
+  },
+  "madda_obligatory_monfasel": {
+    "name": "madda_obligatory_monfasel",
+    "description": "",
+    "alias": ""
+  },
+  "madda_obligatory_mottasel": {
+    "name": "madda_obligatory_mottasel",
+    "description": "",
+    "alias": ""
+  },
+  "idgham_ghunnah": {
+    "name": "idgham_ghunnah",
+    "description": "",
+    "alias": ""
+  },
+  "ikhafa_shafawi": {
+    "name": "ikhafa_shafawi",
+    "description": "",
+    "alias": ""
+  },
+  "idgham_shafawi": {
+    "name": "idgham_shafawi",
+    "description": "",
+    "alias": ""
+  },
+  "iqlab": {
+    "name": "iqlab",
+    "description": "",
+    "alias": ""
+  },
+  "idgham_mutajanisayn": {
+    "name": "idgham_mutajanisayn",
+    "description": "",
+    "alias": ""
+  },
+  "idgham_mutaqaribayn": {
+    "name": "idgham_mutaqaribayn",
+    "description": "",
+    "alias": ""
+  }
+}

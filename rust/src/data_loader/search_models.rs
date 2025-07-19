@@ -28,7 +28,7 @@ pub struct WordResult {
     #[serde(rename = "textUthmani")]
     pub text_uthmani: String,        // Teks Uthmani asli kata tersebut
     #[serde(rename = "translationText")] // Nama field diubah untuk konsistensi di JSON
-    pub translation_text: String,    // Terjemahan Bahasa Indonesia untuk kata tersebut
+    // pub translation_text: String,    // Terjemahan Bahasa Indonesia untuk kata tersebut
     pub highlighted: bool,           // <-- TAMBAH INI: True jika kata ini harus disorot
     // Anda bisa menambahkan field lain dari Word asli yang relevan jika diperlukan.
     // Contoh: #[serde(rename = "charTypeName")] pub char_type_name: String,

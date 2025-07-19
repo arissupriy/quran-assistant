@@ -4,7 +4,7 @@ use flutter_rust_bridge::frb;
 
 use crate::GLOBAL_DATA;
 use crate::data_loader::ayah_texts::AyahText;
-use crate::data_loader::verse_by_chapter::{Verse, Word};
+use crate::data_loader::verse_by_chapter::{Translation, Verse, Word};
 use log::{debug, info, warn};
 
 #[frb]
@@ -20,6 +20,28 @@ pub fn get_verse_text_uthmani(verse_key: String) -> Option<String> {
 }
 
 #[frb]
+pub fn get_verse_texts(verse_key: String) -> AyahText {
+    let engine_data = &GLOBAL_DATA;
+    engine_data
+        .ayah_texts
+        .texts
+        .iter()
+        .find(|at| at.verse_key == verse_key)
+        .cloned()
+        .unwrap_or_else(|| {
+            warn!("⚠️ Ayat dengan kunci {} tidak ditemukan dalam ayah_texts", verse_key);
+            AyahText {
+                verse_key,
+                text_uthmani_simple: String::new(),
+                text_uthmani: String::new(),
+                text_qpc_hafs: String::new(),
+            }
+        })
+
+    
+}
+
+#[frb]
 /// Mengembalikan nomor juz untuk sebuah ayat berdasarkan kunci ayat.
 pub fn get_juz_number_for_verse(verse_key: String) -> Option<u32> {
     let engine_data = &GLOBAL_DATA;
@@ -31,7 +53,7 @@ pub fn get_juz_number_for_verse(verse_key: String) -> Option<u32> {
     let chapter_id = parts[0].parse::<u32>().ok()?;
     let verse_number = parts[1].parse::<u32>().ok()?;
 
-    engine_data.verses_by_chapter.get(&chapter_id)
+    engine_data.verses.get(&chapter_id)
         .and_then(|verses_in_chapter| {
             verses_in_chapter.iter().find(|v| v.verse_number == verse_number)
         })
@@ -52,7 +74,7 @@ pub fn get_verse_by_chapter_and_verse_number(
         chapter_number, verse_number
     );
 
-    if let Some(verses_in_chapter) = engine_data.verses_by_chapter.get(&chapter_number) {
+    if let Some(verses_in_chapter) = engine_data.verses.get(&chapter_number) {
         debug!("✅ Ditemukan {} ayat dalam surah {}", verses_in_chapter.len(), chapter_number);
 
         if let Some(verse) = verses_in_chapter
@@ -74,31 +96,17 @@ pub fn get_verse_by_chapter_and_verse_number(
 
 #[frb]
 /// Mengembalikan teks terjemahan untuk ayat tertentu berdasarkan kunci ayat dan ID sumber terjemahan.
-pub fn get_translation_text(verse_key: String, resource_id: u32) -> Option<String> {
+pub fn get_translation_text(verse_key: &str) -> Option<String> {
+    // Pastikan translation data sudah dimuat
     let engine_data = &GLOBAL_DATA;
 
-    if resource_id == 33 {
-        engine_data
-            .translations_33
-            .map
-            .get(&verse_key)
-            .cloned()
-    } else {
-        None
-    }
+    // Ambil dari hashmap berdasarkan key seperti "2:1"
+    engine_data.translation.get(verse_key).map(|t| t.text.clone())
 }
 
 #[frb]
-/// Mengembalikan detail objek Word (kata) untuk kata spesifik dalam sebuah ayat.
-pub fn get_word_details(chapter_id: u32, verse_number: u32, word_position: u32) -> Option<Word> {
+/// Mengembalikan detail objek Word (kata) berdasarkan `word_key`, misalnya "2:1:3"
+pub fn get_word_details(verse_key: String) -> Option<Translation> {
     let engine_data = &GLOBAL_DATA;
-    engine_data
-        .verses_by_chapter
-        .get(&chapter_id)
-        .and_then(|verses_in_chapter| {
-            verses_in_chapter.iter().find(|v| v.verse_number == verse_number)
-        })
-        .and_then(|verse| {
-            verse.words.iter().find(|w| w.position == word_position).cloned()
-        })
+    engine_data.translation.get(&verse_key).cloned()
 }

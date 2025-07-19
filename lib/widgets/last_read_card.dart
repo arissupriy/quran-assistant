@@ -170,15 +170,7 @@ class LastReadCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              Image.network(
-                'https://placehold.co/100x100/00796B/FFFFFF?text=Quran',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.menu_book_rounded, size: 80, color: Colors.white.withOpacity(0.7));
-                },
-              ),
+              Icon(Icons.menu_book_rounded, size: 80, color: Colors.white.withOpacity(0.7))
             ],
           ),
         ),

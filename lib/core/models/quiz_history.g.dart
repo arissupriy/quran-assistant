@@ -97,13 +97,14 @@ class QuizAttemptAdapter extends TypeAdapter<QuizAttempt> {
       isCorrect: fields[10] as bool,
       timeSpentSeconds: fields[11] as int,
       timestamp: fields[12] as DateTime,
+      userOrderIndicesJson: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, QuizAttempt obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.attemptId)
       ..writeByte(1)
@@ -129,7 +130,9 @@ class QuizAttemptAdapter extends TypeAdapter<QuizAttempt> {
       ..writeByte(11)
       ..write(obj.timeSpentSeconds)
       ..writeByte(12)
-      ..write(obj.timestamp);
+      ..write(obj.timestamp)
+      ..writeByte(13)
+      ..write(obj.userOrderIndicesJson);
   }
 
   @override

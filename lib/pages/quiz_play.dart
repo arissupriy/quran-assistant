@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_assistant/src/rust/data_loader/quiz_models.dart' as RustModels;
 import 'package:quran_assistant/providers/quiz_provider.dart';
 import 'package:quran_assistant/pages/quiz/quiz_summary_page.dart';
-import 'package:quran_assistant/core/themes/app_theme.dart'; // Import AppTheme
+import 'package:quran_assistant/pages/quiz/quiz_verse_order_page.dart';
+import 'package:quran_assistant/core/themes/app_theme.dart';
 
 class QuizPlay extends ConsumerStatefulWidget {
   const QuizPlay({super.key});
@@ -16,11 +17,28 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeInitializeVerseOrderUserOrder();
+    });
+  }
+
+  void _maybeInitializeVerseOrderUserOrder() {
+    final quizType = ref.read(quizSessionControllerProvider).quizType;
+    final currentQuestion = ref.read(currentQuizQuestionProvider);
+    final userOrder = ref.read(userOrderProvider);
+
+    if (quizType == 'verse_order' &&
+        currentQuestion != null &&
+        currentQuestion.shuffledParts != null &&
+        userOrder == null) {
+      final indices = List<int>.generate(currentQuestion.shuffledParts!.length, (i) => i);
+      ref.read(userOrderProvider.notifier).state = indices;
+    }
   }
 
   void _onOptionSelected(int index) {
     final isAnswerChecked = ref.read(answerCheckedProvider);
-    if (isAnswerChecked) return; // Jangan izinkan perubahan jika sudah dicek
+    if (isAnswerChecked) return;
 
     ref.read(selectedOptionIndexProvider.notifier).state = index;
   }
@@ -49,16 +67,20 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
     final currentIndex = ref.read(currentQuestionIndexProvider);
     final totalQuestions = ref.read(currentQuizQuestionsProvider).length;
 
+    ref.invalidate(answerCheckedProvider);
+    ref.invalidate(selectedOptionIndexProvider);
+    ref.invalidate(userOrderProvider);
+
     if (currentIndex + 1 >= totalQuestions) {
-      // Navigasi ke QuizSummaryPage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const QuizSummaryPage()),
       );
-      // PENTING: endQuizSession() TIDAK dipanggil di sini lagi
-      // karena akan dipanggil di QuizSummaryPage saat kembali ke menu utama.
     } else {
       quizController.nextQuestion();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _maybeInitializeVerseOrderUserOrder();
+      });
     }
   }
 
@@ -69,19 +91,11 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
     final questions = ref.watch(currentQuizQuestionsProvider);
     final selectedIndex = ref.watch(selectedOptionIndexProvider);
     final isAnswerChecked = ref.watch(answerCheckedProvider);
+    final quizType = ref.watch(quizSessionControllerProvider).quizType;
 
     if (currentQuestion == null) {
       return Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        appBar: AppBar(
-          title: Text(
-            'Memuat Kuis...',
-            style: TextStyle(color: AppTheme.textColor),
-          ),
-          centerTitle: true,
-          backgroundColor: AppTheme.backgroundColor,
-          elevation: 0,
-        ),
         body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
       );
     }
@@ -97,10 +111,7 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
             return AlertDialog(
               backgroundColor: AppTheme.cardColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text(
-                'Akhiri Sesi Kuis?',
-                style: TextStyle(color: AppTheme.textColor),
-              ),
+              title: Text('Akhiri Sesi Kuis?', style: TextStyle(color: AppTheme.textColor)),
               content: Text(
                 'Anda akan keluar dari sesi kuis saat ini. Apakah Anda yakin? Progres sesi ini akan disimpan.',
                 style: TextStyle(color: AppTheme.secondaryTextColor),
@@ -129,10 +140,7 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
-          title: Text(
-            'Kuis',
-            style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
-          ),
+          title: Text('Kuis', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
           centerTitle: true,
           backgroundColor: AppTheme.backgroundColor,
           elevation: 0,
@@ -142,61 +150,137 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
               padding: const EdgeInsets.only(right: 16.0),
               child: Center(
                 child: Text(
-                  '${currentIndex + 1}/${questions.length}', // Progres soal di AppBar
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textColor,
-                  ),
+                  '${currentIndex + 1}/${questions.length}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
                 ),
               ),
             ),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Progres soal (fixed top)
-              Text(
-                'Soal ${currentIndex + 1}/${questions.length}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.secondaryTextColor,
-                ),
-              ),
-              const SizedBox(height: 16),
+        body: Builder(
+          builder: (_) {
+            if (quizType == 'verse_order') {
+              return const VerseOrderQuizPage();
+            }
+            return _buildStandardQuizView(
+              context,
+              currentQuestion,
+              currentIndex,
+              questions,
+              selectedIndex,
+              isAnswerChecked,
+              quizType!,
+            );
+          },
+        ),
+      ),
+    );
+  }
 
-              // Bagian yang dapat di-scroll: Pertanyaan dan Opsi Jawaban
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // TEKS PERTANYAAN (RATA KANAN) dengan latar belakang Card
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Card(
-                          color: AppTheme.backgroundColor,
-                          margin: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: AppTheme.primaryColor.withOpacity(0.2), width: 1),
+  Widget _buildStandardQuizView(
+    BuildContext context,
+    RustModels.QuizQuestion currentQuestion,
+    int currentIndex,
+    List<RustModels.QuizQuestion> questions,
+    int? selectedIndex,
+    bool isAnswerChecked,
+    String quizType,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Card(
+                      color: AppTheme.backgroundColor,
+                      margin: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: AppTheme.primaryColor.withOpacity(0.2), width: 1),
+                      ),
+                      elevation: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            quizType == 'verse_previous'
+                                ? '${currentQuestion.questionTextPart1} ...'
+                                : '${currentQuestion.questionTextPart1} ______ ${currentQuestion.questionTextPart2}',
+                            style: TextStyle(
+                              fontSize: 20,
+                              height: 2,
+                              fontFamily: 'UthmaniHafs',
+                              color: AppTheme.textColor,
+                            ),
+                            textAlign: TextAlign.right,
                           ),
-                          elevation: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ...currentQuestion.options.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final option = entry.value;
+
+                    final isSelected = index == selectedIndex;
+                    final isCorrect = index == currentQuestion.correctAnswerIndex;
+
+                    Color cardColor = AppTheme.cardColor;
+                    Color textColor = AppTheme.textColor;
+                    Color borderColor = Colors.grey.shade300;
+
+                    if (isAnswerChecked) {
+                      if (isCorrect) {
+                        cardColor = Colors.green.shade100;
+                        textColor = Colors.green.shade800;
+                        borderColor = Colors.green.shade500;
+                      } else if (isSelected) {
+                        cardColor = Colors.red.shade100;
+                        textColor = Colors.red.shade800;
+                        borderColor = Colors.red.shade500;
+                      }
+                    } else if (isSelected) {
+                      cardColor = AppTheme.primaryColor.withOpacity(0.1);
+                      textColor = AppTheme.primaryColor;
+                      borderColor = AppTheme.primaryColor;
+                    }
+
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: Card(
+                        color: cardColor,
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: borderColor, width: 2),
+                        ),
+                        elevation: 2,
+                        child: InkWell(
+                          onTap: () => _onOptionSelected(index),
+                          borderRadius: BorderRadius.circular(12),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: Directionality(
                               textDirection: TextDirection.rtl,
                               child: Text(
-                                '${currentQuestion.questionTextPart1} _____ ${currentQuestion.questionTextPart2}',
+                                option.text,
                                 style: TextStyle(
-                                  fontSize: 28,
-                                  height: 1.5,
-                                  fontFamily: 'UthmanicHafs',
-                                  color: AppTheme.textColor,
+                                  fontSize: 20,
+                                  fontFamily: 'UthmaniHafs',
+                                  height: 1.6,
+                                  color: textColor,
+                                  fontWeight: isSelected && !isAnswerChecked
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                 ),
                                 textAlign: TextAlign.right,
                               ),
@@ -204,120 +288,42 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Opsi Jawaban
-                      ...currentQuestion.options.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        RustModels.QuizOption option = entry.value;
-
-                        final isSelected = index == selectedIndex;
-                        final isCorrect = (index == currentQuestion.correctAnswerIndex);
-
-                        Color cardColor = AppTheme.cardColor;
-                        Color textColor = AppTheme.textColor;
-                        Color borderColor = Colors.grey.shade300;
-
-                        if (isAnswerChecked) {
-                          if (isCorrect) {
-                            cardColor = Colors.green.shade100;
-                            textColor = Colors.green.shade800;
-                            borderColor = Colors.green.shade500;
-                          } else if (isSelected) {
-                            cardColor = Colors.red.shade100;
-                            textColor = Colors.red.shade800;
-                            borderColor = Colors.red.shade500;
-                          }
-                        } else if (isSelected) {
-                          cardColor = AppTheme.primaryColor.withOpacity(0.1);
-                          textColor = AppTheme.primaryColor;
-                          borderColor = AppTheme.primaryColor;
-                        }
-
-                        return Align(
-                          alignment: Alignment.centerRight,
-                          child: Card(
-                            color: cardColor,
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: borderColor, width: 2),
-                            ),
-                            elevation: 2,
-                            child: InkWell(
-                              onTap: () => _onOptionSelected(index),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                child: Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: Text(
-                                    option.text,
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontFamily: 'UthmanicHafs',
-                                      color: textColor,
-                                      fontWeight: isSelected && !isAnswerChecked ? FontWeight.bold : FontWeight.normal,
-                                    ),
-                                    textAlign: TextAlign.right,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
+                    );
+                  }).toList(),
+                ],
               ),
-
-              const SizedBox(height: 24),
-
-              // Tombol (fixed bottom)
-              SizedBox(
-                width: double.infinity,
-                child: !isAnswerChecked
-                    ? ElevatedButton(
-                        onPressed: selectedIndex == null ? null : _onCheckAnswer,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text('Cek Jawaban'),
-                      )
-                    : ElevatedButton(
-                        onPressed: _onNextQuestion,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.secondaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          currentIndex + 1 < questions.length
-                              ? 'Soal Selanjutnya'
-                              : 'Selesai',
-                        ),
-                      ),
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: !isAnswerChecked
+                ? ElevatedButton(
+                    onPressed: selectedIndex == null ? null : _onCheckAnswer,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Cek Jawaban'),
+                  )
+                : ElevatedButton(
+                    onPressed: _onNextQuestion,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.secondaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Text(
+                      currentIndex + 1 < questions.length ? 'Soal Selanjutnya' : 'Selesai',
+                    ),
+                  ),
+          ),
+        ],
       ),
     );
   }

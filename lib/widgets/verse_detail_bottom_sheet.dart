@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_assistant/src/rust/api/quran/similarity.dart';
 // import 'package:quran_assistant/core/models/chapter_model.dart';
 // import 'package:quran_assistant/core/models/search_model.dart';
 import 'package:quran_assistant/src/rust/api/quran/verse.dart';
+import 'package:quran_assistant/src/rust/data_loader/ayah_texts.dart';
 import 'package:quran_assistant/src/rust/data_loader/valid_matching_ayah.dart';
 import 'package:quran_assistant/src/rust/data_loader/verse_by_chapter.dart';
 
@@ -52,18 +54,18 @@ class VerseDetailBottomSheet extends StatelessWidget {
                   Directionality(
                     textDirection: TextDirection.rtl,
                     child: Text(
-                      data.verse.words.map((w) => w.textUthmani).join(' '),
-                      style: const TextStyle(fontSize: 26, height: 1.6),
+                      data.ayahText.textQpcHafs,
+                      style: TextStyle(
+                        fontSize: 24, height: 1.6, fontWeight: FontWeight.w600, fontFamily: 'UthmaniHafs',
+                      ),
+                      
                     ),
                   ),
                   const SizedBox(height: 24),
-                  ...data.verse.translations.map((t) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          t.text,
+                  Text(
+                          data.verse.translations.firstOrNull?.text ?? "Terjemahan tidak tersedia",
                           style: const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
-                      )),
                   const Divider(height: 32),
                   const Text(
                     'Similar Ayahs',
@@ -113,16 +115,22 @@ class VerseDetailBottomSheet extends StatelessWidget {
 
     final similar = await getSimilarAyahsInverted(verseKey: verseKey);
 
-    return _VerseDetailData(verse: verse!, similarAyahs: similar);
+    final ayahText = await getVerseTexts(verseKey: verseKey);
+
+    
+
+    return _VerseDetailData(verse: verse!, similarAyahs: similar, ayahText: ayahText);
   }
 }
 
 class _VerseDetailData {
   final Verse verse;
   final List<MatchedAyah> similarAyahs;
+  final AyahText ayahText;
 
   _VerseDetailData({
     required this.verse,
     required this.similarAyahs,
+    required this.ayahText,
   });
 }

@@ -60,32 +60,45 @@ class QuizSession extends HiveObject {
 class QuizAttempt extends HiveObject {
   @HiveField(0)
   late String attemptId;
+
   @HiveField(1)
   late String sessionId; // Foreign key manual ke QuizSession
+
   @HiveField(2)
   late int questionIndex;
+
   @HiveField(3)
   late String verseKey;
+
   @HiveField(4)
   late String questionTextPart1;
-  // --- TAMBAH INI ---
-  @HiveField(5) // Perhatikan bahwa @HiveField index ini harus unik dan berurutan
+
+  @HiveField(5)
   late String questionTextPart2;
-  // --- AKHIR TAMBAH INI ---
+
   @HiveField(6)
-  late String missingPartText; // Index HiveField yang ini akan berubah jika ada penambahan di atasnya
+  late String missingPartText;
+
   @HiveField(7)
   late String optionsJson;
+
   @HiveField(8)
   late int? userAnswerIndex;
+
   @HiveField(9)
   late int correctAnswerIndex;
+
   @HiveField(10)
   late bool isCorrect;
+
   @HiveField(11)
   late int timeSpentSeconds;
-  @HiveField(12) // Index HiveField yang ini akan berubah
+
+  @HiveField(12)
   late DateTime timestamp;
+
+  @HiveField(13)
+  String? userOrderIndicesJson; // ✅ untuk verse_order
 
   QuizAttempt({
     required this.attemptId,
@@ -93,9 +106,7 @@ class QuizAttempt extends HiveObject {
     required this.questionIndex,
     required this.verseKey,
     required this.questionTextPart1,
-    // --- TAMBAH INI DI KONSTRUKTOR ---
     required this.questionTextPart2,
-    // --- AKHIR TAMBAH INI ---
     required this.missingPartText,
     required this.optionsJson,
     required this.userAnswerIndex,
@@ -103,6 +114,7 @@ class QuizAttempt extends HiveObject {
     required this.isCorrect,
     required this.timeSpentSeconds,
     required this.timestamp,
+    this.userOrderIndicesJson, // ✅ Tambahkan ini
   });
 }
 

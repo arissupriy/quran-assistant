@@ -6,7 +6,8 @@ import 'package:quran_assistant/core/themes/app_theme.dart'; // Import AppTheme
 
 import 'package:quran_assistant/core/models/fts_search_model.dart_'; // Model hasil pencarian Anda
 import 'package:quran_assistant/providers/fts_search_provider.dart';
-import 'package:quran_assistant/src/rust/data_loader/search_models.dart'; // Provider pencarian Anda
+import 'package:quran_assistant/src/rust/data_loader/search_models.dart';
+import 'package:quran_assistant/widgets/verse_detail_bottom_sheet.dart'; // Provider pencarian Anda
 
 class FtsSearchPage extends ConsumerStatefulWidget {
   const FtsSearchPage({super.key});
@@ -105,41 +106,55 @@ class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
     } else {
       return ListView.builder(
         itemCount: state.searchResults.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (ctx, index) {
           final result = state.searchResults[index];
           return Card(
             // Gaya Card sudah diatur di AppTheme
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Margin disesuaikan
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${result.verseKey}', // Hapus skor jika tidak diperlukan di UI
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0, // Ukuran font lebih besar
-                      color: AppTheme.textColor, // Warna teks
+            margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0), // Margin disesuaikan
+            child: GestureDetector(
+              onTap: () {
+                // Tampilkan detail ayat saat ditekan
+                showModalBottomSheet(
+                  enableDrag: true,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  context: context,
+                  builder: (context) {
+                    return VerseDetailBottomSheet(verseKey: result.verseKey);
+                  },
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0), // Padding disesuaikan
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Text(
+                    //   '${result.verseKey}', // Hapus skor jika tidak diperlukan di UI
+                    //   style: TextStyle(
+                    //     fontWeight: FontWeight.bold,
+                    //     fontSize: 18.0, // Ukuran font lebih besar
+                    //     color: AppTheme.textColor, // Warna teks
+                    //   ),
+                    // ),
+                    const SizedBox(height: 8.0),
+                    _buildVerseWords(
+                      result.words,
+                      state,
                     ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  _buildVerseWords(
-                    result.words,
-                    state,
-                  ),
-                  const SizedBox(height: 8.0),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Text(
-                      'Skor: ${result.score.toStringAsFixed(2)}', // Skor di pojok kanan bawah
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        color: AppTheme.secondaryTextColor,
-                      ),
-                    ),
-                  ),
-                ],
+                    const SizedBox(height: 8.0),
+                    // Align(
+                    //   alignment: Alignment.bottomRight,
+                    //   child: Text(
+                    //     'Skor: ${result}', // Skor di pojok kanan bawah
+                    //     style: TextStyle(
+                    //       fontSize: 12.0,
+                    //       color: AppTheme.secondaryTextColor,
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
               ),
             ),
           );
@@ -170,9 +185,11 @@ class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
                 children: [
                   Text(
                     word.textUthmani,
+                    
                     style: TextStyle(
                       fontSize: 20.0, // Ukuran font Arab lebih besar
-                      fontFamily: 'UthmanicHafs',
+                      fontFamily: 'UthmaniHafs',
+                      
                       color: word.highlighted
                           ? AppTheme.primaryColor // Warna teks sorotan dari tema
                           : AppTheme.textColor, // Warna teks normal dari tema
@@ -183,16 +200,16 @@ class _FtsSearchPageState extends ConsumerState<FtsSearchPage> {
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                   ),
-                  if (state.showTranslation && word.translationText != null && word.translationText!.isNotEmpty)
-                    Text(
-                      word.translationText!,
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        color: AppTheme.secondaryTextColor, // Warna terjemahan dari tema
-                      ),
-                      textAlign: TextAlign.right, // Terjemahan juga ke kanan
-                      textDirection: TextDirection.rtl, // Terjemahan juga ke kanan
-                    ),
+                  // if (state.showTranslation && word.translationText != null && word.translationText!.isNotEmpty)
+                  //   Text(
+                  //     word.translationText!,
+                  //     style: TextStyle(
+                  //       fontSize: 12.0,
+                  //       color: AppTheme.secondaryTextColor, // Warna terjemahan dari tema
+                  //     ),
+                  //     textAlign: TextAlign.right, // Terjemahan juga ke kanan
+                  //     textDirection: TextDirection.rtl, // Terjemahan juga ke kanan
+                  //   ),
                 ],
               );
             },

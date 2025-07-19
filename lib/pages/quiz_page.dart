@@ -12,7 +12,8 @@ class QuizPage extends StatelessWidget {
       {
         'type': 'verse_completion',
         'title': 'Melengkapi Ayat',
-        'description': 'Lengkapi ayat berikutnya dari potongan ayat sebelumnya.',
+        'description':
+            'Lengkapi ayat berikutnya dari potongan ayat sebelumnya.',
         'icon': Icons.short_text_rounded,
       },
       {
@@ -21,13 +22,26 @@ class QuizPage extends StatelessWidget {
         'description': 'Tebak bagian ayat yang hilang dari satu ayat panjang.',
         'icon': Icons.edit_note_rounded,
       },
-      // Anda bisa menambahkan jenis kuis lain di sini jika ada
+      {
+        'type': 'verse_previous',
+        'title': 'Tebak Ayat Sebelumnya',
+        'description': 'Tebak ayat yang datang sebelum ayat yang ditampilkan.',
+        'icon': Icons.undo_rounded,
+      },
+      {
+        'type': 'verse_order',
+        'title': 'Puzzle Urutan Ayat',
+        'description':
+            'Urutkan potongan ayat yang telah diacak agar sesuai urutan aslinya.',
+        'icon': Icons.sort_rounded,
+      },
     ];
 
     // Hapus Scaffold dan AppBar di sini.
     // Konten QuizPage akan menjadi body dari Scaffold di MainScreen.
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // Agar teks "Pilih Jenis Kuis" rata kiri
+      crossAxisAlignment:
+          CrossAxisAlignment.start, // Agar teks "Pilih Jenis Kuis" rata kiri
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -53,7 +67,8 @@ class QuizPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const QuizHistoryPage(), // Navigasi ke QuizHistoryPage
+                      builder: (_) =>
+                          const QuizHistoryPage(), // Navigasi ke QuizHistoryPage
                     ),
                   );
                 },
@@ -91,7 +106,8 @@ class QuizPage extends StatelessWidget {
                   subtitle: Text(
                     quiz['description'] as String,
                     style: TextStyle(
-                      color: AppTheme.secondaryTextColor, // Warna teks subtitle dari tema
+                      color: AppTheme
+                          .secondaryTextColor, // Warna teks subtitle dari tema
                     ),
                   ),
                   trailing: Icon(

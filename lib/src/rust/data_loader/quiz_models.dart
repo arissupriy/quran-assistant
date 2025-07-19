@@ -12,14 +12,12 @@ part 'quiz_models.freezed.dart';
 class QuizFilter {
   /// Cakupan ayat yang akan digunakan untuk membuat soal.
   final QuizScope scope;
+  final int quizCount;
 
-  /// Jumlah soal yang ingin dihasilkan.
-  final int questionCount;
-
-  const QuizFilter({required this.scope, required this.questionCount});
+  const QuizFilter({required this.scope, required this.quizCount});
 
   @override
-  int get hashCode => scope.hashCode ^ questionCount.hashCode;
+  int get hashCode => scope.hashCode ^ quizCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -27,12 +25,16 @@ class QuizFilter {
       other is QuizFilter &&
           runtimeType == other.runtimeType &&
           scope == other.scope &&
-          questionCount == other.questionCount;
+          quizCount == other.quizCount;
 }
 
 @freezed
 sealed class QuizGenerationError with _$QuizGenerationError {
   const QuizGenerationError._();
+
+  /// Error internal lainnya yang tidak terduga.
+  const factory QuizGenerationError.internalError(String field0) =
+      QuizGenerationError_InternalError;
 
   /// Terjadi ketika filter yang diberikan (mis. Juz/Surah) tidak menghasilkan satu pun ayat.
   const factory QuizGenerationError.noVersesInScope() =
@@ -43,9 +45,9 @@ sealed class QuizGenerationError with _$QuizGenerationError {
   const factory QuizGenerationError.noValidQuestionFound() =
       QuizGenerationError_NoValidQuestionFound;
 
-  /// Error internal lainnya yang tidak terduga.
-  const factory QuizGenerationError.internalError(String field0) =
-      QuizGenerationError_InternalError;
+  /// Terjadi ketika teks ayat yang diperlukan untuk soal tidak ditemukan.
+  const factory QuizGenerationError.missingAyahText() =
+      QuizGenerationError_MissingAyahText;
 }
 
 /// Struct yang akan selalu dikembalikan oleh fungsi generator kuis.
@@ -124,6 +126,15 @@ class QuizQuestion {
   /// Contoh: "verse_completion", "fragment_completion", "word_puzzle", "verse_puzzle".
   final String quizType;
 
+  /// Hanya untuk tipe puzzle: bagian yang diacak (teks)
+  final List<String>? shuffledParts;
+
+  /// Hanya untuk puzzle ayat: urutan `verseKey` dari `shuffled_parts`
+  final List<String>? shuffledKeys;
+
+  /// Hanya untuk puzzle ayat: urutan benar `verseKey` yang harus dicapai
+  final List<String>? correctOrderKeys;
+
   const QuizQuestion({
     required this.verseKey,
     required this.questionTextPart1,
@@ -133,6 +144,9 @@ class QuizQuestion {
     required this.correctAnswerIndex,
     this.correctOrderIndices,
     required this.quizType,
+    this.shuffledParts,
+    this.shuffledKeys,
+    this.correctOrderKeys,
   });
 
   @override
@@ -144,7 +158,10 @@ class QuizQuestion {
       options.hashCode ^
       correctAnswerIndex.hashCode ^
       correctOrderIndices.hashCode ^
-      quizType.hashCode;
+      quizType.hashCode ^
+      shuffledParts.hashCode ^
+      shuffledKeys.hashCode ^
+      correctOrderKeys.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -158,7 +175,10 @@ class QuizQuestion {
           options == other.options &&
           correctAnswerIndex == other.correctAnswerIndex &&
           correctOrderIndices == other.correctOrderIndices &&
-          quizType == other.quizType;
+          quizType == other.quizType &&
+          shuffledParts == other.shuffledParts &&
+          shuffledKeys == other.shuffledKeys &&
+          correctOrderKeys == other.correctOrderKeys;
 }
 
 /// Struct pembungkus jika Anda ingin mengembalikan satu set pertanyaan kuis sekaligus.

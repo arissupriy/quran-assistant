@@ -8,7 +8,7 @@ use std::collections::HashMap;
 pub type HighlightMap = HashMap<String, Vec<u32>>;
 
 // Represents the object that contains "root", "stem", "lemma"
-#[derive(Debug, Serialize, Deserialize, Encode, Decode)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Clone)]
 pub struct HighlightEntry {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub root: Option<HighlightMap>,
@@ -19,7 +19,7 @@ pub struct HighlightEntry {
 }
 
 // Represents the top-level structure of highlight_index_combined.json
-#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone)]
 pub struct HighlightIndexCombined {
     #[serde(flatten)] // Mengizinkan HashMap langsung menjadi struct root
     pub map: HashMap<String, HighlightEntry>,

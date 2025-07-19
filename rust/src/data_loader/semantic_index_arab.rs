@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use bincode::{Decode, Encode};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone)]
 pub struct SemanticIndexArab {
     // Karena semantic_index_arab.json adalah objek langsung (map),
     // kita gunakan #[serde(flatten)] untuk memetakannya ke dalam struct.

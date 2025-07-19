@@ -7,6 +7,8 @@ import 'api/engine_loader.dart';
 import 'api/mushaf.dart';
 import 'api/quiz/quiz_fragment_completion.dart';
 import 'api/quiz/verse_completion.dart';
+import 'api/quiz/verse_order.dart';
+import 'api/quiz/verse_previous.dart';
 import 'api/quran/chapter.dart';
 import 'api/quran/metadata.dart';
 import 'api/quran/search.dart';
@@ -84,7 +86,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -503911634;
+  int get rustContentHash => 1829330823;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -99,23 +101,36 @@ abstract class RustLibApi extends BaseApi {
     required String query,
   });
 
-  Future<QuizGenerationResult>
-  crateApiQuizVerseCompletionGenerateVerseCompletionQuiz({
+  Future<QuizQuestions>
+  crateApiQuizQuizFragmentCompletionGenerateBatchFragmentQuizzes({
     required QuizFilter filter,
   });
 
   Future<QuizQuestions>
-  crateApiQuizVerseCompletionGenerateVerseCompletionQuizBatch({
+  crateApiQuizVerseCompletionGenerateBatchVerseCompletionQuizzes({
+    required QuizFilter filter,
+  });
+
+  Future<QuizQuestions> crateApiQuizVerseOrderGenerateBatchVerseOrderQuizzes({
+    required QuizFilter filter,
+  });
+
+  Future<QuizQuestions>
+  crateApiQuizVersePreviousGenerateBatchVersePreviousQuizzes({
     required QuizFilter filter,
   });
 
   Future<QuizGenerationResult>
+  crateApiQuizVersePreviousGeneratePreviousVerseQuiz({
+    required QuizFilter filter,
+  });
+
+  QuizGenerationResult crateApiQuizVerseCompletionGenerateVerseCompletionQuiz({
+    required QuizFilter filter,
+  });
+
+  QuizGenerationResult
   crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuiz({
-    required QuizFilter filter,
-  });
-
-  Future<QuizQuestions>
-  crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuizBatch({
     required QuizFilter filter,
   });
 
@@ -169,7 +184,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<String?> crateApiQuranVerseGetTranslationText({
     required String verseKey,
-    required int resourceId,
   });
 
   Future<Verse?> crateApiQuranVerseGetVerseByChapterAndVerseNumber({
@@ -181,15 +195,20 @@ abstract class RustLibApi extends BaseApi {
     required String verseKey,
   });
 
-  Future<Word?> crateApiQuranVerseGetWordDetails({
-    required int chapterId,
-    required int verseNumber,
-    required int wordPosition,
+  Future<AyahText> crateApiQuranVerseGetVerseTexts({required String verseKey});
+
+  Future<Translation?> crateApiQuranVerseGetWordDetails({
+    required String verseKey,
   });
 
   String crateApiSimpleGreet({required String name});
 
   Future<void> crateApiSimpleInitApp();
+
+  Future<QuizGenerationResult>
+  crateApiQuizVerseCompletionInnerGenerateVerseCompletionQuiz({
+    required QuizFilter filter,
+  });
 
   Future<void> crateApiEngineLoaderLoadEngineDataFromFlutterAssets({
     required Map<String, Uint8List> map,
@@ -241,8 +260,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "fts_search", argNames: ["query"]);
 
   @override
-  Future<QuizGenerationResult>
-  crateApiQuizVerseCompletionGenerateVerseCompletionQuiz({
+  Future<QuizQuestions>
+  crateApiQuizQuizFragmentCompletionGenerateBatchFragmentQuizzes({
     required QuizFilter filter,
   }) {
     return handler.executeNormal(
@@ -256,6 +275,178 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 2,
             port: port_,
           );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quiz_questions,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiQuizQuizFragmentCompletionGenerateBatchFragmentQuizzesConstMeta,
+        argValues: [filter],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiQuizQuizFragmentCompletionGenerateBatchFragmentQuizzesConstMeta =>
+      const TaskConstMeta(
+        debugName: "generate_batch_fragment_quizzes",
+        argNames: ["filter"],
+      );
+
+  @override
+  Future<QuizQuestions>
+  crateApiQuizVerseCompletionGenerateBatchVerseCompletionQuizzes({
+    required QuizFilter filter,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_quiz_filter(filter, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quiz_questions,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiQuizVerseCompletionGenerateBatchVerseCompletionQuizzesConstMeta,
+        argValues: [filter],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiQuizVerseCompletionGenerateBatchVerseCompletionQuizzesConstMeta =>
+      const TaskConstMeta(
+        debugName: "generate_batch_verse_completion_quizzes",
+        argNames: ["filter"],
+      );
+
+  @override
+  Future<QuizQuestions> crateApiQuizVerseOrderGenerateBatchVerseOrderQuizzes({
+    required QuizFilter filter,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_quiz_filter(filter, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quiz_questions,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiQuizVerseOrderGenerateBatchVerseOrderQuizzesConstMeta,
+        argValues: [filter],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiQuizVerseOrderGenerateBatchVerseOrderQuizzesConstMeta =>
+      const TaskConstMeta(
+        debugName: "generate_batch_verse_order_quizzes",
+        argNames: ["filter"],
+      );
+
+  @override
+  Future<QuizQuestions>
+  crateApiQuizVersePreviousGenerateBatchVersePreviousQuizzes({
+    required QuizFilter filter,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_quiz_filter(filter, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quiz_questions,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiQuizVersePreviousGenerateBatchVersePreviousQuizzesConstMeta,
+        argValues: [filter],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiQuizVersePreviousGenerateBatchVersePreviousQuizzesConstMeta =>
+      const TaskConstMeta(
+        debugName: "generate_batch_verse_previous_quizzes",
+        argNames: ["filter"],
+      );
+
+  @override
+  Future<QuizGenerationResult>
+  crateApiQuizVersePreviousGeneratePreviousVerseQuiz({
+    required QuizFilter filter,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_quiz_filter(filter, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quiz_generation_result,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiQuizVersePreviousGeneratePreviousVerseQuizConstMeta,
+        argValues: [filter],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiQuizVersePreviousGeneratePreviousVerseQuizConstMeta =>
+      const TaskConstMeta(
+        debugName: "generate_previous_verse_quiz",
+        argNames: ["filter"],
+      );
+
+  @override
+  QuizGenerationResult crateApiQuizVerseCompletionGenerateVerseCompletionQuiz({
+    required QuizFilter filter,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_quiz_filter(filter, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_quiz_generation_result,
@@ -277,57 +468,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<QuizQuestions>
-  crateApiQuizVerseCompletionGenerateVerseCompletionQuizBatch({
-    required QuizFilter filter,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_quiz_filter(filter, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 3,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_quiz_questions,
-          decodeErrorData: null,
-        ),
-        constMeta:
-            kCrateApiQuizVerseCompletionGenerateVerseCompletionQuizBatchConstMeta,
-        argValues: [filter],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta
-  get kCrateApiQuizVerseCompletionGenerateVerseCompletionQuizBatchConstMeta =>
-      const TaskConstMeta(
-        debugName: "generate_verse_completion_quiz_batch",
-        argNames: ["filter"],
-      );
-
-  @override
-  Future<QuizGenerationResult>
+  QuizGenerationResult
   crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuiz({
     required QuizFilter filter,
   }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_quiz_filter(filter, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 4,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_quiz_generation_result,
@@ -349,42 +499,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<QuizQuestions>
-  crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuizBatch({
-    required QuizFilter filter,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_quiz_filter(filter, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 5,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_quiz_questions,
-          decodeErrorData: null,
-        ),
-        constMeta:
-            kCrateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuizBatchConstMeta,
-        argValues: [filter],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta
-  get kCrateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuizBatchConstMeta =>
-      const TaskConstMeta(
-        debugName: "generate_verse_fragment_quiz_batch",
-        argNames: ["filter"],
-      );
-
-  @override
   Future<List<Chapter>> crateApiQuranChapterGetAllChapters() {
     return handler.executeNormal(
       NormalTask(
@@ -393,7 +507,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 9,
             port: port_,
           );
         },
@@ -420,7 +534,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 10,
             port: port_,
           );
         },
@@ -447,7 +561,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 11,
             port: port_,
           );
         },
@@ -477,7 +591,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 12,
             port: port_,
           );
         },
@@ -510,7 +624,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 13,
             port: port_,
           );
         },
@@ -543,7 +657,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 14,
             port: port_,
           );
         },
@@ -576,7 +690,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 15,
             port: port_,
           );
         },
@@ -607,7 +721,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 16,
             port: port_,
           );
         },
@@ -640,7 +754,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 14,
+            funcId: 17,
             port: port_,
           );
         },
@@ -673,7 +787,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 18,
             port: port_,
           );
         },
@@ -704,7 +818,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 19,
             port: port_,
           );
         },
@@ -735,7 +849,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 20,
             port: port_,
           );
         },
@@ -765,7 +879,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 21,
             port: port_,
           );
         },
@@ -795,7 +909,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 22,
             port: port_,
           );
         },
@@ -828,7 +942,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 23,
             port: port_,
           );
         },
@@ -852,18 +966,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<String?> crateApiQuranVerseGetTranslationText({
     required String verseKey,
-    required int resourceId,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(verseKey, serializer);
-          sse_encode_u_32(resourceId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 21,
+            funcId: 24,
             port: port_,
           );
         },
@@ -872,7 +984,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiQuranVerseGetTranslationTextConstMeta,
-        argValues: [verseKey, resourceId],
+        argValues: [verseKey],
         apiImpl: this,
       ),
     );
@@ -881,7 +993,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiQuranVerseGetTranslationTextConstMeta =>
       const TaskConstMeta(
         debugName: "get_translation_text",
-        argNames: ["verseKey", "resourceId"],
+        argNames: ["verseKey"],
       );
 
   @override
@@ -898,7 +1010,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 22,
+            funcId: 25,
             port: port_,
           );
         },
@@ -932,7 +1044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 23,
+            funcId: 26,
             port: port_,
           );
         },
@@ -954,31 +1066,55 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Word?> crateApiQuranVerseGetWordDetails({
-    required int chapterId,
-    required int verseNumber,
-    required int wordPosition,
+  Future<AyahText> crateApiQuranVerseGetVerseTexts({required String verseKey}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(verseKey, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 27,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_ayah_text,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiQuranVerseGetVerseTextsConstMeta,
+        argValues: [verseKey],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiQuranVerseGetVerseTextsConstMeta =>
+      const TaskConstMeta(debugName: "get_verse_texts", argNames: ["verseKey"]);
+
+  @override
+  Future<Translation?> crateApiQuranVerseGetWordDetails({
+    required String verseKey,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_u_32(chapterId, serializer);
-          sse_encode_u_32(verseNumber, serializer);
-          sse_encode_u_32(wordPosition, serializer);
+          sse_encode_String(verseKey, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 24,
+            funcId: 28,
             port: port_,
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_opt_box_autoadd_word,
+          decodeSuccessData: sse_decode_opt_box_autoadd_translation,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiQuranVerseGetWordDetailsConstMeta,
-        argValues: [chapterId, verseNumber, wordPosition],
+        argValues: [verseKey],
         apiImpl: this,
       ),
     );
@@ -987,7 +1123,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiQuranVerseGetWordDetailsConstMeta =>
       const TaskConstMeta(
         debugName: "get_word_details",
-        argNames: ["chapterId", "verseNumber", "wordPosition"],
+        argNames: ["verseKey"],
       );
 
   @override
@@ -997,7 +1133,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1022,7 +1158,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 26,
+            funcId: 30,
             port: port_,
           );
         },
@@ -1041,6 +1177,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
+  Future<QuizGenerationResult>
+  crateApiQuizVerseCompletionInnerGenerateVerseCompletionQuiz({
+    required QuizFilter filter,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_quiz_filter(filter, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 31,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quiz_generation_result,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiQuizVerseCompletionInnerGenerateVerseCompletionQuizConstMeta,
+        argValues: [filter],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiQuizVerseCompletionInnerGenerateVerseCompletionQuizConstMeta =>
+      const TaskConstMeta(
+        debugName: "inner_generate_verse_completion_quiz",
+        argNames: ["filter"],
+      );
+
+  @override
   Future<void> crateApiEngineLoaderLoadEngineDataFromFlutterAssets({
     required Map<String, Uint8List> map,
   }) {
@@ -1052,7 +1224,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 27,
+            funcId: 32,
             port: port_,
           );
         },
@@ -1085,7 +1257,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 28,
+            funcId: 33,
             port: port_,
           );
         },
@@ -1115,7 +1287,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 29,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1223,6 +1395,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Translation dco_decode_box_autoadd_translation(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_translation(raw);
+  }
+
+  @protected
   int dco_decode_box_autoadd_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -1232,12 +1410,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Verse dco_decode_box_autoadd_verse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_verse(raw);
-  }
-
-  @protected
-  Word dco_decode_box_autoadd_word(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_word(raw);
   }
 
   @protected
@@ -1318,6 +1490,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       juz: dco_decode_juz(arr[0]),
       pageNumber: dco_decode_u_32(arr[1]),
     );
+  }
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
   }
 
   @protected
@@ -1417,12 +1595,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<Word> dco_decode_list_word(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_word).toList();
-  }
-
-  @protected
   List<WordResult> dco_decode_list_word_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_word_result).toList();
@@ -1492,6 +1664,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Translation? dco_decode_opt_box_autoadd_translation(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_translation(raw);
+  }
+
+  @protected
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
@@ -1504,9 +1682,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Word? dco_decode_opt_box_autoadd_word(dynamic raw) {
+  List<String>? dco_decode_opt_list_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_word(raw);
+    return raw == null ? null : dco_decode_list_String(raw);
   }
 
   @protected
@@ -1535,7 +1713,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return QuizFilter(
       scope: dco_decode_quiz_scope(arr[0]),
-      questionCount: dco_decode_u_32(arr[1]),
+      quizCount: dco_decode_u_32(arr[1]),
     );
   }
 
@@ -1544,11 +1722,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return QuizGenerationError_NoVersesInScope();
-      case 1:
-        return QuizGenerationError_NoValidQuestionFound();
-      case 2:
         return QuizGenerationError_InternalError(dco_decode_String(raw[1]));
+      case 1:
+        return QuizGenerationError_NoVersesInScope();
+      case 2:
+        return QuizGenerationError_NoValidQuestionFound();
+      case 3:
+        return QuizGenerationError_MissingAyahText();
       default:
         throw Exception("unreachable");
     }
@@ -1582,8 +1762,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   QuizQuestion dco_decode_quiz_question(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return QuizQuestion(
       verseKey: dco_decode_String(arr[0]),
       questionTextPart1: dco_decode_String(arr[1]),
@@ -1593,6 +1773,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       correctAnswerIndex: dco_decode_u_32(arr[5]),
       correctOrderIndices: dco_decode_opt_list_prim_u_32_strict(arr[6]),
       quizType: dco_decode_String(arr[7]),
+      shuffledParts: dco_decode_opt_list_String(arr[8]),
+      shuffledKeys: dco_decode_opt_list_String(arr[9]),
+      correctOrderKeys: dco_decode_opt_list_String(arr[10]),
     );
   }
 
@@ -1673,12 +1856,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Translation dco_decode_translation(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return Translation(
-      id: dco_decode_u_32(arr[0]),
-      resourceId: dco_decode_u_32(arr[1]),
-      text: dco_decode_String(arr[2]),
+      text: dco_decode_String(arr[0]),
+      footnotes: dco_decode_Map_String_String_None(arr[1]),
     );
   }
 
@@ -1723,39 +1905,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       sajdahNumber: dco_decode_opt_box_autoadd_u_32(arr[7]),
       pageNumber: dco_decode_u_32(arr[8]),
       juzNumber: dco_decode_u_32(arr[9]),
-      words: dco_decode_list_word(arr[10]),
+      wordIds: dco_decode_list_String(arr[10]),
       translations: dco_decode_list_translation(arr[11]),
-    );
-  }
-
-  @protected
-  Word dco_decode_word(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 21)
-      throw Exception('unexpected arr length: expect 21 but see ${arr.length}');
-    return Word(
-      id: dco_decode_u_32(arr[0]),
-      position: dco_decode_u_32(arr[1]),
-      audioUrl: dco_decode_opt_String(arr[2]),
-      charTypeName: dco_decode_String(arr[3]),
-      lineV1: dco_decode_u_32(arr[4]),
-      lineV2: dco_decode_u_32(arr[5]),
-      codeV1: dco_decode_String(arr[6]),
-      codeV2: dco_decode_String(arr[7]),
-      textQpcHafs: dco_decode_String(arr[8]),
-      textUthmani: dco_decode_String(arr[9]),
-      textUthmaniSimple: dco_decode_String(arr[10]),
-      textUthmaniTajweed: dco_decode_String(arr[11]),
-      location: dco_decode_String(arr[12]),
-      chapterId: dco_decode_u_32(arr[13]),
-      verseId: dco_decode_u_32(arr[14]),
-      verseKey: dco_decode_String(arr[15]),
-      lineNumber: dco_decode_u_32(arr[16]),
-      pageNumber: dco_decode_u_32(arr[17]),
-      text: dco_decode_String(arr[18]),
-      translation: dco_decode_word_translation(arr[19]),
-      transliteration: dco_decode_word_transliteration(arr[20]),
     );
   }
 
@@ -1763,38 +1914,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WordResult dco_decode_word_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return WordResult(
       id: dco_decode_u_32(arr[0]),
       position: dco_decode_u_32(arr[1]),
       textUthmani: dco_decode_String(arr[2]),
-      translationText: dco_decode_String(arr[3]),
-      highlighted: dco_decode_bool(arr[4]),
-    );
-  }
-
-  @protected
-  WordTranslation dco_decode_word_translation(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return WordTranslation(
-      text: dco_decode_String(arr[0]),
-      languageName: dco_decode_String(arr[1]),
-    );
-  }
-
-  @protected
-  WordTransliteration dco_decode_word_transliteration(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return WordTransliteration(
-      text: dco_decode_opt_String(arr[0]),
-      languageName: dco_decode_String(arr[1]),
+      highlighted: dco_decode_bool(arr[3]),
     );
   }
 
@@ -1888,6 +2014,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Translation sse_decode_box_autoadd_translation(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_translation(deserializer));
+  }
+
+  @protected
   int sse_decode_box_autoadd_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_u_32(deserializer));
@@ -1897,12 +2029,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Verse sse_decode_box_autoadd_verse(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_verse(deserializer));
-  }
-
-  @protected
-  Word sse_decode_box_autoadd_word(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_word(deserializer));
   }
 
   @protected
@@ -1996,6 +2122,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_juz = sse_decode_juz(deserializer);
     var var_pageNumber = sse_decode_u_32(deserializer);
     return JuzWithPage(juz: var_juz, pageNumber: var_pageNumber);
+  }
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -2183,18 +2321,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<Word> sse_decode_list_word(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <Word>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_word(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<WordResult> sse_decode_list_word_result(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2298,6 +2424,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Translation? sse_decode_opt_box_autoadd_translation(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_translation(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2320,11 +2459,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Word? sse_decode_opt_box_autoadd_word(SseDeserializer deserializer) {
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_word(deserializer));
+      return (sse_decode_list_String(deserializer));
     } else {
       return null;
     }
@@ -2371,8 +2510,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   QuizFilter sse_decode_quiz_filter(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_scope = sse_decode_quiz_scope(deserializer);
-    var var_questionCount = sse_decode_u_32(deserializer);
-    return QuizFilter(scope: var_scope, questionCount: var_questionCount);
+    var var_quizCount = sse_decode_u_32(deserializer);
+    return QuizFilter(scope: var_scope, quizCount: var_quizCount);
   }
 
   @protected
@@ -2384,12 +2523,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return QuizGenerationError_NoVersesInScope();
-      case 1:
-        return QuizGenerationError_NoValidQuestionFound();
-      case 2:
         var var_field0 = sse_decode_String(deserializer);
         return QuizGenerationError_InternalError(var_field0);
+      case 1:
+        return QuizGenerationError_NoVersesInScope();
+      case 2:
+        return QuizGenerationError_NoValidQuestionFound();
+      case 3:
+        return QuizGenerationError_MissingAyahText();
       default:
         throw UnimplementedError('');
     }
@@ -2428,6 +2569,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       deserializer,
     );
     var var_quizType = sse_decode_String(deserializer);
+    var var_shuffledParts = sse_decode_opt_list_String(deserializer);
+    var var_shuffledKeys = sse_decode_opt_list_String(deserializer);
+    var var_correctOrderKeys = sse_decode_opt_list_String(deserializer);
     return QuizQuestion(
       verseKey: var_verseKey,
       questionTextPart1: var_questionTextPart1,
@@ -2437,6 +2581,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       correctAnswerIndex: var_correctAnswerIndex,
       correctOrderIndices: var_correctOrderIndices,
       quizType: var_quizType,
+      shuffledParts: var_shuffledParts,
+      shuffledKeys: var_shuffledKeys,
+      correctOrderKeys: var_correctOrderKeys,
     );
   }
 
@@ -2510,10 +2657,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   Translation sse_decode_translation(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_id = sse_decode_u_32(deserializer);
-    var var_resourceId = sse_decode_u_32(deserializer);
     var var_text = sse_decode_String(deserializer);
-    return Translation(id: var_id, resourceId: var_resourceId, text: var_text);
+    var var_footnotes = sse_decode_Map_String_String_None(deserializer);
+    return Translation(text: var_text, footnotes: var_footnotes);
   }
 
   @protected
@@ -2552,7 +2698,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_sajdahNumber = sse_decode_opt_box_autoadd_u_32(deserializer);
     var var_pageNumber = sse_decode_u_32(deserializer);
     var var_juzNumber = sse_decode_u_32(deserializer);
-    var var_words = sse_decode_list_word(deserializer);
+    var var_wordIds = sse_decode_list_String(deserializer);
     var var_translations = sse_decode_list_translation(deserializer);
     return Verse(
       id: var_id,
@@ -2565,57 +2711,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       sajdahNumber: var_sajdahNumber,
       pageNumber: var_pageNumber,
       juzNumber: var_juzNumber,
-      words: var_words,
+      wordIds: var_wordIds,
       translations: var_translations,
-    );
-  }
-
-  @protected
-  Word sse_decode_word(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_id = sse_decode_u_32(deserializer);
-    var var_position = sse_decode_u_32(deserializer);
-    var var_audioUrl = sse_decode_opt_String(deserializer);
-    var var_charTypeName = sse_decode_String(deserializer);
-    var var_lineV1 = sse_decode_u_32(deserializer);
-    var var_lineV2 = sse_decode_u_32(deserializer);
-    var var_codeV1 = sse_decode_String(deserializer);
-    var var_codeV2 = sse_decode_String(deserializer);
-    var var_textQpcHafs = sse_decode_String(deserializer);
-    var var_textUthmani = sse_decode_String(deserializer);
-    var var_textUthmaniSimple = sse_decode_String(deserializer);
-    var var_textUthmaniTajweed = sse_decode_String(deserializer);
-    var var_location = sse_decode_String(deserializer);
-    var var_chapterId = sse_decode_u_32(deserializer);
-    var var_verseId = sse_decode_u_32(deserializer);
-    var var_verseKey = sse_decode_String(deserializer);
-    var var_lineNumber = sse_decode_u_32(deserializer);
-    var var_pageNumber = sse_decode_u_32(deserializer);
-    var var_text = sse_decode_String(deserializer);
-    var var_translation = sse_decode_word_translation(deserializer);
-    var var_transliteration = sse_decode_word_transliteration(deserializer);
-    return Word(
-      id: var_id,
-      position: var_position,
-      audioUrl: var_audioUrl,
-      charTypeName: var_charTypeName,
-      lineV1: var_lineV1,
-      lineV2: var_lineV2,
-      codeV1: var_codeV1,
-      codeV2: var_codeV2,
-      textQpcHafs: var_textQpcHafs,
-      textUthmani: var_textUthmani,
-      textUthmaniSimple: var_textUthmaniSimple,
-      textUthmaniTajweed: var_textUthmaniTajweed,
-      location: var_location,
-      chapterId: var_chapterId,
-      verseId: var_verseId,
-      verseKey: var_verseKey,
-      lineNumber: var_lineNumber,
-      pageNumber: var_pageNumber,
-      text: var_text,
-      translation: var_translation,
-      transliteration: var_transliteration,
     );
   }
 
@@ -2625,33 +2722,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_id = sse_decode_u_32(deserializer);
     var var_position = sse_decode_u_32(deserializer);
     var var_textUthmani = sse_decode_String(deserializer);
-    var var_translationText = sse_decode_String(deserializer);
     var var_highlighted = sse_decode_bool(deserializer);
     return WordResult(
       id: var_id,
       position: var_position,
       textUthmani: var_textUthmani,
-      translationText: var_translationText,
       highlighted: var_highlighted,
     );
-  }
-
-  @protected
-  WordTranslation sse_decode_word_translation(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_text = sse_decode_String(deserializer);
-    var var_languageName = sse_decode_String(deserializer);
-    return WordTranslation(text: var_text, languageName: var_languageName);
-  }
-
-  @protected
-  WordTransliteration sse_decode_word_transliteration(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_text = sse_decode_opt_String(deserializer);
-    var var_languageName = sse_decode_String(deserializer);
-    return WordTransliteration(text: var_text, languageName: var_languageName);
   }
 
   @protected
@@ -2748,6 +2825,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_translation(
+    Translation self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_translation(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self, serializer);
@@ -2757,12 +2843,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_box_autoadd_verse(Verse self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_verse(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_word(Word self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_word(self, serializer);
   }
 
   @protected
@@ -2823,6 +2903,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_juz(self.juz, serializer);
     sse_encode_u_32(self.pageNumber, serializer);
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
   }
 
   @protected
@@ -2996,15 +3085,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_word(List<Word> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_word(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_word_result(
     List<WordResult> self,
     SseSerializer serializer,
@@ -3098,6 +3178,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_translation(
+    Translation? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_translation(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -3118,12 +3211,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_opt_box_autoadd_word(Word? self, SseSerializer serializer) {
+  void sse_encode_opt_list_String(
+    List<String>? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
-      sse_encode_box_autoadd_word(self, serializer);
+      sse_encode_list_String(self, serializer);
     }
   }
 
@@ -3170,7 +3266,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_quiz_filter(QuizFilter self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_quiz_scope(self.scope, serializer);
-    sse_encode_u_32(self.questionCount, serializer);
+    sse_encode_u_32(self.quizCount, serializer);
   }
 
   @protected
@@ -3180,13 +3276,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case QuizGenerationError_NoVersesInScope():
-        sse_encode_i_32(0, serializer);
-      case QuizGenerationError_NoValidQuestionFound():
-        sse_encode_i_32(1, serializer);
       case QuizGenerationError_InternalError(field0: final field0):
-        sse_encode_i_32(2, serializer);
+        sse_encode_i_32(0, serializer);
         sse_encode_String(field0, serializer);
+      case QuizGenerationError_NoVersesInScope():
+        sse_encode_i_32(1, serializer);
+      case QuizGenerationError_NoValidQuestionFound():
+        sse_encode_i_32(2, serializer);
+      case QuizGenerationError_MissingAyahText():
+        sse_encode_i_32(3, serializer);
     }
   }
 
@@ -3218,6 +3316,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.correctAnswerIndex, serializer);
     sse_encode_opt_list_prim_u_32_strict(self.correctOrderIndices, serializer);
     sse_encode_String(self.quizType, serializer);
+    sse_encode_opt_list_String(self.shuffledParts, serializer);
+    sse_encode_opt_list_String(self.shuffledKeys, serializer);
+    sse_encode_opt_list_String(self.correctOrderKeys, serializer);
   }
 
   @protected
@@ -3282,9 +3383,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_translation(Translation self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_32(self.id, serializer);
-    sse_encode_u_32(self.resourceId, serializer);
     sse_encode_String(self.text, serializer);
+    sse_encode_Map_String_String_None(self.footnotes, serializer);
   }
 
   @protected
@@ -3323,34 +3423,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_u_32(self.sajdahNumber, serializer);
     sse_encode_u_32(self.pageNumber, serializer);
     sse_encode_u_32(self.juzNumber, serializer);
-    sse_encode_list_word(self.words, serializer);
+    sse_encode_list_String(self.wordIds, serializer);
     sse_encode_list_translation(self.translations, serializer);
-  }
-
-  @protected
-  void sse_encode_word(Word self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_32(self.id, serializer);
-    sse_encode_u_32(self.position, serializer);
-    sse_encode_opt_String(self.audioUrl, serializer);
-    sse_encode_String(self.charTypeName, serializer);
-    sse_encode_u_32(self.lineV1, serializer);
-    sse_encode_u_32(self.lineV2, serializer);
-    sse_encode_String(self.codeV1, serializer);
-    sse_encode_String(self.codeV2, serializer);
-    sse_encode_String(self.textQpcHafs, serializer);
-    sse_encode_String(self.textUthmani, serializer);
-    sse_encode_String(self.textUthmaniSimple, serializer);
-    sse_encode_String(self.textUthmaniTajweed, serializer);
-    sse_encode_String(self.location, serializer);
-    sse_encode_u_32(self.chapterId, serializer);
-    sse_encode_u_32(self.verseId, serializer);
-    sse_encode_String(self.verseKey, serializer);
-    sse_encode_u_32(self.lineNumber, serializer);
-    sse_encode_u_32(self.pageNumber, serializer);
-    sse_encode_String(self.text, serializer);
-    sse_encode_word_translation(self.translation, serializer);
-    sse_encode_word_transliteration(self.transliteration, serializer);
   }
 
   @protected
@@ -3359,27 +3433,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.id, serializer);
     sse_encode_u_32(self.position, serializer);
     sse_encode_String(self.textUthmani, serializer);
-    sse_encode_String(self.translationText, serializer);
     sse_encode_bool(self.highlighted, serializer);
-  }
-
-  @protected
-  void sse_encode_word_translation(
-    WordTranslation self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.text, serializer);
-    sse_encode_String(self.languageName, serializer);
-  }
-
-  @protected
-  void sse_encode_word_transliteration(
-    WordTransliteration self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_String(self.text, serializer);
-    sse_encode_String(self.languageName, serializer);
   }
 }

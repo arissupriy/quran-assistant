@@ -15,7 +15,5 @@ Future<void> loadEngineDataFromFlutterAssets({
   map: map,
 );
 
-/// Hanya reset EngineData jika sudah pernah di-load sebelumnya.
-/// Akan gagal jika belum pernah dipanggil.
 Future<void> resetEngineFromFlutter({required Map<String, Uint8List> map}) =>
     RustLib.instance.api.crateApiEngineLoaderResetEngineFromFlutter(map: map);

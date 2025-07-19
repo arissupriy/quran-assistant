@@ -1,10 +1,12 @@
 pub mod api;
+pub mod data_loader;
 pub mod models;
 mod frb_generated;
-mod data_loader;
+
 // mod engine_data_loader;
-pub mod search_engine;
 pub mod quiz_utils;
+
+pub mod search_engine;
 
 
 // Import EngineData dari modul engine_data_loader

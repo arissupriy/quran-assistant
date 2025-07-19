@@ -73,7 +73,7 @@ void main() async {
       // Buka "boxes" (mirip tabel) with error handling
       await Hive.openBox<QuizSession>('quizSessions');
       await Hive.openBox<QuizAttempt>('quizAttempts');
-      await Hive.openBox('reading_sessions'); // Add reading sessions box
+      await Hive.openBox<ReadingSession>('reading_sessions'); // Add reading sessions box
       debugPrint('✅ Hive boxes opened successfully');
     } catch (e) {
       debugPrint('❌ Failed to open Hive boxes: $e');
@@ -86,7 +86,7 @@ void main() async {
         
         await Hive.openBox<QuizSession>('quizSessions');
         await Hive.openBox<QuizAttempt>('quizAttempts');
-        await Hive.openBox('reading_sessions');
+        await Hive.openBox<ReadingSession>('reading_sessions');
         debugPrint('✅ Hive boxes recreated successfully');
       } catch (recoveryError) {
         debugPrint('❌ Failed to recover Hive boxes: $recoveryError');

@@ -7,16 +7,17 @@ import '../../data_loader/quiz_models.dart';
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<QuizGenerationResult> generateVerseFragmentQuiz({
-  required QuizFilter filter,
-}) => RustLib.instance.api
-    .crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuiz(
-      filter: filter,
-    );
+// These functions are ignored because they are not marked as `pub`: `inner_generate_verse_fragment_quiz`
 
-Future<QuizQuestions> generateVerseFragmentQuizBatch({
+QuizGenerationResult generateVerseFragmentQuiz({required QuizFilter filter}) =>
+    RustLib.instance.api
+        .crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuiz(
+          filter: filter,
+        );
+
+Future<QuizQuestions> generateBatchFragmentQuizzes({
   required QuizFilter filter,
 }) => RustLib.instance.api
-    .crateApiQuizQuizFragmentCompletionGenerateVerseFragmentQuizBatch(
+    .crateApiQuizQuizFragmentCompletionGenerateBatchFragmentQuizzes(
       filter: filter,
     );

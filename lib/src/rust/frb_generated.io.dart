@@ -7,6 +7,8 @@ import 'api/engine_loader.dart';
 import 'api/mushaf.dart';
 import 'api/quiz/quiz_fragment_completion.dart';
 import 'api/quiz/verse_completion.dart';
+import 'api/quiz/verse_order.dart';
+import 'api/quiz/verse_previous.dart';
 import 'api/quran/chapter.dart';
 import 'api/quran/metadata.dart';
 import 'api/quran/search.dart';
@@ -72,13 +74,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QuizQuestion dco_decode_box_autoadd_quiz_question(dynamic raw);
 
   @protected
+  Translation dco_decode_box_autoadd_translation(dynamic raw);
+
+  @protected
   int dco_decode_box_autoadd_u_32(dynamic raw);
 
   @protected
   Verse dco_decode_box_autoadd_verse(dynamic raw);
-
-  @protected
-  Word dco_decode_box_autoadd_word(dynamic raw);
 
   @protected
   Chapter dco_decode_chapter(dynamic raw);
@@ -97,6 +99,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   JuzWithPage dco_decode_juz_with_page(dynamic raw);
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw);
 
   @protected
   List<AyahText> dco_decode_list_ayah_text(dynamic raw);
@@ -146,9 +151,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Translation> dco_decode_list_translation(dynamic raw);
 
   @protected
-  List<Word> dco_decode_list_word(dynamic raw);
-
-  @protected
   List<WordResult> dco_decode_list_word_result(dynamic raw);
 
   @protected
@@ -175,13 +177,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QuizQuestion? dco_decode_opt_box_autoadd_quiz_question(dynamic raw);
 
   @protected
+  Translation? dco_decode_opt_box_autoadd_translation(dynamic raw);
+
+  @protected
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
 
   @protected
   Verse? dco_decode_opt_box_autoadd_verse(dynamic raw);
 
   @protected
-  Word? dco_decode_opt_box_autoadd_word(dynamic raw);
+  List<String>? dco_decode_opt_list_String(dynamic raw);
 
   @protected
   List<GlyphPosition>? dco_decode_opt_list_glyph_position(dynamic raw);
@@ -246,16 +251,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Verse dco_decode_verse(dynamic raw);
 
   @protected
-  Word dco_decode_word(dynamic raw);
-
-  @protected
   WordResult dco_decode_word_result(dynamic raw);
-
-  @protected
-  WordTranslation dco_decode_word_translation(dynamic raw);
-
-  @protected
-  WordTransliteration dco_decode_word_transliteration(dynamic raw);
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
@@ -299,13 +295,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Translation sse_decode_box_autoadd_translation(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
   Verse sse_decode_box_autoadd_verse(SseDeserializer deserializer);
-
-  @protected
-  Word sse_decode_box_autoadd_word(SseDeserializer deserializer);
 
   @protected
   Chapter sse_decode_chapter(SseDeserializer deserializer);
@@ -324,6 +320,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   JuzWithPage sse_decode_juz_with_page(SseDeserializer deserializer);
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
 
   @protected
   List<AyahText> sse_decode_list_ayah_text(SseDeserializer deserializer);
@@ -383,9 +382,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Translation> sse_decode_list_translation(SseDeserializer deserializer);
 
   @protected
-  List<Word> sse_decode_list_word(SseDeserializer deserializer);
-
-  @protected
   List<WordResult> sse_decode_list_word_result(SseDeserializer deserializer);
 
   @protected
@@ -414,13 +410,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Translation? sse_decode_opt_box_autoadd_translation(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
   Verse? sse_decode_opt_box_autoadd_verse(SseDeserializer deserializer);
 
   @protected
-  Word? sse_decode_opt_box_autoadd_word(SseDeserializer deserializer);
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
   @protected
   List<GlyphPosition>? sse_decode_opt_list_glyph_position(
@@ -495,18 +496,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Verse sse_decode_verse(SseDeserializer deserializer);
 
   @protected
-  Word sse_decode_word(SseDeserializer deserializer);
-
-  @protected
   WordResult sse_decode_word_result(SseDeserializer deserializer);
-
-  @protected
-  WordTranslation sse_decode_word_translation(SseDeserializer deserializer);
-
-  @protected
-  WordTransliteration sse_decode_word_transliteration(
-    SseDeserializer deserializer,
-  );
 
   @protected
   void sse_encode_AnyhowException(
@@ -560,13 +550,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_translation(
+    Translation self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_verse(Verse self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_word(Word self, SseSerializer serializer);
 
   @protected
   void sse_encode_chapter(Chapter self, SseSerializer serializer);
@@ -585,6 +578,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_juz_with_page(JuzWithPage self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_ayah_text(List<AyahText> self, SseSerializer serializer);
@@ -668,9 +664,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_list_word(List<Word> self, SseSerializer serializer);
-
-  @protected
   void sse_encode_list_word_result(
     List<WordResult> self,
     SseSerializer serializer,
@@ -710,13 +703,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_translation(
+    Translation? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_verse(Verse? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_word(Word? self, SseSerializer serializer);
+  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_list_glyph_position(
@@ -803,22 +802,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_verse(Verse self, SseSerializer serializer);
 
   @protected
-  void sse_encode_word(Word self, SseSerializer serializer);
-
-  @protected
   void sse_encode_word_result(WordResult self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_word_translation(
-    WordTranslation self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_word_transliteration(
-    WordTransliteration self,
-    SseSerializer serializer,
-  );
 }
 
 // Section: wire_class

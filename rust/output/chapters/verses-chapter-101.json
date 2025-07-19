@@ -1,0 +1,203 @@
+[
+  {
+    "id": 6158,
+    "verseNumber": 1,
+    "verseKey": "101:1",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:1:1",
+      "101:1:2"
+    ]
+  },
+  {
+    "id": 6159,
+    "verseNumber": 2,
+    "verseKey": "101:2",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:2:1",
+      "101:2:2",
+      "101:2:3"
+    ]
+  },
+  {
+    "id": 6160,
+    "verseNumber": 3,
+    "verseKey": "101:3",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:3:1",
+      "101:3:2",
+      "101:3:3",
+      "101:3:4",
+      "101:3:5"
+    ]
+  },
+  {
+    "id": 6161,
+    "verseNumber": 4,
+    "verseKey": "101:4",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:4:1",
+      "101:4:2",
+      "101:4:3",
+      "101:4:4",
+      "101:4:5",
+      "101:4:6"
+    ]
+  },
+  {
+    "id": 6162,
+    "verseNumber": 5,
+    "verseKey": "101:5",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:5:1",
+      "101:5:2",
+      "101:5:3",
+      "101:5:4",
+      "101:5:5"
+    ]
+  },
+  {
+    "id": 6163,
+    "verseNumber": 6,
+    "verseKey": "101:6",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:6:1",
+      "101:6:2",
+      "101:6:3",
+      "101:6:4",
+      "101:6:5"
+    ]
+  },
+  {
+    "id": 6164,
+    "verseNumber": 7,
+    "verseKey": "101:7",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:7:1",
+      "101:7:2",
+      "101:7:3",
+      "101:7:4",
+      "101:7:5"
+    ]
+  },
+  {
+    "id": 6165,
+    "verseNumber": 8,
+    "verseKey": "101:8",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:8:1",
+      "101:8:2",
+      "101:8:3",
+      "101:8:4",
+      "101:8:5"
+    ]
+  },
+  {
+    "id": 6166,
+    "verseNumber": 9,
+    "verseKey": "101:9",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:9:1",
+      "101:9:2",
+      "101:9:3"
+    ]
+  },
+  {
+    "id": 6167,
+    "verseNumber": 10,
+    "verseKey": "101:10",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:10:1",
+      "101:10:2",
+      "101:10:3",
+      "101:10:4",
+      "101:10:5"
+    ]
+  },
+  {
+    "id": 6168,
+    "verseNumber": 11,
+    "verseKey": "101:11",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 545,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 600,
+    "juzNumber": 30,
+    "wordIds": [
+      "101:11:1",
+      "101:11:2",
+      "101:11:3"
+    ]
+  }
+]

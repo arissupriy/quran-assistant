@@ -101,7 +101,17 @@ flutter:
   fonts:
     - family: UthmaniHafs
       fonts:
-        - asset: assets/fonts/UthmanicHafs.ttf # Ganti dengan nama file Anda
+        - asset: assets/fonts/UthmanicHafs1Ver18.ttf # Ganti dengan nama file Anda
+    # - family: MeQuran
+    #   fonts:
+    #     - asset: assets/fonts/me_quran.ttf # Ganti dengan nama file Anda
+    - family: LPMQ
+      fonts:
+        - asset: assets/fonts/LPMQ.ttf # Ganti dengan nama file Anda
+    # - family: Omar
+    #   fonts:
+    #     - asset: assets/fonts/OmarRegular.ttf # Ganti dengan nama file Anda
+        
     # - family: UthmaniHafsV22
     #   fonts:
     #     - asset: assets/fonts/UthmanicHafs_V22.ttf # Ganti dengan nama file Anda

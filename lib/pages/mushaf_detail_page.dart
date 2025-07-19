@@ -347,6 +347,7 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppTheme.textColor,
+              fontFamily: 'UthmaniHafs',
             ),
           ),
           Text(
@@ -373,15 +374,11 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
             style: TextStyle(
               fontSize: 16,
               color: AppTheme.textColor,
+              fontFamily: 'UthmaniHafs',
+              fontWeight: FontWeight.w600,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
+          Text(
               '${pageInfo.pageNumber}',
               style: TextStyle(
                 fontSize: 18,
@@ -389,7 +386,6 @@ class _MushafDetailPageState extends ConsumerState<MushafDetailPage> {
                 color: AppTheme.primaryColor,
               ),
             ),
-          ),
         ],
       ),
     );

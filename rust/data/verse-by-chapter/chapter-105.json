@@ -1,0 +1,969 @@
+[
+  {
+    "id": 6189,
+    "verseNumber": 1,
+    "verseKey": "105:1",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 549,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 137,
+        "position": 1,
+        "audioUrl": "wbw/105_001_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮍ",
+        "codeV2": "ﱽ",
+        "textQpcHafs": "أَلَمۡ",
+        "textUthmani": "أَلَمْ",
+        "textUthmaniSimple": "الم",
+        "textUthmaniTajweed": "أَلَمۡ",
+        "location": "105:1:1",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﱽ",
+        "translation": {
+          "text": "apakah tidak",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "alam",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 138,
+        "position": 2,
+        "audioUrl": "wbw/105_001_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮎ",
+        "codeV2": "ﱾ",
+        "textQpcHafs": "تَرَ",
+        "textUthmani": "تَرَ",
+        "textUthmaniSimple": "تر",
+        "textUthmaniTajweed": "تَرَ",
+        "location": "105:1:2",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﱾ",
+        "translation": {
+          "text": "kamu perhatikan",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "tara",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 139,
+        "position": 3,
+        "audioUrl": "wbw/105_001_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮏ",
+        "codeV2": "ﱿ",
+        "textQpcHafs": "كَيۡفَ",
+        "textUthmani": "كَيْفَ",
+        "textUthmaniSimple": "كيف",
+        "textUthmaniTajweed": "كَيۡفَ",
+        "location": "105:1:3",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﱿ",
+        "translation": {
+          "text": "bagaimana",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "kayfa",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 140,
+        "position": 4,
+        "audioUrl": "wbw/105_001_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮐ",
+        "codeV2": "ﲀ",
+        "textQpcHafs": "فَعَلَ",
+        "textUthmani": "فَعَلَ",
+        "textUthmaniSimple": "فعل",
+        "textUthmaniTajweed": "فَعَلَ",
+        "location": "105:1:4",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲀ",
+        "translation": {
+          "text": "berbuat/bertindak",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "faʿala",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 141,
+        "position": 5,
+        "audioUrl": "wbw/105_001_005.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮑ",
+        "codeV2": "ﲁ",
+        "textQpcHafs": "رَبُّكَ",
+        "textUthmani": "رَبُّكَ",
+        "textUthmaniSimple": "ربك",
+        "textUthmaniTajweed": "رَبُّكَ",
+        "location": "105:1:5",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲁ",
+        "translation": {
+          "text": "Tuhanmu",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "rabbuka",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 142,
+        "position": 6,
+        "audioUrl": "wbw/105_001_006.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮒ",
+        "codeV2": "ﲂ",
+        "textQpcHafs": "بِأَصۡحَٰبِ",
+        "textUthmani": "بِأَصْحَـٰبِ",
+        "textUthmaniSimple": "باصحـب",
+        "textUthmaniTajweed": "بِأَصۡحَ<rule class=madda_normal>ـٰ</rule>بِ",
+        "location": "105:1:6",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲂ",
+        "translation": {
+          "text": "terhadap golongan (tentara)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "bi-aṣḥābi",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 143,
+        "position": 7,
+        "audioUrl": "wbw/105_001_007.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮓ",
+        "codeV2": "ﲃ",
+        "textQpcHafs": "ٱلۡفِيلِ",
+        "textUthmani": "ٱلْفِيلِ",
+        "textUthmaniSimple": "الفيل",
+        "textUthmaniTajweed": "<rule class=ham_wasl>ٱ</rule>لۡف<rule class=madda_permissible>ِي</rule>لِ",
+        "location": "105:1:7",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲃ",
+        "translation": {
+          "text": "gajah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "l-fīli",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 144,
+        "position": 8,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮔ",
+        "codeV2": "ﲄ",
+        "textQpcHafs": "١",
+        "textUthmani": "١",
+        "textUthmaniSimple": "١",
+        "textUthmaniTajweed": "١",
+        "location": "105:1:8",
+        "chapterId": 105,
+        "verseId": 6189,
+        "verseKey": "105:1",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲄ",
+        "translation": {
+          "text": "(1)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922618,
+        "resourceId": 134,
+        "text": "Apakah kamu tidak memperhatikan bagaimana Tuhan-mu telah bertindak terhadap tentara bergajah<sup foot_note=211371>1</sup>?"
+      },
+      {
+        "id": 181373,
+        "resourceId": 33,
+        "text": "Tidakkah engkau (Muhammad) perhatikan bagaimana Tuhanmu telah bertindak terhadap pasukan bergajah?<sup foot_note=135876>1</sup>"
+      },
+      {
+        "id": 966274,
+        "resourceId": 141,
+        "text": "Tidakkah engkau (Muhammad) perhatikan bagaimana Tuhanmu telah bertindak terhadap pasukan bergajah?<sup foot_note=155992>1</sup>"
+      }
+    ]
+  },
+  {
+    "id": 6190,
+    "verseNumber": 2,
+    "verseKey": "105:2",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 549,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 1019,
+        "position": 1,
+        "audioUrl": "wbw/105_002_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮕ",
+        "codeV2": "ﲅ",
+        "textQpcHafs": "أَلَمۡ",
+        "textUthmani": "أَلَمْ",
+        "textUthmaniSimple": "الم",
+        "textUthmaniTajweed": "أَلَمۡ",
+        "location": "105:2:1",
+        "chapterId": 105,
+        "verseId": 6190,
+        "verseKey": "105:2",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲅ",
+        "translation": {
+          "text": "apakah tidak",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "alam",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 1020,
+        "position": 2,
+        "audioUrl": "wbw/105_002_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 13,
+        "codeV1": "ﮖ",
+        "codeV2": "ﲆ",
+        "textQpcHafs": "يَجۡعَلۡ",
+        "textUthmani": "يَجْعَلْ",
+        "textUthmaniSimple": "يجعل",
+        "textUthmaniTajweed": "يَ<rule class=qalaqah>جۡ</rule>عَلۡ",
+        "location": "105:2:2",
+        "chapterId": 105,
+        "verseId": 6190,
+        "verseKey": "105:2",
+        "lineNumber": 13,
+        "pageNumber": 601,
+        "text": "ﲆ",
+        "translation": {
+          "text": "Dia jadikan",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "yajʿal",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 1021,
+        "position": 3,
+        "audioUrl": "wbw/105_002_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 13,
+        "lineV2": 14,
+        "codeV1": "ﮗ",
+        "codeV2": "ﲇ",
+        "textQpcHafs": "كَيۡدَهُمۡ",
+        "textUthmani": "كَيْدَهُمْ",
+        "textUthmaniSimple": "كيدهم",
+        "textUthmaniTajweed": "كَيۡدَهُمۡ",
+        "location": "105:2:3",
+        "chapterId": 105,
+        "verseId": 6190,
+        "verseKey": "105:2",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲇ",
+        "translation": {
+          "text": "tipu daya mereka",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "kaydahum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 1022,
+        "position": 4,
+        "audioUrl": "wbw/105_002_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮘ",
+        "codeV2": "ﲈ",
+        "textQpcHafs": "فِي",
+        "textUthmani": "فِى",
+        "textUthmaniSimple": "فى",
+        "textUthmaniTajweed": "فِى",
+        "location": "105:2:4",
+        "chapterId": 105,
+        "verseId": 6190,
+        "verseKey": "105:2",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲈ",
+        "translation": {
+          "text": "dalam",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "fī",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 1023,
+        "position": 5,
+        "audioUrl": "wbw/105_002_005.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮙ",
+        "codeV2": "ﲉ",
+        "textQpcHafs": "تَضۡلِيلٖ",
+        "textUthmani": "تَضْلِيلٍۢ",
+        "textUthmaniSimple": "تضليل",
+        "textUthmaniTajweed": "تَضۡل<rule class=madda_permissible>ِي</rule>لٍ",
+        "location": "105:2:5",
+        "chapterId": 105,
+        "verseId": 6190,
+        "verseKey": "105:2",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲉ",
+        "translation": {
+          "text": "kesesatan/sia-sia",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "taḍlīlin",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 1024,
+        "position": 6,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮚ",
+        "codeV2": "ﲊ",
+        "textQpcHafs": "٢",
+        "textUthmani": "٢",
+        "textUthmaniSimple": "٢",
+        "textUthmaniTajweed": "٢",
+        "location": "105:2:6",
+        "chapterId": 105,
+        "verseId": 6190,
+        "verseKey": "105:2",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲊ",
+        "translation": {
+          "text": "(2)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922619,
+        "resourceId": 134,
+        "text": "Bukankah Dia telah menjadikan tipu daya mereka (untuk menghancurkan Kakbah) itu sia-sia?"
+      },
+      {
+        "id": 181354,
+        "resourceId": 33,
+        "text": "Bukankah Dia telah menjadikan tipu daya mereka itu sia-sia?"
+      },
+      {
+        "id": 966275,
+        "resourceId": 141,
+        "text": "Bukankah Dia telah menjadikan tipu daya mereka itu sia-sia?"
+      }
+    ]
+  },
+  {
+    "id": 6191,
+    "verseNumber": 3,
+    "verseKey": "105:3",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 549,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 2361,
+        "position": 1,
+        "audioUrl": "wbw/105_003_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮛ",
+        "codeV2": "ﲋ",
+        "textQpcHafs": "وَأَرۡسَلَ",
+        "textUthmani": "وَأَرْسَلَ",
+        "textUthmaniSimple": "وارسل",
+        "textUthmaniTajweed": "وَأَرۡسَلَ",
+        "location": "105:3:1",
+        "chapterId": 105,
+        "verseId": 6191,
+        "verseKey": "105:3",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲋ",
+        "translation": {
+          "text": "dan Dia mengirimkan",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "wa-arsala",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2362,
+        "position": 2,
+        "audioUrl": "wbw/105_003_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮜ",
+        "codeV2": "ﲌ",
+        "textQpcHafs": "عَلَيۡهِمۡ",
+        "textUthmani": "عَلَيْهِمْ",
+        "textUthmaniSimple": "عليهم",
+        "textUthmaniTajweed": "عَلَيۡهِمۡ",
+        "location": "105:3:2",
+        "chapterId": 105,
+        "verseId": 6191,
+        "verseKey": "105:3",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲌ",
+        "translation": {
+          "text": "kepada mereka",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "ʿalayhim",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2363,
+        "position": 3,
+        "audioUrl": "wbw/105_003_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮝ",
+        "codeV2": "ﲍ",
+        "textQpcHafs": "طَيۡرًا",
+        "textUthmani": "طَيْرًا",
+        "textUthmaniSimple": "طيرا",
+        "textUthmaniTajweed": "طَيۡرًا",
+        "location": "105:3:3",
+        "chapterId": 105,
+        "verseId": 6191,
+        "verseKey": "105:3",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲍ",
+        "translation": {
+          "text": "burung",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "ṭayran",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2364,
+        "position": 4,
+        "audioUrl": "wbw/105_003_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮞ",
+        "codeV2": "ﲎ",
+        "textQpcHafs": "أَبَابِيلَ",
+        "textUthmani": "أَبَابِيلَ",
+        "textUthmaniSimple": "ابابيل",
+        "textUthmaniTajweed": "أَبَاب<rule class=madda_permissible>ِي</rule>لَ",
+        "location": "105:3:4",
+        "chapterId": 105,
+        "verseId": 6191,
+        "verseKey": "105:3",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲎ",
+        "translation": {
+          "text": "yang berbondong-bondong",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "abābīla",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2365,
+        "position": 5,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 14,
+        "lineV2": 14,
+        "codeV1": "ﮟ",
+        "codeV2": "ﲏ",
+        "textQpcHafs": "٣",
+        "textUthmani": "٣",
+        "textUthmaniSimple": "٣",
+        "textUthmaniTajweed": "٣",
+        "location": "105:3:5",
+        "chapterId": 105,
+        "verseId": 6191,
+        "verseKey": "105:3",
+        "lineNumber": 14,
+        "pageNumber": 601,
+        "text": "ﲏ",
+        "translation": {
+          "text": "(3)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922620,
+        "resourceId": 134,
+        "text": "dan Dia mengirimkan kapada mereka burung yang berbondong-bondong,"
+      },
+      {
+        "id": 181379,
+        "resourceId": 33,
+        "text": "dan Dia mengirimkan kepada mereka burung yang berbondong-bondong,"
+      },
+      {
+        "id": 966276,
+        "resourceId": 141,
+        "text": "Dan Dia mengirimkan kepada mereka burung yang berbondong-bondong,"
+      }
+    ]
+  },
+  {
+    "id": 6192,
+    "verseNumber": 4,
+    "verseKey": "105:4",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 549,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 3867,
+        "position": 1,
+        "audioUrl": "wbw/105_004_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 14,
+        "lineV2": 15,
+        "codeV1": "ﮠ",
+        "codeV2": "ﲐ",
+        "textQpcHafs": "تَرۡمِيهِم",
+        "textUthmani": "تَرْمِيهِم",
+        "textUthmaniSimple": "ترميهم",
+        "textUthmaniTajweed": "تَرۡمِيه<rule class=ikhafa_shafawi>ِم</rule>",
+        "location": "105:4:1",
+        "chapterId": 105,
+        "verseId": 6192,
+        "verseKey": "105:4",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲐ",
+        "translation": {
+          "text": "yang melempari mereka",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "tarmīhim",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3868,
+        "position": 2,
+        "audioUrl": "wbw/105_004_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮡ",
+        "codeV2": "ﲑ",
+        "textQpcHafs": "بِحِجَارَةٖ",
+        "textUthmani": "بِحِجَارَةٍۢ",
+        "textUthmaniSimple": "بحجارة",
+        "textUthmaniTajweed": "<rule class=ikhafa_shafawi>ب</rule>ِحِجَارَ<rule class=idgham_ghunnah>ةٍ</rule>",
+        "location": "105:4:2",
+        "chapterId": 105,
+        "verseId": 6192,
+        "verseKey": "105:4",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲑ",
+        "translation": {
+          "text": "dengan batu-batu",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "biḥijāratin",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3869,
+        "position": 3,
+        "audioUrl": "wbw/105_004_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮢ",
+        "codeV2": "ﲒ",
+        "textQpcHafs": "مِّن",
+        "textUthmani": "مِّن",
+        "textUthmaniSimple": "من",
+        "textUthmaniTajweed": "<rule class=idgham_ghunnah>م</rule>ِّ<rule class=ikhafa>ن</rule>",
+        "location": "105:4:3",
+        "chapterId": 105,
+        "verseId": 6192,
+        "verseKey": "105:4",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲒ",
+        "translation": {
+          "text": "dari",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "min",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3870,
+        "position": 4,
+        "audioUrl": "wbw/105_004_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮣ",
+        "codeV2": "ﲓ",
+        "textQpcHafs": "سِجِّيلٖ",
+        "textUthmani": "سِجِّيلٍۢ",
+        "textUthmaniSimple": "سجيل",
+        "textUthmaniTajweed": "<rule class=ikhafa>س</rule>ِجّ<rule class=madda_permissible>ِي</rule>لٍ",
+        "location": "105:4:4",
+        "chapterId": 105,
+        "verseId": 6192,
+        "verseKey": "105:4",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲓ",
+        "translation": {
+          "text": "tanah keras/terbakar",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "sijjīlin",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3871,
+        "position": 5,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮤ",
+        "codeV2": "ﲔ",
+        "textQpcHafs": "٤",
+        "textUthmani": "٤",
+        "textUthmaniSimple": "٤",
+        "textUthmaniTajweed": "٤",
+        "location": "105:4:5",
+        "chapterId": 105,
+        "verseId": 6192,
+        "verseKey": "105:4",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲔ",
+        "translation": {
+          "text": "(4)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922621,
+        "resourceId": 134,
+        "text": "yang melempari mereka dengan batu (berasal) dari tanah yang terbakar,"
+      },
+      {
+        "id": 181390,
+        "resourceId": 33,
+        "text": "yang melempari mereka dengan batu dari tanah liat yang dibakar,"
+      },
+      {
+        "id": 966277,
+        "resourceId": 141,
+        "text": "Yang melempari mereka dengan batu dari tanah liat yang dibakar,"
+      }
+    ]
+  },
+  {
+    "id": 6193,
+    "verseNumber": 5,
+    "verseKey": "105:5",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 549,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 5092,
+        "position": 1,
+        "audioUrl": "wbw/105_005_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮥ",
+        "codeV2": "ﲕ",
+        "textQpcHafs": "فَجَعَلَهُمۡ",
+        "textUthmani": "فَجَعَلَهُمْ",
+        "textUthmaniSimple": "فجعلهم",
+        "textUthmaniTajweed": "فَجَعَلَهُمۡ",
+        "location": "105:5:1",
+        "chapterId": 105,
+        "verseId": 6193,
+        "verseKey": "105:5",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲕ",
+        "translation": {
+          "text": "lalu Dia menjadikan mereka",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "fajaʿalahum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5093,
+        "position": 2,
+        "audioUrl": "wbw/105_005_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮦ",
+        "codeV2": "ﲖ",
+        "textQpcHafs": "كَعَصۡفٖ",
+        "textUthmani": "كَعَصْفٍۢ",
+        "textUthmaniSimple": "كعصف",
+        "textUthmaniTajweed": "كَعَصۡ<rule class=idgham_ghunnah>فٍ</rule>",
+        "location": "105:5:2",
+        "chapterId": 105,
+        "verseId": 6193,
+        "verseKey": "105:5",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲖ",
+        "translation": {
+          "text": "seperti daun",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "kaʿaṣfin",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5094,
+        "position": 3,
+        "audioUrl": "wbw/105_005_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮧ",
+        "codeV2": "ﲗ",
+        "textQpcHafs": "مَّأۡكُولِۭ",
+        "textUthmani": "مَّأْكُولٍۭ",
+        "textUthmaniSimple": "ماكولۭ",
+        "textUthmaniTajweed": "<rule class=idgham_ghunnah>م</rule>َّأۡك<rule class=madda_permissible>ُو</rule>لِۭ",
+        "location": "105:5:3",
+        "chapterId": 105,
+        "verseId": 6193,
+        "verseKey": "105:5",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲗ",
+        "translation": {
+          "text": "dimakan",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "makūlin",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5095,
+        "position": 4,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 15,
+        "lineV2": 15,
+        "codeV1": "ﮨ",
+        "codeV2": "ﲘ",
+        "textQpcHafs": "٥",
+        "textUthmani": "٥",
+        "textUthmaniSimple": "٥",
+        "textUthmaniTajweed": "٥",
+        "location": "105:5:4",
+        "chapterId": 105,
+        "verseId": 6193,
+        "verseKey": "105:5",
+        "lineNumber": 15,
+        "pageNumber": 601,
+        "text": "ﲘ",
+        "translation": {
+          "text": "(5)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922622,
+        "resourceId": 134,
+        "text": "lalu Dia menjadikan mereka seperti daun-daun yang dimakan (ulat)."
+      },
+      {
+        "id": 181382,
+        "resourceId": 33,
+        "text": "sehingga mereka dijadikan-Nya seperti daun-daun yang dimakan (ulat)."
+      },
+      {
+        "id": 966278,
+        "resourceId": 141,
+        "text": "Sehingga mereka dijadikan-Nya seperti daun-daun yang dimakan (ulat)"
+      }
+    ]
+  }
+]

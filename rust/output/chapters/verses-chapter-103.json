@@ -1,0 +1,61 @@
+[
+  {
+    "id": 6177,
+    "verseNumber": 1,
+    "verseKey": "103:1",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 547,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "wordIds": [
+      "103:1:1",
+      "103:1:2"
+    ]
+  },
+  {
+    "id": 6178,
+    "verseNumber": 2,
+    "verseKey": "103:2",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 547,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "wordIds": [
+      "103:2:1",
+      "103:2:2",
+      "103:2:3",
+      "103:2:4",
+      "103:2:5"
+    ]
+  },
+  {
+    "id": 6179,
+    "verseNumber": 3,
+    "verseKey": "103:3",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 547,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 601,
+    "juzNumber": 30,
+    "wordIds": [
+      "103:3:1",
+      "103:3:2",
+      "103:3:3",
+      "103:3:4",
+      "103:3:5",
+      "103:3:6",
+      "103:3:7",
+      "103:3:8",
+      "103:3:9",
+      "103:3:10"
+    ]
+  }
+]

@@ -22,12 +22,22 @@ fn normalize_arabic_text_rust(text: &str) -> String {
         '\u{0658}',
     ];
 
-    let mut cleaned = text.chars().filter(|c| !diacritics.contains(c)).collect::<String>();
+    let mut cleaned = text
+        .chars()
+        .filter(|c| !diacritics.contains(c))
+        .collect::<String>();
 
     let replacements = [
-        ("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ٱ", "ا"),
-        ("ى", "ي"), ("ئ", "ي"), ("ؤ", "و"),
-        ("ة", "ه"), ("ء", ""), ("ـ", ""),
+        ("أ", "ا"),
+        ("إ", "ا"),
+        ("آ", "ا"),
+        ("ٱ", "ا"),
+        ("ى", "ي"),
+        ("ئ", "ي"),
+        ("ؤ", "و"),
+        ("ة", "ه"),
+        ("ء", ""),
+        ("ـ", ""),
     ];
 
     for (from, to) in replacements {
@@ -90,24 +100,28 @@ pub fn search(query_str: &str) -> Result<Vec<SearchResult>, String> {
     }
 
     let mut results = Vec::new();
+
     for (vk, info) in verse_matches {
         let score = calculate_relevance_score(&vk, &info);
         let mut words = Vec::new();
 
         if let Some((s, v)) = vk.split_once(':') {
             if let (Ok(surah), Ok(verse)) = (s.parse::<u32>(), v.parse::<u32>()) {
-                if let Some(verses) = GLOBAL_DATA.verses_by_chapter.get(&surah) {
+                if let Some(verses) = GLOBAL_DATA.verses.get(&surah) {
                     if let Some(verse_data) = verses.iter().find(|v| v.verse_number == verse) {
-                        for word in &verse_data.words {
-                            let norm = normalize_arabic_text_rust(&word.text_uthmani).to_lowercase();
-                            let is_highlighted = terms.contains(&norm);
-                            words.push(WordResult {
-                                id: word.id,
-                                position: word.position,
-                                text_uthmani: word.text_uthmani.clone(),
-                                translation_text: word.translation.text.clone(),
-                                highlighted: is_highlighted,
-                            });
+                        for word_key in &verse_data.word_ids {
+                            if let Some(word) = GLOBAL_DATA.words.data.get(word_key) {
+                                let norm =
+                                    normalize_arabic_text_rust(&word.text_uthmani).to_lowercase();
+                                let is_highlighted = terms.contains(&norm);
+                                words.push(WordResult {
+                                    id: word.id,
+                                    position: word.position,
+                                    text_uthmani: word.text_uthmani.clone(),
+                                    // translation_text: word.translation.text.clone(),
+                                    highlighted: is_highlighted,
+                                });
+                            }
                         }
                     }
                 }
@@ -122,9 +136,16 @@ pub fn search(query_str: &str) -> Result<Vec<SearchResult>, String> {
     }
 
     results.sort_by(|a, b| {
-        b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal)
+        b.score
+            .partial_cmp(&a.score)
+            .unwrap_or(std::cmp::Ordering::Equal)
             .then_with(|| {
-                let get_surah = |k: &str| k.split(':').next().and_then(|x| x.parse::<u32>().ok()).unwrap_or(u32::MAX);
+                let get_surah = |k: &str| {
+                    k.split(':')
+                        .next()
+                        .and_then(|x| x.parse::<u32>().ok())
+                        .unwrap_or(u32::MAX)
+                };
                 get_surah(&a.verse_key).cmp(&get_surah(&b.verse_key))
             })
     });
@@ -132,13 +153,9 @@ pub fn search(query_str: &str) -> Result<Vec<SearchResult>, String> {
     Ok(results)
 }
 
-fn calculate_relevance_score(
-    _vk: &str,
-    info: &VerseMatchInfo,
-) -> f32 {
+fn calculate_relevance_score(_vk: &str, info: &VerseMatchInfo) -> f32 {
     info.matched_query_terms.len() as f32
 }
-
 
 // --- UNIT TEST DENGAN EKSPEKTASI YANG BENAR ---
 #[cfg(test)]
@@ -153,17 +170,13 @@ mod tests {
             // Kasus 1: Menghapus harakat dan Dagger Alif.
             ("الرَّحْمَٰنِ", "الرحمن"),
             ("رَحْمٰن", "رحمن"),
-
             // Kasus 2: Menyeragamkan bentuk Alif.
             ("أَحَدٌ", "احد"),
-
             // Kasus 3: Memastikan kata tanpa harakat (tetapi dengan Alif standar) TIDAK berubah.
             // Ini adalah perbaikan penting pada ekspektasi tes.
             ("رحمان", "رحمان"),
-            
             // Kasus 4: Memastikan kata yang sudah bersih sepenuhnya tidak berubah.
             ("رحمن", "رحمن"),
-            
             // Kasus 5: Kasus kompleks
             ("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ", "بسم الله الرحمن الرحيم"),
         ];

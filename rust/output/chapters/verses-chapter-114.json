@@ -1,0 +1,112 @@
+[
+  {
+    "id": 6231,
+    "verseNumber": 1,
+    "verseKey": "114:1",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 558,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 604,
+    "juzNumber": 30,
+    "wordIds": [
+      "114:1:1",
+      "114:1:2",
+      "114:1:3",
+      "114:1:4",
+      "114:1:5"
+    ]
+  },
+  {
+    "id": 6232,
+    "verseNumber": 2,
+    "verseKey": "114:2",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 558,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 604,
+    "juzNumber": 30,
+    "wordIds": [
+      "114:2:1",
+      "114:2:2",
+      "114:2:3"
+    ]
+  },
+  {
+    "id": 6233,
+    "verseNumber": 3,
+    "verseKey": "114:3",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 558,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 604,
+    "juzNumber": 30,
+    "wordIds": [
+      "114:3:1",
+      "114:3:2",
+      "114:3:3"
+    ]
+  },
+  {
+    "id": 6234,
+    "verseNumber": 4,
+    "verseKey": "114:4",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 558,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 604,
+    "juzNumber": 30,
+    "wordIds": [
+      "114:4:1",
+      "114:4:2",
+      "114:4:3",
+      "114:4:4",
+      "114:4:5"
+    ]
+  },
+  {
+    "id": 6235,
+    "verseNumber": 5,
+    "verseKey": "114:5",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 558,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 604,
+    "juzNumber": 30,
+    "wordIds": [
+      "114:5:1",
+      "114:5:2",
+      "114:5:3",
+      "114:5:4",
+      "114:5:5",
+      "114:5:6"
+    ]
+  },
+  {
+    "id": 6236,
+    "verseNumber": 6,
+    "verseKey": "114:6",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 558,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 604,
+    "juzNumber": 30,
+    "wordIds": [
+      "114:6:1",
+      "114:6:2",
+      "114:6:3",
+      "114:6:4"
+    ]
+  }
+]

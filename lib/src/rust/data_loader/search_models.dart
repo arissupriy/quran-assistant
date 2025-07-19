@@ -37,14 +37,12 @@ class WordResult {
   final int id;
   final int position;
   final String textUthmani;
-  final String translationText;
   final bool highlighted;
 
   const WordResult({
     required this.id,
     required this.position,
     required this.textUthmani,
-    required this.translationText,
     required this.highlighted,
   });
 
@@ -53,7 +51,6 @@ class WordResult {
       id.hashCode ^
       position.hashCode ^
       textUthmani.hashCode ^
-      translationText.hashCode ^
       highlighted.hashCode;
 
   @override
@@ -64,6 +61,5 @@ class WordResult {
           id == other.id &&
           position == other.position &&
           textUthmani == other.textUthmani &&
-          translationText == other.translationText &&
           highlighted == other.highlighted;
 }

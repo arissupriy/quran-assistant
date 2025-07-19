@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_assistant/pages/quiz_play.dart';
 import 'package:quran_assistant/src/rust/api/quiz/quiz_fragment_completion.dart';
 import 'package:quran_assistant/src/rust/api/quiz/verse_completion.dart';
+import 'package:quran_assistant/src/rust/api/quiz/verse_order.dart';
+import 'package:quran_assistant/src/rust/api/quiz/verse_previous.dart';
 import 'package:quran_assistant/src/rust/data_loader/quiz_models.dart';
 import 'package:quran_assistant/providers/quiz_provider.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart'; // Import AppTheme
@@ -76,12 +78,11 @@ class _QuizConfigPageState extends ConsumerState<QuizConfigPage> {
           }
 
           debugPrint('Start: $start, End: $end');
-          final juzList = <int>[];
-          for (int i = start; i <= end; i++) {
-            juzList.add(i);
-          }
+          final juzList = <int>[start, end];
 
           scope = QuizScope.byJuz(juzNumbers: Uint32List.fromList(juzList));
+
+          debugPrint('Juz yang dipilih: $juzList');
           break;
         default:
           scope = const QuizScope.all();
@@ -103,7 +104,7 @@ class _QuizConfigPageState extends ConsumerState<QuizConfigPage> {
     debugPrint("🟦 scope.toString(): $scope");
     debugPrint("🟦 Jumlah soal yang diminta: $count");
 
-    final filter = QuizFilter(scope: scope, questionCount: count);
+    final filter = QuizFilter(scope: scope, quizCount: count);
 
     QuizQuestions result;
 
@@ -112,12 +113,20 @@ class _QuizConfigPageState extends ConsumerState<QuizConfigPage> {
     try {
       switch (widget.selectedQuizType) {
         case 'fragment_completion':
-          debugPrint("🟩 Menjalankan generateVerseFragmentQuizBatch...");
-          result = await generateVerseFragmentQuizBatch(filter: filter);
+          debugPrint("🟩 Menjalankan generateBatchFragmentQuizzes...");
+          result = await generateBatchFragmentQuizzes(filter: filter);
+          break;
+        case 'verse_previous':
+          debugPrint("🟩 Menjalankan generateBatchVersePreviousQuizzes...");
+          result = await generateBatchVersePreviousQuizzes(filter: filter);
+          break;
+        case 'verse_order':
+          debugPrint("🟩 Menjalankan generateBatchVerseOrderQuizzes...");
+          result = await generateBatchVerseOrderQuizzes(filter: filter);
           break;
         default:
-          debugPrint("🟩 Menjalankan generateVerseCompletionQuizBatch...");
-          result = await generateVerseCompletionQuizBatch(filter: filter);
+          debugPrint("🟩 Menjalankan generateBatchVerseCompletionQuizzes...");
+          result = await generateBatchVerseCompletionQuizzes(filter: filter);
           break;
       }
 

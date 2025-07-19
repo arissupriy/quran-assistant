@@ -19,47 +19,56 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$QuizGenerationError {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String field0) internalError,
     required TResult Function() noVersesInScope,
     required TResult Function() noValidQuestionFound,
-    required TResult Function(String field0) internalError,
+    required TResult Function() missingAyahText,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String field0)? internalError,
     TResult? Function()? noVersesInScope,
     TResult? Function()? noValidQuestionFound,
-    TResult? Function(String field0)? internalError,
+    TResult? Function()? missingAyahText,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String field0)? internalError,
     TResult Function()? noVersesInScope,
     TResult Function()? noValidQuestionFound,
-    TResult Function(String field0)? internalError,
+    TResult Function()? missingAyahText,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(QuizGenerationError_InternalError value)
+    internalError,
     required TResult Function(QuizGenerationError_NoVersesInScope value)
     noVersesInScope,
     required TResult Function(QuizGenerationError_NoValidQuestionFound value)
     noValidQuestionFound,
-    required TResult Function(QuizGenerationError_InternalError value)
-    internalError,
+    required TResult Function(QuizGenerationError_MissingAyahText value)
+    missingAyahText,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(QuizGenerationError_InternalError value)? internalError,
     TResult? Function(QuizGenerationError_NoVersesInScope value)?
     noVersesInScope,
     TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
     noValidQuestionFound,
-    TResult? Function(QuizGenerationError_InternalError value)? internalError,
+    TResult? Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(QuizGenerationError_InternalError value)? internalError,
     TResult Function(QuizGenerationError_NoVersesInScope value)?
     noVersesInScope,
     TResult Function(QuizGenerationError_NoValidQuestionFound value)?
     noValidQuestionFound,
-    TResult Function(QuizGenerationError_InternalError value)? internalError,
+    TResult Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 }
@@ -81,257 +90,6 @@ class _$QuizGenerationErrorCopyWithImpl<$Res, $Val extends QuizGenerationError>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-}
-
-/// @nodoc
-abstract class _$$QuizGenerationError_NoVersesInScopeImplCopyWith<$Res> {
-  factory _$$QuizGenerationError_NoVersesInScopeImplCopyWith(
-    _$QuizGenerationError_NoVersesInScopeImpl value,
-    $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) then,
-  ) = __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>
-    extends
-        _$QuizGenerationErrorCopyWithImpl<
-          $Res,
-          _$QuizGenerationError_NoVersesInScopeImpl
-        >
-    implements _$$QuizGenerationError_NoVersesInScopeImplCopyWith<$Res> {
-  __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl(
-    _$QuizGenerationError_NoVersesInScopeImpl _value,
-    $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) _then,
-  ) : super(_value, _then);
-}
-
-/// @nodoc
-
-class _$QuizGenerationError_NoVersesInScopeImpl
-    extends QuizGenerationError_NoVersesInScope {
-  const _$QuizGenerationError_NoVersesInScopeImpl() : super._();
-
-  @override
-  String toString() {
-    return 'QuizGenerationError.noVersesInScope()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$QuizGenerationError_NoVersesInScopeImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() noVersesInScope,
-    required TResult Function() noValidQuestionFound,
-    required TResult Function(String field0) internalError,
-  }) {
-    return noVersesInScope();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? noVersesInScope,
-    TResult? Function()? noValidQuestionFound,
-    TResult? Function(String field0)? internalError,
-  }) {
-    return noVersesInScope?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? noVersesInScope,
-    TResult Function()? noValidQuestionFound,
-    TResult Function(String field0)? internalError,
-    required TResult orElse(),
-  }) {
-    if (noVersesInScope != null) {
-      return noVersesInScope();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(QuizGenerationError_NoVersesInScope value)
-    noVersesInScope,
-    required TResult Function(QuizGenerationError_NoValidQuestionFound value)
-    noValidQuestionFound,
-    required TResult Function(QuizGenerationError_InternalError value)
-    internalError,
-  }) {
-    return noVersesInScope(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(QuizGenerationError_NoVersesInScope value)?
-    noVersesInScope,
-    TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
-    noValidQuestionFound,
-    TResult? Function(QuizGenerationError_InternalError value)? internalError,
-  }) {
-    return noVersesInScope?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(QuizGenerationError_NoVersesInScope value)?
-    noVersesInScope,
-    TResult Function(QuizGenerationError_NoValidQuestionFound value)?
-    noValidQuestionFound,
-    TResult Function(QuizGenerationError_InternalError value)? internalError,
-    required TResult orElse(),
-  }) {
-    if (noVersesInScope != null) {
-      return noVersesInScope(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class QuizGenerationError_NoVersesInScope extends QuizGenerationError {
-  const factory QuizGenerationError_NoVersesInScope() =
-      _$QuizGenerationError_NoVersesInScopeImpl;
-  const QuizGenerationError_NoVersesInScope._() : super._();
-}
-
-/// @nodoc
-abstract class _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith<$Res> {
-  factory _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith(
-    _$QuizGenerationError_NoValidQuestionFoundImpl value,
-    $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) then,
-  ) = __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>
-    extends
-        _$QuizGenerationErrorCopyWithImpl<
-          $Res,
-          _$QuizGenerationError_NoValidQuestionFoundImpl
-        >
-    implements _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith<$Res> {
-  __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl(
-    _$QuizGenerationError_NoValidQuestionFoundImpl _value,
-    $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) _then,
-  ) : super(_value, _then);
-}
-
-/// @nodoc
-
-class _$QuizGenerationError_NoValidQuestionFoundImpl
-    extends QuizGenerationError_NoValidQuestionFound {
-  const _$QuizGenerationError_NoValidQuestionFoundImpl() : super._();
-
-  @override
-  String toString() {
-    return 'QuizGenerationError.noValidQuestionFound()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$QuizGenerationError_NoValidQuestionFoundImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() noVersesInScope,
-    required TResult Function() noValidQuestionFound,
-    required TResult Function(String field0) internalError,
-  }) {
-    return noValidQuestionFound();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? noVersesInScope,
-    TResult? Function()? noValidQuestionFound,
-    TResult? Function(String field0)? internalError,
-  }) {
-    return noValidQuestionFound?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? noVersesInScope,
-    TResult Function()? noValidQuestionFound,
-    TResult Function(String field0)? internalError,
-    required TResult orElse(),
-  }) {
-    if (noValidQuestionFound != null) {
-      return noValidQuestionFound();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(QuizGenerationError_NoVersesInScope value)
-    noVersesInScope,
-    required TResult Function(QuizGenerationError_NoValidQuestionFound value)
-    noValidQuestionFound,
-    required TResult Function(QuizGenerationError_InternalError value)
-    internalError,
-  }) {
-    return noValidQuestionFound(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(QuizGenerationError_NoVersesInScope value)?
-    noVersesInScope,
-    TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
-    noValidQuestionFound,
-    TResult? Function(QuizGenerationError_InternalError value)? internalError,
-  }) {
-    return noValidQuestionFound?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(QuizGenerationError_NoVersesInScope value)?
-    noVersesInScope,
-    TResult Function(QuizGenerationError_NoValidQuestionFound value)?
-    noValidQuestionFound,
-    TResult Function(QuizGenerationError_InternalError value)? internalError,
-    required TResult orElse(),
-  }) {
-    if (noValidQuestionFound != null) {
-      return noValidQuestionFound(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class QuizGenerationError_NoValidQuestionFound
-    extends QuizGenerationError {
-  const factory QuizGenerationError_NoValidQuestionFound() =
-      _$QuizGenerationError_NoValidQuestionFoundImpl;
-  const QuizGenerationError_NoValidQuestionFound._() : super._();
 }
 
 /// @nodoc
@@ -410,9 +168,10 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String field0) internalError,
     required TResult Function() noVersesInScope,
     required TResult Function() noValidQuestionFound,
-    required TResult Function(String field0) internalError,
+    required TResult Function() missingAyahText,
   }) {
     return internalError(field0);
   }
@@ -420,9 +179,10 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String field0)? internalError,
     TResult? Function()? noVersesInScope,
     TResult? Function()? noValidQuestionFound,
-    TResult? Function(String field0)? internalError,
+    TResult? Function()? missingAyahText,
   }) {
     return internalError?.call(field0);
   }
@@ -430,9 +190,10 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String field0)? internalError,
     TResult Function()? noVersesInScope,
     TResult Function()? noValidQuestionFound,
-    TResult Function(String field0)? internalError,
+    TResult Function()? missingAyahText,
     required TResult orElse(),
   }) {
     if (internalError != null) {
@@ -444,12 +205,14 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(QuizGenerationError_InternalError value)
+    internalError,
     required TResult Function(QuizGenerationError_NoVersesInScope value)
     noVersesInScope,
     required TResult Function(QuizGenerationError_NoValidQuestionFound value)
     noValidQuestionFound,
-    required TResult Function(QuizGenerationError_InternalError value)
-    internalError,
+    required TResult Function(QuizGenerationError_MissingAyahText value)
+    missingAyahText,
   }) {
     return internalError(this);
   }
@@ -457,11 +220,13 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(QuizGenerationError_InternalError value)? internalError,
     TResult? Function(QuizGenerationError_NoVersesInScope value)?
     noVersesInScope,
     TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
     noValidQuestionFound,
-    TResult? Function(QuizGenerationError_InternalError value)? internalError,
+    TResult? Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
   }) {
     return internalError?.call(this);
   }
@@ -469,11 +234,13 @@ class _$QuizGenerationError_InternalErrorImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(QuizGenerationError_InternalError value)? internalError,
     TResult Function(QuizGenerationError_NoVersesInScope value)?
     noVersesInScope,
     TResult Function(QuizGenerationError_NoValidQuestionFound value)?
     noValidQuestionFound,
-    TResult Function(QuizGenerationError_InternalError value)? internalError,
+    TResult Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
     required TResult orElse(),
   }) {
     if (internalError != null) {
@@ -494,6 +261,409 @@ abstract class QuizGenerationError_InternalError extends QuizGenerationError {
     _$QuizGenerationError_InternalErrorImpl
   >
   get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$QuizGenerationError_NoVersesInScopeImplCopyWith<$Res> {
+  factory _$$QuizGenerationError_NoVersesInScopeImplCopyWith(
+    _$QuizGenerationError_NoVersesInScopeImpl value,
+    $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) then,
+  ) = __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl<$Res>
+    extends
+        _$QuizGenerationErrorCopyWithImpl<
+          $Res,
+          _$QuizGenerationError_NoVersesInScopeImpl
+        >
+    implements _$$QuizGenerationError_NoVersesInScopeImplCopyWith<$Res> {
+  __$$QuizGenerationError_NoVersesInScopeImplCopyWithImpl(
+    _$QuizGenerationError_NoVersesInScopeImpl _value,
+    $Res Function(_$QuizGenerationError_NoVersesInScopeImpl) _then,
+  ) : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$QuizGenerationError_NoVersesInScopeImpl
+    extends QuizGenerationError_NoVersesInScope {
+  const _$QuizGenerationError_NoVersesInScopeImpl() : super._();
+
+  @override
+  String toString() {
+    return 'QuizGenerationError.noVersesInScope()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$QuizGenerationError_NoVersesInScopeImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String field0) internalError,
+    required TResult Function() noVersesInScope,
+    required TResult Function() noValidQuestionFound,
+    required TResult Function() missingAyahText,
+  }) {
+    return noVersesInScope();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String field0)? internalError,
+    TResult? Function()? noVersesInScope,
+    TResult? Function()? noValidQuestionFound,
+    TResult? Function()? missingAyahText,
+  }) {
+    return noVersesInScope?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String field0)? internalError,
+    TResult Function()? noVersesInScope,
+    TResult Function()? noValidQuestionFound,
+    TResult Function()? missingAyahText,
+    required TResult orElse(),
+  }) {
+    if (noVersesInScope != null) {
+      return noVersesInScope();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(QuizGenerationError_InternalError value)
+    internalError,
+    required TResult Function(QuizGenerationError_NoVersesInScope value)
+    noVersesInScope,
+    required TResult Function(QuizGenerationError_NoValidQuestionFound value)
+    noValidQuestionFound,
+    required TResult Function(QuizGenerationError_MissingAyahText value)
+    missingAyahText,
+  }) {
+    return noVersesInScope(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(QuizGenerationError_InternalError value)? internalError,
+    TResult? Function(QuizGenerationError_NoVersesInScope value)?
+    noVersesInScope,
+    TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
+    noValidQuestionFound,
+    TResult? Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
+  }) {
+    return noVersesInScope?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(QuizGenerationError_InternalError value)? internalError,
+    TResult Function(QuizGenerationError_NoVersesInScope value)?
+    noVersesInScope,
+    TResult Function(QuizGenerationError_NoValidQuestionFound value)?
+    noValidQuestionFound,
+    TResult Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
+    required TResult orElse(),
+  }) {
+    if (noVersesInScope != null) {
+      return noVersesInScope(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class QuizGenerationError_NoVersesInScope extends QuizGenerationError {
+  const factory QuizGenerationError_NoVersesInScope() =
+      _$QuizGenerationError_NoVersesInScopeImpl;
+  const QuizGenerationError_NoVersesInScope._() : super._();
+}
+
+/// @nodoc
+abstract class _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith<$Res> {
+  factory _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith(
+    _$QuizGenerationError_NoValidQuestionFoundImpl value,
+    $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) then,
+  ) = __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl<$Res>
+    extends
+        _$QuizGenerationErrorCopyWithImpl<
+          $Res,
+          _$QuizGenerationError_NoValidQuestionFoundImpl
+        >
+    implements _$$QuizGenerationError_NoValidQuestionFoundImplCopyWith<$Res> {
+  __$$QuizGenerationError_NoValidQuestionFoundImplCopyWithImpl(
+    _$QuizGenerationError_NoValidQuestionFoundImpl _value,
+    $Res Function(_$QuizGenerationError_NoValidQuestionFoundImpl) _then,
+  ) : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$QuizGenerationError_NoValidQuestionFoundImpl
+    extends QuizGenerationError_NoValidQuestionFound {
+  const _$QuizGenerationError_NoValidQuestionFoundImpl() : super._();
+
+  @override
+  String toString() {
+    return 'QuizGenerationError.noValidQuestionFound()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$QuizGenerationError_NoValidQuestionFoundImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String field0) internalError,
+    required TResult Function() noVersesInScope,
+    required TResult Function() noValidQuestionFound,
+    required TResult Function() missingAyahText,
+  }) {
+    return noValidQuestionFound();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String field0)? internalError,
+    TResult? Function()? noVersesInScope,
+    TResult? Function()? noValidQuestionFound,
+    TResult? Function()? missingAyahText,
+  }) {
+    return noValidQuestionFound?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String field0)? internalError,
+    TResult Function()? noVersesInScope,
+    TResult Function()? noValidQuestionFound,
+    TResult Function()? missingAyahText,
+    required TResult orElse(),
+  }) {
+    if (noValidQuestionFound != null) {
+      return noValidQuestionFound();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(QuizGenerationError_InternalError value)
+    internalError,
+    required TResult Function(QuizGenerationError_NoVersesInScope value)
+    noVersesInScope,
+    required TResult Function(QuizGenerationError_NoValidQuestionFound value)
+    noValidQuestionFound,
+    required TResult Function(QuizGenerationError_MissingAyahText value)
+    missingAyahText,
+  }) {
+    return noValidQuestionFound(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(QuizGenerationError_InternalError value)? internalError,
+    TResult? Function(QuizGenerationError_NoVersesInScope value)?
+    noVersesInScope,
+    TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
+    noValidQuestionFound,
+    TResult? Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
+  }) {
+    return noValidQuestionFound?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(QuizGenerationError_InternalError value)? internalError,
+    TResult Function(QuizGenerationError_NoVersesInScope value)?
+    noVersesInScope,
+    TResult Function(QuizGenerationError_NoValidQuestionFound value)?
+    noValidQuestionFound,
+    TResult Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
+    required TResult orElse(),
+  }) {
+    if (noValidQuestionFound != null) {
+      return noValidQuestionFound(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class QuizGenerationError_NoValidQuestionFound
+    extends QuizGenerationError {
+  const factory QuizGenerationError_NoValidQuestionFound() =
+      _$QuizGenerationError_NoValidQuestionFoundImpl;
+  const QuizGenerationError_NoValidQuestionFound._() : super._();
+}
+
+/// @nodoc
+abstract class _$$QuizGenerationError_MissingAyahTextImplCopyWith<$Res> {
+  factory _$$QuizGenerationError_MissingAyahTextImplCopyWith(
+    _$QuizGenerationError_MissingAyahTextImpl value,
+    $Res Function(_$QuizGenerationError_MissingAyahTextImpl) then,
+  ) = __$$QuizGenerationError_MissingAyahTextImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$QuizGenerationError_MissingAyahTextImplCopyWithImpl<$Res>
+    extends
+        _$QuizGenerationErrorCopyWithImpl<
+          $Res,
+          _$QuizGenerationError_MissingAyahTextImpl
+        >
+    implements _$$QuizGenerationError_MissingAyahTextImplCopyWith<$Res> {
+  __$$QuizGenerationError_MissingAyahTextImplCopyWithImpl(
+    _$QuizGenerationError_MissingAyahTextImpl _value,
+    $Res Function(_$QuizGenerationError_MissingAyahTextImpl) _then,
+  ) : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$QuizGenerationError_MissingAyahTextImpl
+    extends QuizGenerationError_MissingAyahText {
+  const _$QuizGenerationError_MissingAyahTextImpl() : super._();
+
+  @override
+  String toString() {
+    return 'QuizGenerationError.missingAyahText()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$QuizGenerationError_MissingAyahTextImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String field0) internalError,
+    required TResult Function() noVersesInScope,
+    required TResult Function() noValidQuestionFound,
+    required TResult Function() missingAyahText,
+  }) {
+    return missingAyahText();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String field0)? internalError,
+    TResult? Function()? noVersesInScope,
+    TResult? Function()? noValidQuestionFound,
+    TResult? Function()? missingAyahText,
+  }) {
+    return missingAyahText?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String field0)? internalError,
+    TResult Function()? noVersesInScope,
+    TResult Function()? noValidQuestionFound,
+    TResult Function()? missingAyahText,
+    required TResult orElse(),
+  }) {
+    if (missingAyahText != null) {
+      return missingAyahText();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(QuizGenerationError_InternalError value)
+    internalError,
+    required TResult Function(QuizGenerationError_NoVersesInScope value)
+    noVersesInScope,
+    required TResult Function(QuizGenerationError_NoValidQuestionFound value)
+    noValidQuestionFound,
+    required TResult Function(QuizGenerationError_MissingAyahText value)
+    missingAyahText,
+  }) {
+    return missingAyahText(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(QuizGenerationError_InternalError value)? internalError,
+    TResult? Function(QuizGenerationError_NoVersesInScope value)?
+    noVersesInScope,
+    TResult? Function(QuizGenerationError_NoValidQuestionFound value)?
+    noValidQuestionFound,
+    TResult? Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
+  }) {
+    return missingAyahText?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(QuizGenerationError_InternalError value)? internalError,
+    TResult Function(QuizGenerationError_NoVersesInScope value)?
+    noVersesInScope,
+    TResult Function(QuizGenerationError_NoValidQuestionFound value)?
+    noValidQuestionFound,
+    TResult Function(QuizGenerationError_MissingAyahText value)?
+    missingAyahText,
+    required TResult orElse(),
+  }) {
+    if (missingAyahText != null) {
+      return missingAyahText(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class QuizGenerationError_MissingAyahText extends QuizGenerationError {
+  const factory QuizGenerationError_MissingAyahText() =
+      _$QuizGenerationError_MissingAyahTextImpl;
+  const QuizGenerationError_MissingAyahText._() : super._();
 }
 
 /// @nodoc

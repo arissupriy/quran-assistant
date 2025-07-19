@@ -1,0 +1,1116 @@
+[
+  {
+    "id": 6208,
+    "verseNumber": 1,
+    "verseKey": "109:1",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 553,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 603,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 158,
+        "position": 1,
+        "audioUrl": "wbw/109_001_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭑ",
+        "codeV2": "ﱁ",
+        "textQpcHafs": "قُلۡ",
+        "textUthmani": "قُلْ",
+        "textUthmaniSimple": "قل",
+        "textUthmaniTajweed": "قُلۡ",
+        "location": "109:1:1",
+        "chapterId": 109,
+        "verseId": 6208,
+        "verseKey": "109:1",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱁ",
+        "translation": {
+          "text": "katakanlah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "qul",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 159,
+        "position": 2,
+        "audioUrl": "wbw/109_001_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭒ",
+        "codeV2": "ﱂ",
+        "textQpcHafs": "يَٰٓأَيُّهَا",
+        "textUthmani": "يَـٰٓأَيُّهَا",
+        "textUthmaniSimple": "يـايها",
+        "textUthmaniTajweed": "يَ<rule class=madda_obligatory_mottasel>ـٰٓ</rule>أَيُّهَا",
+        "location": "109:1:2",
+        "chapterId": 109,
+        "verseId": 6208,
+        "verseKey": "109:1",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱂ",
+        "translation": {
+          "text": "wahai",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "yāayyuhā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 160,
+        "position": 3,
+        "audioUrl": "wbw/109_001_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭓ",
+        "codeV2": "ﱃ",
+        "textQpcHafs": "ٱلۡكَٰفِرُونَ",
+        "textUthmani": "ٱلْكَـٰفِرُونَ",
+        "textUthmaniSimple": "الكـفرون",
+        "textUthmaniTajweed": "<rule class=ham_wasl>ٱ</rule>لۡكَ<rule class=madda_normal>ـٰ</rule>فِر<rule class=madda_permissible>ُو</rule>نَ",
+        "location": "109:1:3",
+        "chapterId": 109,
+        "verseId": 6208,
+        "verseKey": "109:1",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱃ",
+        "translation": {
+          "text": "orang-orang kafir",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "l-kāfirūna",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 161,
+        "position": 4,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭔ",
+        "codeV2": "ﱄ",
+        "textQpcHafs": "١",
+        "textUthmani": "١",
+        "textUthmaniSimple": "١",
+        "textUthmaniTajweed": "١",
+        "location": "109:1:4",
+        "chapterId": 109,
+        "verseId": 6208,
+        "verseKey": "109:1",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱄ",
+        "translation": {
+          "text": "(1)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922637,
+        "resourceId": 134,
+        "text": "Katakanlah, \"Hai orang-orang kafir,"
+      },
+      {
+        "id": 181243,
+        "resourceId": 33,
+        "text": "Katakanlah (Muhammad), \"Wahai orang-orang kafir!"
+      },
+      {
+        "id": 966293,
+        "resourceId": 141,
+        "text": "Katakanlah (Muhammad), “Wahai orang-orang kafir!"
+      }
+    ]
+  },
+  {
+    "id": 6209,
+    "verseNumber": 2,
+    "verseKey": "109:2",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 553,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 603,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 942,
+        "position": 1,
+        "audioUrl": "wbw/109_002_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭕ",
+        "codeV2": "ﱅ",
+        "textQpcHafs": "لَآ",
+        "textUthmani": "لَآ",
+        "textUthmaniSimple": "لا",
+        "textUthmaniTajweed": "ل<rule class=madda_obligatory_monfasel>َآ</rule>",
+        "location": "109:2:1",
+        "chapterId": 109,
+        "verseId": 6209,
+        "verseKey": "109:2",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱅ",
+        "translation": {
+          "text": "tidak",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "lā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 943,
+        "position": 2,
+        "audioUrl": "wbw/109_002_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭖ",
+        "codeV2": "ﱆ",
+        "textQpcHafs": "أَعۡبُدُ",
+        "textUthmani": "أَعْبُدُ",
+        "textUthmaniSimple": "اعبد",
+        "textUthmaniTajweed": "أَعۡبُدُ",
+        "location": "109:2:2",
+        "chapterId": 109,
+        "verseId": 6209,
+        "verseKey": "109:2",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱆ",
+        "translation": {
+          "text": "aku menyembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "aʿbudu",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 944,
+        "position": 3,
+        "audioUrl": "wbw/109_002_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭗ",
+        "codeV2": "ﱇ",
+        "textQpcHafs": "مَا",
+        "textUthmani": "مَا",
+        "textUthmaniSimple": "ما",
+        "textUthmaniTajweed": "مَا",
+        "location": "109:2:3",
+        "chapterId": 109,
+        "verseId": 6209,
+        "verseKey": "109:2",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱇ",
+        "translation": {
+          "text": "apa",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "mā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 945,
+        "position": 4,
+        "audioUrl": "wbw/109_002_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭘ",
+        "codeV2": "ﱈ",
+        "textQpcHafs": "تَعۡبُدُونَ",
+        "textUthmani": "تَعْبُدُونَ",
+        "textUthmaniSimple": "تعبدون",
+        "textUthmaniTajweed": "تَعۡبُد<rule class=madda_permissible>ُو</rule>نَ",
+        "location": "109:2:4",
+        "chapterId": 109,
+        "verseId": 6209,
+        "verseKey": "109:2",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱈ",
+        "translation": {
+          "text": "kamu sembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "taʿbudūna",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 946,
+        "position": 5,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 3,
+        "lineV2": 3,
+        "codeV1": "ﭙ",
+        "codeV2": "ﱉ",
+        "textQpcHafs": "٢",
+        "textUthmani": "٢",
+        "textUthmaniSimple": "٢",
+        "textUthmaniTajweed": "٢",
+        "location": "109:2:5",
+        "chapterId": 109,
+        "verseId": 6209,
+        "verseKey": "109:2",
+        "lineNumber": 3,
+        "pageNumber": 603,
+        "text": "ﱉ",
+        "translation": {
+          "text": "(2)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922638,
+        "resourceId": 134,
+        "text": "Aku tidak akan menyembah apa yang kamu sembah."
+      },
+      {
+        "id": 181433,
+        "resourceId": 33,
+        "text": "aku tidak akan menyembah apa yang kamu sembah,"
+      },
+      {
+        "id": 966294,
+        "resourceId": 141,
+        "text": "Aku tidak akan menyembah apa yang kamu sembah,"
+      }
+    ]
+  },
+  {
+    "id": 6210,
+    "verseNumber": 3,
+    "verseKey": "109:3",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 553,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 603,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 2570,
+        "position": 1,
+        "audioUrl": "wbw/109_003_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭚ",
+        "codeV2": "ﱊ",
+        "textQpcHafs": "وَلَآ",
+        "textUthmani": "وَلَآ",
+        "textUthmaniSimple": "ولا",
+        "textUthmaniTajweed": "وَل<rule class=madda_obligatory_monfasel>َآ</rule>",
+        "location": "109:3:1",
+        "chapterId": 109,
+        "verseId": 6210,
+        "verseKey": "109:3",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱊ",
+        "translation": {
+          "text": "dan tidak",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "walā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2571,
+        "position": 2,
+        "audioUrl": "wbw/109_003_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭛ",
+        "codeV2": "ﱋ",
+        "textQpcHafs": "أَنتُمۡ",
+        "textUthmani": "أَنتُمْ",
+        "textUthmaniSimple": "انتم",
+        "textUthmaniTajweed": "أَ<rule class=ikhafa>نت</rule>ُمۡ",
+        "location": "109:3:2",
+        "chapterId": 109,
+        "verseId": 6210,
+        "verseKey": "109:3",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱋ",
+        "translation": {
+          "text": "kamu",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "antum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2572,
+        "position": 3,
+        "audioUrl": "wbw/109_003_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭜ",
+        "codeV2": "ﱌ",
+        "textQpcHafs": "عَٰبِدُونَ",
+        "textUthmani": "عَـٰبِدُونَ",
+        "textUthmaniSimple": "عـبدون",
+        "textUthmaniTajweed": "عَ<rule class=madda_normal>ـٰ</rule>بِدُونَ",
+        "location": "109:3:3",
+        "chapterId": 109,
+        "verseId": 6210,
+        "verseKey": "109:3",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱌ",
+        "translation": {
+          "text": "menyembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "ʿābidūna",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2573,
+        "position": 4,
+        "audioUrl": "wbw/109_003_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭝ",
+        "codeV2": "ﱍ",
+        "textQpcHafs": "مَآ",
+        "textUthmani": "مَآ",
+        "textUthmaniSimple": "ما",
+        "textUthmaniTajweed": "م<rule class=madda_obligatory_monfasel>َآ</rule>",
+        "location": "109:3:4",
+        "chapterId": 109,
+        "verseId": 6210,
+        "verseKey": "109:3",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱍ",
+        "translation": {
+          "text": "apa",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "mā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2574,
+        "position": 5,
+        "audioUrl": "wbw/109_003_005.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭞ",
+        "codeV2": "ﱎ",
+        "textQpcHafs": "أَعۡبُدُ",
+        "textUthmani": "أَعْبُدُ",
+        "textUthmaniSimple": "اعبد",
+        "textUthmaniTajweed": "أَعۡبُ<rule class=qalaqah>د</rule>ُ",
+        "location": "109:3:5",
+        "chapterId": 109,
+        "verseId": 6210,
+        "verseKey": "109:3",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱎ",
+        "translation": {
+          "text": "aku sembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "aʿbudu",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 2575,
+        "position": 6,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭟ",
+        "codeV2": "ﱏ",
+        "textQpcHafs": "٣",
+        "textUthmani": "٣",
+        "textUthmaniSimple": "٣",
+        "textUthmaniTajweed": "٣",
+        "location": "109:3:6",
+        "chapterId": 109,
+        "verseId": 6210,
+        "verseKey": "109:3",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱏ",
+        "translation": {
+          "text": "(3)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922639,
+        "resourceId": 134,
+        "text": "Dan kamu bukan penyembah Tuhan yang aku sembah."
+      },
+      {
+        "id": 181437,
+        "resourceId": 33,
+        "text": "dan kamu bukan penyembah apa yang aku sembah,"
+      },
+      {
+        "id": 966295,
+        "resourceId": 141,
+        "text": "Dan kamu bukan penyembah apa yang aku sembah,"
+      }
+    ]
+  },
+  {
+    "id": 6211,
+    "verseNumber": 4,
+    "verseKey": "109:4",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 553,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 603,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 3992,
+        "position": 1,
+        "audioUrl": "wbw/109_004_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭠ",
+        "codeV2": "ﱐ",
+        "textQpcHafs": "وَلَآ",
+        "textUthmani": "وَلَآ",
+        "textUthmaniSimple": "ولا",
+        "textUthmaniTajweed": "وَل<rule class=madda_obligatory_monfasel>َآ</rule>",
+        "location": "109:4:1",
+        "chapterId": 109,
+        "verseId": 6211,
+        "verseKey": "109:4",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱐ",
+        "translation": {
+          "text": "dan bukanlah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "walā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3993,
+        "position": 2,
+        "audioUrl": "wbw/109_004_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭡ",
+        "codeV2": "ﱑ",
+        "textQpcHafs": "أَنَا۠",
+        "textUthmani": "أَنَا۠",
+        "textUthmaniSimple": "انا۠",
+        "textUthmaniTajweed": "أَنَاۡ",
+        "location": "109:4:2",
+        "chapterId": 109,
+        "verseId": 6211,
+        "verseKey": "109:4",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱑ",
+        "translation": {
+          "text": "aku",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "anā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3994,
+        "position": 3,
+        "audioUrl": "wbw/109_004_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭢ",
+        "codeV2": "ﱒ",
+        "textQpcHafs": "عَابِدٞ",
+        "textUthmani": "عَابِدٌۭ",
+        "textUthmaniSimple": "عابدۭ",
+        "textUthmaniTajweed": "عَابِ<rule class=idgham_ghunnah>دٌ</rule>",
+        "location": "109:4:3",
+        "chapterId": 109,
+        "verseId": 6211,
+        "verseKey": "109:4",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱒ",
+        "translation": {
+          "text": "menjadi penyembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "ʿābidun",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3995,
+        "position": 4,
+        "audioUrl": "wbw/109_004_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭣ",
+        "codeV2": "ﱓ",
+        "textQpcHafs": "مَّا",
+        "textUthmani": "مَّا",
+        "textUthmaniSimple": "ما",
+        "textUthmaniTajweed": "<rule class=idgham_ghunnah>م</rule>َّا",
+        "location": "109:4:4",
+        "chapterId": 109,
+        "verseId": 6211,
+        "verseKey": "109:4",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱓ",
+        "translation": {
+          "text": "apa",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "mā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3996,
+        "position": 5,
+        "audioUrl": "wbw/109_004_005.mp3",
+        "charTypeName": "word",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭤ",
+        "codeV2": "ﱔ",
+        "textQpcHafs": "عَبَدتُّمۡ",
+        "textUthmani": "عَبَدتُّمْ",
+        "textUthmaniSimple": "عبدتم",
+        "textUthmaniTajweed": "عَبَ<rule class=idgham_mutajanisayn>د</rule>تُّمۡ",
+        "location": "109:4:5",
+        "chapterId": 109,
+        "verseId": 6211,
+        "verseKey": "109:4",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱔ",
+        "translation": {
+          "text": "kamu sembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "ʿabadttum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 3997,
+        "position": 6,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 4,
+        "lineV2": 4,
+        "codeV1": "ﭥ",
+        "codeV2": "ﱕ",
+        "textQpcHafs": "٤",
+        "textUthmani": "٤",
+        "textUthmaniSimple": "٤",
+        "textUthmaniTajweed": "٤",
+        "location": "109:4:6",
+        "chapterId": 109,
+        "verseId": 6211,
+        "verseKey": "109:4",
+        "lineNumber": 4,
+        "pageNumber": 603,
+        "text": "ﱕ",
+        "translation": {
+          "text": "(4)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922640,
+        "resourceId": 134,
+        "text": "Dan aku tidak pernah menjadi penyembah apa yang kamu sembah,"
+      },
+      {
+        "id": 181436,
+        "resourceId": 33,
+        "text": "dan aku tidak pernah menjadi penyembah apa yang kamu sembah,"
+      },
+      {
+        "id": 966296,
+        "resourceId": 141,
+        "text": "Dan aku tidak pernah menjadi penyembah apa yang kamu sembah,"
+      }
+    ]
+  },
+  {
+    "id": 6212,
+    "verseNumber": 5,
+    "verseKey": "109:5",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 553,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 603,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 5290,
+        "position": 1,
+        "audioUrl": "wbw/109_005_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭦ",
+        "codeV2": "ﱖ",
+        "textQpcHafs": "وَلَآ",
+        "textUthmani": "وَلَآ",
+        "textUthmaniSimple": "ولا",
+        "textUthmaniTajweed": "وَل<rule class=madda_obligatory_monfasel>َآ</rule>",
+        "location": "109:5:1",
+        "chapterId": 109,
+        "verseId": 6212,
+        "verseKey": "109:5",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱖ",
+        "translation": {
+          "text": "dan bukanlah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "walā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5291,
+        "position": 2,
+        "audioUrl": "wbw/109_005_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭧ",
+        "codeV2": "ﱗ",
+        "textQpcHafs": "أَنتُمۡ",
+        "textUthmani": "أَنتُمْ",
+        "textUthmaniSimple": "انتم",
+        "textUthmaniTajweed": "أَ<rule class=ikhafa>نت</rule>ُمۡ",
+        "location": "109:5:2",
+        "chapterId": 109,
+        "verseId": 6212,
+        "verseKey": "109:5",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱗ",
+        "translation": {
+          "text": "kamu",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "antum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5292,
+        "position": 3,
+        "audioUrl": "wbw/109_005_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭨ",
+        "codeV2": "ﱘ",
+        "textQpcHafs": "عَٰبِدُونَ",
+        "textUthmani": "عَـٰبِدُونَ",
+        "textUthmaniSimple": "عـبدون",
+        "textUthmaniTajweed": "عَ<rule class=madda_normal>ـٰ</rule>بِدُونَ",
+        "location": "109:5:3",
+        "chapterId": 109,
+        "verseId": 6212,
+        "verseKey": "109:5",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱘ",
+        "translation": {
+          "text": "menyembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "ʿābidūna",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5293,
+        "position": 4,
+        "audioUrl": "wbw/109_005_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭩ",
+        "codeV2": "ﱙ",
+        "textQpcHafs": "مَآ",
+        "textUthmani": "مَآ",
+        "textUthmaniSimple": "ما",
+        "textUthmaniTajweed": "م<rule class=madda_obligatory_monfasel>َآ</rule>",
+        "location": "109:5:4",
+        "chapterId": 109,
+        "verseId": 6212,
+        "verseKey": "109:5",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱙ",
+        "translation": {
+          "text": "apa",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "mā",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5294,
+        "position": 5,
+        "audioUrl": "wbw/109_005_005.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭪ",
+        "codeV2": "ﱚ",
+        "textQpcHafs": "أَعۡبُدُ",
+        "textUthmani": "أَعْبُدُ",
+        "textUthmaniSimple": "اعبد",
+        "textUthmaniTajweed": "أَعۡبُ<rule class=qalaqah>د</rule>ُ",
+        "location": "109:5:5",
+        "chapterId": 109,
+        "verseId": 6212,
+        "verseKey": "109:5",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱚ",
+        "translation": {
+          "text": "aku sembah",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "aʿbudu",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 5295,
+        "position": 6,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭫ",
+        "codeV2": "ﱛ",
+        "textQpcHafs": "٥",
+        "textUthmani": "٥",
+        "textUthmaniSimple": "٥",
+        "textUthmaniTajweed": "٥",
+        "location": "109:5:6",
+        "chapterId": 109,
+        "verseId": 6212,
+        "verseKey": "109:5",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱛ",
+        "translation": {
+          "text": "(5)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922641,
+        "resourceId": 134,
+        "text": "dan kamu tidak pernah (pula) menjadi penyembah Tuhan yang aku sembah."
+      },
+      {
+        "id": 181445,
+        "resourceId": 33,
+        "text": "dan kamu tidak pernah (pula) menjadi penyembah apa yang aku sembah."
+      },
+      {
+        "id": 966297,
+        "resourceId": 141,
+        "text": "Dan kamu tidak pernah (pula) menjadi penyembah apa yang aku sembah."
+      }
+    ]
+  },
+  {
+    "id": 6213,
+    "verseNumber": 6,
+    "verseKey": "109:6",
+    "hizbNumber": 60,
+    "rubElHizbNumber": 240,
+    "rukuNumber": 553,
+    "manzilNumber": 7,
+    "sajdahNumber": null,
+    "pageNumber": 603,
+    "juzNumber": 30,
+    "words": [
+      {
+        "id": 6550,
+        "position": 1,
+        "audioUrl": "wbw/109_006_001.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭬ",
+        "codeV2": "ﱜ",
+        "textQpcHafs": "لَكُمۡ",
+        "textUthmani": "لَكُمْ",
+        "textUthmaniSimple": "لكم",
+        "textUthmaniTajweed": "لَكُمۡ",
+        "location": "109:6:1",
+        "chapterId": 109,
+        "verseId": 6213,
+        "verseKey": "109:6",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱜ",
+        "translation": {
+          "text": "bagi kalian",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "lakum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 6551,
+        "position": 2,
+        "audioUrl": "wbw/109_006_002.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭭ",
+        "codeV2": "ﱝ",
+        "textQpcHafs": "دِينُكُمۡ",
+        "textUthmani": "دِينُكُمْ",
+        "textUthmaniSimple": "دينكم",
+        "textUthmaniTajweed": "دِينُكُمۡ",
+        "location": "109:6:2",
+        "chapterId": 109,
+        "verseId": 6213,
+        "verseKey": "109:6",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱝ",
+        "translation": {
+          "text": "agamamu",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "dīnukum",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 6552,
+        "position": 3,
+        "audioUrl": "wbw/109_006_003.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭮ",
+        "codeV2": "ﱞ",
+        "textQpcHafs": "وَلِيَ",
+        "textUthmani": "وَلِىَ",
+        "textUthmaniSimple": "ولى",
+        "textUthmaniTajweed": "وَلِىَ",
+        "location": "109:6:3",
+        "chapterId": 109,
+        "verseId": 6213,
+        "verseKey": "109:6",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱞ",
+        "translation": {
+          "text": "bagiku",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "waliya",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 6553,
+        "position": 4,
+        "audioUrl": "wbw/109_006_004.mp3",
+        "charTypeName": "word",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭯ",
+        "codeV2": "ﱟ",
+        "textQpcHafs": "دِينِ",
+        "textUthmani": "دِينِ",
+        "textUthmaniSimple": "دين",
+        "textUthmaniTajweed": "د<rule class=madda_permissible>ِي</rule>نِ",
+        "location": "109:6:4",
+        "chapterId": 109,
+        "verseId": 6213,
+        "verseKey": "109:6",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱟ",
+        "translation": {
+          "text": "agamaku",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": "dīni",
+          "languageName": "english"
+        }
+      },
+      {
+        "id": 6554,
+        "position": 5,
+        "audioUrl": null,
+        "charTypeName": "end",
+        "lineV1": 5,
+        "lineV2": 5,
+        "codeV1": "ﭰ",
+        "codeV2": "ﱠ",
+        "textQpcHafs": "٦",
+        "textUthmani": "٦",
+        "textUthmaniSimple": "٦",
+        "textUthmaniTajweed": "٦",
+        "location": "109:6:5",
+        "chapterId": 109,
+        "verseId": 6213,
+        "verseKey": "109:6",
+        "lineNumber": 5,
+        "pageNumber": 603,
+        "text": "ﱠ",
+        "translation": {
+          "text": "(6)",
+          "languageName": "indonesian"
+        },
+        "transliteration": {
+          "text": null,
+          "languageName": "english"
+        }
+      }
+    ],
+    "translations": [
+      {
+        "id": 922642,
+        "resourceId": 134,
+        "text": "Untukmulah agamamu dan untukkulah agamaku\"."
+      },
+      {
+        "id": 181442,
+        "resourceId": 33,
+        "text": "Untukmu agamamu, dan untukku agamaku.\""
+      },
+      {
+        "id": 966298,
+        "resourceId": 141,
+        "text": "Untukmu agamamu, dan untukku agamaku.”"
+      }
+    ]
+  }
+]

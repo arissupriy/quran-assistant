@@ -3,6 +3,7 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
+import '../../data_loader/ayah_texts.dart';
 import '../../data_loader/verse_by_chapter.dart';
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -12,6 +13,9 @@ Future<String?> getVerseTextUthmani({required String verseKey}) => RustLib
     .instance
     .api
     .crateApiQuranVerseGetVerseTextUthmani(verseKey: verseKey);
+
+Future<AyahText> getVerseTexts({required String verseKey}) =>
+    RustLib.instance.api.crateApiQuranVerseGetVerseTexts(verseKey: verseKey);
 
 /// Mengembalikan nomor juz untuk sebuah ayat berdasarkan kunci ayat.
 Future<int?> getJuzNumberForVerse({required String verseKey}) => RustLib
@@ -29,21 +33,11 @@ Future<Verse?> getVerseByChapterAndVerseNumber({
 );
 
 /// Mengembalikan teks terjemahan untuk ayat tertentu berdasarkan kunci ayat dan ID sumber terjemahan.
-Future<String?> getTranslationText({
-  required String verseKey,
-  required int resourceId,
-}) => RustLib.instance.api.crateApiQuranVerseGetTranslationText(
-  verseKey: verseKey,
-  resourceId: resourceId,
-);
+Future<String?> getTranslationText({required String verseKey}) => RustLib
+    .instance
+    .api
+    .crateApiQuranVerseGetTranslationText(verseKey: verseKey);
 
-/// Mengembalikan detail objek Word (kata) untuk kata spesifik dalam sebuah ayat.
-Future<Word?> getWordDetails({
-  required int chapterId,
-  required int verseNumber,
-  required int wordPosition,
-}) => RustLib.instance.api.crateApiQuranVerseGetWordDetails(
-  chapterId: chapterId,
-  verseNumber: verseNumber,
-  wordPosition: wordPosition,
-);
+/// Mengembalikan detail objek Word (kata) berdasarkan `word_key`, misalnya "2:1:3"
+Future<Translation?> getWordDetails({required String verseKey}) =>
+    RustLib.instance.api.crateApiQuranVerseGetWordDetails(verseKey: verseKey);

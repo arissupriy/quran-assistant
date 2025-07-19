@@ -7,27 +7,21 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class Translation {
-  final int id;
-  final int resourceId;
   final String text;
+  final Map<String, String> footnotes;
 
-  const Translation({
-    required this.id,
-    required this.resourceId,
-    required this.text,
-  });
+  const Translation({required this.text, required this.footnotes});
 
   @override
-  int get hashCode => id.hashCode ^ resourceId.hashCode ^ text.hashCode;
+  int get hashCode => text.hashCode ^ footnotes.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Translation &&
           runtimeType == other.runtimeType &&
-          id == other.id &&
-          resourceId == other.resourceId &&
-          text == other.text;
+          text == other.text &&
+          footnotes == other.footnotes;
 }
 
 class Verse {
@@ -41,7 +35,7 @@ class Verse {
   final int? sajdahNumber;
   final int pageNumber;
   final int juzNumber;
-  final List<Word> words;
+  final List<String> wordIds;
   final List<Translation> translations;
 
   const Verse({
@@ -55,7 +49,7 @@ class Verse {
     this.sajdahNumber,
     required this.pageNumber,
     required this.juzNumber,
-    required this.words,
+    required this.wordIds,
     required this.translations,
   });
 
@@ -71,7 +65,7 @@ class Verse {
       sajdahNumber.hashCode ^
       pageNumber.hashCode ^
       juzNumber.hashCode ^
-      words.hashCode ^
+      wordIds.hashCode ^
       translations.hashCode;
 
   @override
@@ -89,141 +83,6 @@ class Verse {
           sajdahNumber == other.sajdahNumber &&
           pageNumber == other.pageNumber &&
           juzNumber == other.juzNumber &&
-          words == other.words &&
+          wordIds == other.wordIds &&
           translations == other.translations;
-}
-
-class Word {
-  final int id;
-  final int position;
-  final String? audioUrl;
-  final String charTypeName;
-  final int lineV1;
-  final int lineV2;
-  final String codeV1;
-  final String codeV2;
-  final String textQpcHafs;
-  final String textUthmani;
-  final String textUthmaniSimple;
-  final String textUthmaniTajweed;
-  final String location;
-  final int chapterId;
-  final int verseId;
-  final String verseKey;
-  final int lineNumber;
-  final int pageNumber;
-  final String text;
-  final WordTranslation translation;
-  final WordTransliteration transliteration;
-
-  const Word({
-    required this.id,
-    required this.position,
-    this.audioUrl,
-    required this.charTypeName,
-    required this.lineV1,
-    required this.lineV2,
-    required this.codeV1,
-    required this.codeV2,
-    required this.textQpcHafs,
-    required this.textUthmani,
-    required this.textUthmaniSimple,
-    required this.textUthmaniTajweed,
-    required this.location,
-    required this.chapterId,
-    required this.verseId,
-    required this.verseKey,
-    required this.lineNumber,
-    required this.pageNumber,
-    required this.text,
-    required this.translation,
-    required this.transliteration,
-  });
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      position.hashCode ^
-      audioUrl.hashCode ^
-      charTypeName.hashCode ^
-      lineV1.hashCode ^
-      lineV2.hashCode ^
-      codeV1.hashCode ^
-      codeV2.hashCode ^
-      textQpcHafs.hashCode ^
-      textUthmani.hashCode ^
-      textUthmaniSimple.hashCode ^
-      textUthmaniTajweed.hashCode ^
-      location.hashCode ^
-      chapterId.hashCode ^
-      verseId.hashCode ^
-      verseKey.hashCode ^
-      lineNumber.hashCode ^
-      pageNumber.hashCode ^
-      text.hashCode ^
-      translation.hashCode ^
-      transliteration.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Word &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          position == other.position &&
-          audioUrl == other.audioUrl &&
-          charTypeName == other.charTypeName &&
-          lineV1 == other.lineV1 &&
-          lineV2 == other.lineV2 &&
-          codeV1 == other.codeV1 &&
-          codeV2 == other.codeV2 &&
-          textQpcHafs == other.textQpcHafs &&
-          textUthmani == other.textUthmani &&
-          textUthmaniSimple == other.textUthmaniSimple &&
-          textUthmaniTajweed == other.textUthmaniTajweed &&
-          location == other.location &&
-          chapterId == other.chapterId &&
-          verseId == other.verseId &&
-          verseKey == other.verseKey &&
-          lineNumber == other.lineNumber &&
-          pageNumber == other.pageNumber &&
-          text == other.text &&
-          translation == other.translation &&
-          transliteration == other.transliteration;
-}
-
-class WordTranslation {
-  final String text;
-  final String languageName;
-
-  const WordTranslation({required this.text, required this.languageName});
-
-  @override
-  int get hashCode => text.hashCode ^ languageName.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WordTranslation &&
-          runtimeType == other.runtimeType &&
-          text == other.text &&
-          languageName == other.languageName;
-}
-
-class WordTransliteration {
-  final String? text;
-  final String languageName;
-
-  const WordTransliteration({this.text, required this.languageName});
-
-  @override
-  int get hashCode => text.hashCode ^ languageName.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WordTransliteration &&
-          runtimeType == other.runtimeType &&
-          text == other.text &&
-          languageName == other.languageName;
 }

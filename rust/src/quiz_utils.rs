@@ -1,200 +1,158 @@
 // src/ffi/quiz_generator/quiz_utils.rs
 
-use crate::data_loader::ayah_texts::AyahText;
 use crate::data_loader::quiz_models::{QuizFilter, QuizScope};
-use crate::data_loader::verse_by_chapter::Verse;
+use crate::data_loader::verse_by_chapter::{Verse, Word};
 use crate::GLOBAL_DATA;
 use anyhow::{bail, Result};
-use log::info;
+use log::warn;
+use rand::{prelude::*, thread_rng};
+use regex::Regex;
 use std::collections::{HashMap, HashSet};
-
-// --- PERBAIKAN FINAL DI SINI ---
-// Impor "prelude" untuk mendapatkan semua trait DAN fungsi umum dari `rand`
-// termasuk Rng, SliceRandom, dan juga thread_rng().
-use rand::{prelude::*, thread_rng}; // Pastikan thread_rng diimpor secara eksplisit
+use strsim::levenshtein;
 
 //======================================================================
 // FUNGSI PUBLIK (API untuk modul kuis lain)
 //======================================================================
 
-pub fn find_valid_long_verse(keys_in_scope: &[String], min_word_count: usize) -> Option<&'static Verse> {
-    let mut rng = thread_rng(); // Perbaikan: Gunakan thread_rng()
+lazy_static::lazy_static! {
+    static ref AYAH_NUMBER_REGEX: Regex = Regex::new(
+        r"^[\p{N}۰-۹٠-٩]+[\.\:\)\-–—]?\s*"
+    ).unwrap();
+}
+
+pub fn remove_ayah_number(text: &str) -> String {
+    AYAH_NUMBER_REGEX.replace(text.trim_start(), "").to_string()
+}
+
+
+pub fn find_valid_long_verse(
+    keys_in_scope: &[String],
+    min_word_count: usize,
+) -> Option<&'static Verse> {
+    let mut rng = thread_rng();
     let mut shuffled_keys = keys_in_scope.to_vec();
     shuffled_keys.shuffle(&mut rng);
 
     for key in &shuffled_keys {
         if let Some(verse) = get_verse_details_by_key(key) {
-            if verse.words.len() >= min_word_count {
-                // Untuk kuis fragmen, keunikan teks tidak sekrusial kuis lanjut ayat,
-                // jadi kita langsung kembalikan ayat yang memenuhi syarat panjang.
+            let word_count = verse
+                .word_ids
+                .iter()
+                .filter(|id| GLOBAL_DATA.words.data.contains_key(*id))
+                .count();
+
+            if word_count >= min_word_count {
                 return Some(verse);
             }
         }
     }
+
     None
 }
 
-/// Mengambil detail `Verse` lengkap (termasuk semua kata) berdasarkan `verse_key`.
 pub fn get_verse_details_by_key(verse_key: &str) -> Option<&'static Verse> {
     let parts: Vec<&str> = verse_key.split(':').collect();
-    if parts.len() != 2 { return None; }
+    if parts.len() != 2 {
+        return None;
+    }
     let chapter_id: u32 = parts[0].parse().ok()?;
     let verse_number: u32 = parts[1].parse().ok()?;
-    
-    GLOBAL_DATA.verses_by_chapter
+
+    GLOBAL_DATA
+        .verses
         .get(&chapter_id)?
         .iter()
         .find(|v| v.verse_number == verse_number)
 }
 
-/// Menghasilkan sejumlah ayat pengecoh (decoy) yang unik.
-pub fn get_decoy_verses(count: usize, correct_answer_key: &str) -> Vec<&'static AyahText> {
+pub fn get_decoy_verses(
+    count: usize,
+    correct_answer_key: &str,
+    keys_in_scope: &[String],
+) -> Vec<&'static Verse> {
     let mut decoys = Vec::with_capacity(count);
     let mut used_keys = HashSet::new();
     used_keys.insert(correct_answer_key.to_string());
 
-    while decoys.len() < count {
-        if let Some(verse) = get_random_verse() {
-            if used_keys.insert(verse.verse_key.clone()) {
-                decoys.push(verse);
+    if let Some(matching_ayahs) = GLOBAL_DATA.valid_matching_ayah.map.get(correct_answer_key) {
+        for matched_ayah_obj in matching_ayahs {
+            let current_decoy_key = &matched_ayah_obj.matched_ayah_key;
+            if keys_in_scope.contains(current_decoy_key) && !used_keys.contains(current_decoy_key) {
+                if let Some(verse) = get_verse_details_by_key(current_decoy_key) {
+                    decoys.push(verse);
+                    used_keys.insert(current_decoy_key.to_string());
+                    if decoys.len() == count {
+                        return decoys;
+                    }
+                }
             }
-        } else {
-            // Jika tidak bisa mendapatkan ayat acak lagi, hentikan
-            break; 
         }
     }
+
+    if let Some(correct_details) = get_verse_details_by_key(correct_answer_key) {
+        let mut smart_decoy_candidates: Vec<(&'static Verse, f32)> = Vec::new();
+
+        for key in keys_in_scope {
+            if used_keys.contains(key) {
+                continue;
+            }
+
+            if let Some(candidate_verse) = get_verse_details_by_key(key) {
+                let similarity_score =
+                    calculate_verse_similarity(correct_details, candidate_verse);
+
+                if similarity_score > 0.4 && similarity_score < 0.95 {
+                    smart_decoy_candidates.push((candidate_verse, similarity_score));
+                }
+            }
+        }
+
+        smart_decoy_candidates
+            .sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+
+        for (candidate_verse, _score) in smart_decoy_candidates {
+            if !used_keys.contains(&candidate_verse.verse_key) {
+                decoys.push(candidate_verse);
+                used_keys.insert(candidate_verse.verse_key.clone());
+                if decoys.len() == count {
+                    return decoys;
+                }
+            }
+        }
+    }
+
+    while decoys.len() < count {
+        if let Some(random_verse) = get_random_unique_verse(&mut used_keys, keys_in_scope) {
+            decoys.push(random_verse);
+        } else {
+            warn!("QuizGen: Tidak dapat menemukan pengecoh acak unik tambahan dalam cakupan.");
+            break;
+        }
+    }
+
     decoys
 }
 
-/// Menghasilkan pengecoh berupa potongan kata acak dari ayat lain.
-pub fn get_decoy_fragments(count: usize, fragment_word_count: usize, correct_fragment: &str) -> Vec<String> {
-    let mut decoys = Vec::with_capacity(count);
-    let mut used_fragments = std::collections::HashSet::new();
-    used_fragments.insert(correct_fragment.to_string());
-
-    let all_keys = &GLOBAL_DATA.all_verse_keys.keys;
-    let mut attempts = 0;
-    // Tentukan batas percobaan yang wajar, misalnya 10x dari jumlah yang diminta
-    let max_attempts_for_decoys = count * 10;
-
-    while decoys.len() < count && attempts < max_attempts_for_decoys {
-        attempts += 1; // Tingkatkan attempts di setiap iterasi loop
-        
-        if let Some(random_verse) = find_valid_long_verse(all_keys, fragment_word_count + 1) {
-            if random_verse.words.len() > fragment_word_count {
-                let mut rng = thread_rng();
-                // Pastikan `start_index` tidak melewati batas.
-                // `random_verse.words.len() - fragment_word_count` bisa jadi 0 jika ukurannya pas.
-                // `gen_range(a..=b)` membutuhkan `a <= b`.
-                let max_range_for_start_index = random_verse.words.len().saturating_sub(fragment_word_count);
-
-                if max_range_for_start_index == 0 {
-                    // Jika ayat terlalu pendek untuk diambil fragmen acak dengan ukuran yang diminta
-                    continue; 
-                }
-                
-                let start_index = rng.gen_range(0..max_range_for_start_index); 
-                let end_index = start_index + fragment_word_count;
-                
-                // Pastikan `end_index` tidak keluar dari batas, meskipun seharusnya sudah dijamin oleh `max_range_for_start_index`
-                if end_index > random_verse.words.len() {
-                    // Ini seharusnya tidak terpicu jika perhitungan `start_index` benar,
-                    // tapi sebagai sanity check tidak ada salahnya.
-                    continue; 
-                }
-
-                let fragment_text = random_verse.words[start_index..end_index]
-                    .iter()
-                    .map(|w| w.text_uthmani.as_str())
-                    .collect::<Vec<_>>()
-                    .join(" ");
-
-                // Jika fragmen baru berhasil ditambahkan, artinya unik
-                if used_fragments.insert(fragment_text.clone()) {
-                    decoys.push(fragment_text);
-                }
-            }
-        }
-        // Jika find_valid_long_verse mengembalikan None, loop tetap berlanjut
-        // dan `attempts` akan terus bertambah, mencegah infinite loop.
+pub fn find_valid_question_verse(keys_in_scope: Vec<String>) -> Option<&'static Verse> {
+    let mut rng = thread_rng();
+    if keys_in_scope.is_empty() {
+        return None;
     }
-
-    // DEBUGGING: Tambahkan log untuk melihat berapa banyak pengecoh yang berhasil didapat
-    info!("DEBUG: get_decoy_fragments mencoba {} kali, berhasil mengumpulkan {} dari {} pengecoh.", attempts, decoys.len(), count);
-
-    decoys // Mengembalikan apa pun yang berhasil dikumpulkan
-}
-
-/// Mengambil semua kunci ayat ('verse_key') dalam cakupan (scope) yang ditentukan.
-pub fn get_verse_keys_in_scope(filter: &QuizFilter) -> Result<Vec<String>> {
-    let engine_data = &GLOBAL_DATA;
-    match &filter.scope {
-        QuizScope::All => Ok(engine_data.all_verse_keys.keys.clone()),
-        QuizScope::BySurah { surah_id } => {
-            let prefix = format!("{}:", surah_id);
-            let keys = engine_data.ayah_texts.texts
-                .iter()
-                .filter(|at| at.verse_key.starts_with(&prefix))
-                .map(|at| at.verse_key.clone())
-                .collect();
-            Ok(keys)
-        }
-        QuizScope::ByJuz { juz_numbers } => {
-            if juz_numbers.is_empty() || juz_numbers.len() > 2 {
-                bail!("Parameter Juz tidak valid. Harus berisi 1 atau 2 elemen.");
-            }
-            let start_juz = juz_numbers[0];
-            let end_juz = if juz_numbers.len() == 2 { juz_numbers[1] } else { start_juz };
-            if start_juz == 0 || end_juz == 0 || start_juz > end_juz || end_juz > 30 {
-                bail!("Nomor Juz tidak valid. Harus antara 1 dan 30.");
-            }
-            let mut keys_in_juz = Vec::new();
-            for juz_num in start_juz..=end_juz {
-                if let Some(juz_data) = engine_data.juzs.juzs.iter().find(|j| j.juz_number == juz_num) {
-                    for (chapter_str, verse_range_str) in &juz_data.verse_mapping {
-                        // Error handling untuk parse chapter_id
-                        let chapter_id: u32 = chapter_str.parse().map_err(|e| anyhow::anyhow!("Gagal parse chapter_id '{}': {}", chapter_str, e))?;
-                        let range_parts: Vec<&str> = verse_range_str.split('-').collect();
-                        if range_parts.len() == 2 {
-                            // Error handling untuk parse start_verse dan end_verse
-                            let start_verse: u32 = range_parts[0].parse().map_err(|e| anyhow::anyhow!("Gagal parse start_verse '{}': {}", range_parts[0], e))?;
-                            let end_verse: u32 = range_parts[1].parse().map_err(|e| anyhow::anyhow!("Gagal parse end_verse '{}': {}", range_parts[1], e))?;
-                            for verse_num in start_verse..=end_verse {
-                                keys_in_juz.push(format!("{}:{}", chapter_id, verse_num));
-                            }
-                        } else {
-                            // Error handling jika format range_parts tidak sesuai
-                            bail!("Format range_parts tidak valid untuk {}:{}", chapter_str, verse_range_str);
-                        }
-                    }
-                } else {
-                    // Jika data juz tidak ditemukan (seharusnya tidak terjadi jika data lengkap)
-                    bail!("Data Juz {} tidak ditemukan.", juz_num);
-                }
-            }
-            Ok(keys_in_juz)
-        }
-    }
-}
-
-/// Mencari kandidat ayat soal yang valid (teksnya unik & punya lanjutan) dari dalam cakupan tertentu.
-pub fn find_valid_question_verse(keys_in_scope: Vec<String>) -> Option<&'static AyahText> {
-    let mut rng = thread_rng(); // Perbaikan: Gunakan thread_rng()
-    if keys_in_scope.is_empty() { return None; }
-    let text_map: HashMap<_, _> = keys_in_scope.iter()
-        .filter_map(|key| get_text_for_key(key).map(|text| (key.as_str(), text)))
-        .collect();
+    let text_map: HashMap<String, String> = keys_in_scope
+    .iter()
+    .filter_map(|key| get_text_for_key(key).map(|text| (key.clone(), text)))
+    .collect();
     let mut text_counts: HashMap<&str, u32> = HashMap::new();
     for text in text_map.values() {
         *text_counts.entry(text).or_insert(0) += 1;
     }
     let mut shuffled_keys: Vec<&String> = keys_in_scope.iter().collect();
-    shuffled_keys.shuffle(&mut rng); // <-- Sekarang akan berfungsi
+    shuffled_keys.shuffle(&mut rng);
     for key in shuffled_keys {
         if let Some(text) = text_map.get(key.as_str()) {
-            if text_counts.get(text) == Some(&1) {
+            if text_counts.get(text.as_str()) == Some(&1) {
                 if get_next_verse_key(key).is_some() {
-                    if let Some(verse) = GLOBAL_DATA.ayah_texts.texts.iter().find(|at| &at.verse_key == key) {
+                    if let Some(verse) = get_verse_details_by_key(key) {
                         return Some(verse);
                     }
                 }
@@ -204,22 +162,20 @@ pub fn find_valid_question_verse(keys_in_scope: Vec<String>) -> Option<&'static 
     None
 }
 
-/// Mendapatkan teks Utsmani dari sebuah verse_key.
-pub fn get_text_for_key(verse_key: &str) -> Option<&'static str> {
-    GLOBAL_DATA.ayah_texts.texts
-        .iter()
-        .find(|at| at.verse_key == verse_key)
-        .map(|at| at.text_uthmani.as_str())
-}
-
-/// Mendapatkan kunci ayat selanjutnya dalam surah yang sama.
 pub fn get_next_verse_key(verse_key: &str) -> Option<String> {
     let parts: Vec<&str> = verse_key.split(':').collect();
-    if parts.len() != 2 { return None; }
+    if parts.len() != 2 {
+        return None;
+    }
     let chapter_id: u32 = parts[0].parse().ok()?;
     let verse_number: u32 = parts[1].parse().ok()?;
     let next_verse_number = verse_number + 1;
-    if let Some(chapter_details) = GLOBAL_DATA.chapters.chapters.iter().find(|c| c.id == chapter_id) {
+    if let Some(chapter_details) = GLOBAL_DATA
+        .chapters
+        .chapters
+        .iter()
+        .find(|c| c.id == chapter_id)
+    {
         if next_verse_number <= chapter_details.verses_count {
             return Some(format!("{}:{}", chapter_id, next_verse_number));
         }
@@ -227,18 +183,275 @@ pub fn get_next_verse_key(verse_key: &str) -> Option<String> {
     None
 }
 
-//======================================================================
-// FUNGSI INTERNAL
-//======================================================================
+pub fn get_text_for_key(verse_key: &str) -> Option<String> {
+    let verse = GLOBAL_DATA.verses
+        .values()
+        .flat_map(|v| v.iter())
+        .find(|v| v.verse_key == verse_key)?;
 
-/// Mengambil satu `AyahText` acak dari seluruh Al-Qur'an.
-fn get_random_verse() -> Option<&'static AyahText> {
-    let engine_data = &GLOBAL_DATA;
-    // --- PERUBAHAN DI SINI ---
-    let mut rng = thread_rng(); // Perbaikan: Gunakan thread_rng()
-    if let Some(random_key) = engine_data.all_verse_keys.keys.choose(&mut rng) {
-        engine_data.ayah_texts.texts.iter().find(|at| &at.verse_key == random_key)
-    } else {
-        None
+    let words: Vec<&Word> = verse.word_ids
+        .iter()
+        .filter_map(|id| GLOBAL_DATA.words.data.get(id))
+        .collect();
+
+    if words.is_empty() {
+        return None;
     }
+
+    Some(
+        words.iter()
+            .map(|w| w.text_uthmani.as_str())
+            .collect::<Vec<_>>()
+            .join(" ")
+    )
+}
+
+pub fn get_prev_verse_key(verse_key: &str) -> Option<String> {
+    let parts: Vec<&str> = verse_key.split(':').collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    let chapter_id: u32 = parts[0].parse().ok()?;
+    let verse_number: u32 = parts[1].parse().ok()?;
+    let prev_verse_number = verse_number.checked_sub(1)?;
+
+    if prev_verse_number == 0 {
+        return None; // tidak ada ayat sebelum 1
+    }
+
+    Some(format!("{}:{}", chapter_id, prev_verse_number))
+}
+
+pub fn get_contextual_decoys(
+    target_prev_word: Option<String>,
+    word_count: usize,
+    correct_fragment: &str,
+    available_keys: &[String],
+) -> Vec<String> {
+    use crate::GLOBAL_DATA;
+    use rand::seq::SliceRandom;
+    use std::collections::HashSet;
+
+    let mut decoys = HashSet::new();
+    let mut rng = rand::thread_rng();
+
+    let Some(target_prev) = target_prev_word else {
+        return vec![];
+    };
+
+    for key in available_keys {
+        // Parse "2:5" → (chapter_id, verse_number)
+        let parts: Vec<&str> = key.split(':').collect();
+        if parts.len() != 2 {
+            continue;
+        }
+
+        let chapter_id: u32 = match parts[0].parse() {
+            Ok(id) => id,
+            Err(_) => continue,
+        };
+        let verse_number: u32 = match parts[1].parse() {
+            Ok(n) => n,
+            Err(_) => continue,
+        };
+
+        if let Some(verses) = GLOBAL_DATA.verses.get(&chapter_id) {
+            if let Some(verse) = verses.iter().find(|v| v.verse_number == verse_number) {
+                let words: Vec<_> = verse
+                    .word_ids
+                    .iter()
+                    .filter_map(|id| GLOBAL_DATA.words.data.get(id))
+                    .collect();
+
+                for i in 0..words.len().saturating_sub(word_count) {
+                    if words[i].text_uthmani == target_prev {
+                        let candidate_words = &words[i + 1..i + 1 + word_count];
+                        let candidate_text = candidate_words
+                            .iter()
+                            .map(|w| w.text_uthmani.as_str())
+                            .collect::<Vec<_>>()
+                            .join(" ");
+                        let norm = crate::quiz_utils::normalize_text(&candidate_text);
+                        if norm != correct_fragment {
+                            decoys.insert(norm);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let mut result: Vec<String> = decoys.into_iter().collect();
+    result.shuffle(&mut rng);
+    result
+}
+
+
+
+
+fn get_random_unique_verse(
+    used_keys: &mut HashSet<String>,
+    scope_keys: &[String],
+) -> Option<&'static Verse> {
+    let mut rng = thread_rng();
+    let mut shuffled_scope_keys = scope_keys.to_vec();
+    shuffled_scope_keys.shuffle(&mut rng);
+
+    for random_key in shuffled_scope_keys {
+        if !used_keys.contains(&random_key) {
+            if let Some(verse) = get_verse_details_by_key(&random_key) {
+                used_keys.insert(random_key);
+                return Some(verse);
+            }
+        }
+    }
+    None
+}
+
+fn calculate_verse_similarity(verse1: &'static Verse, verse2: &'static Verse) -> f32 {
+    if verse1.verse_key == verse2.verse_key {
+        return 0.0;
+    }
+
+    let words1: Vec<String> = verse1.word_ids.iter()
+        .filter_map(|id| GLOBAL_DATA.words.data.get(id))
+        .map(|w| w.text_uthmani.clone())
+        .collect();
+
+    let words2: Vec<String> = verse2.word_ids.iter()
+        .filter_map(|id| GLOBAL_DATA.words.data.get(id))
+        .map(|w| w.text_uthmani.clone())
+        .collect();
+
+    let joined1 = normalize_text(&words1.join(" "));
+    let joined2 = normalize_text(&words2.join(" "));
+
+    let set1: HashSet<String> = get_words_from_fragment_string(&joined1).into_iter().collect();
+    let set2: HashSet<String> = get_words_from_fragment_string(&joined2).into_iter().collect();
+
+    let jaccard = calculate_jaccard_similarity(&set1, &set2);
+    let levenshtein = calculate_normalized_levenshtein(&joined1, &joined2);
+
+    // Kombinasi berbobot
+    (jaccard * 0.6) + (levenshtein * 0.4)
+}
+
+fn calculate_jaccard_similarity(set1: &HashSet<String>, set2: &HashSet<String>) -> f32 {
+    if set1.is_empty() && set2.is_empty() {
+        return 1.0;
+    }
+    let intersection = set1.intersection(set2).count();
+    let union = set1.len() + set2.len() - intersection;
+
+    if union == 0 {
+        return 0.0;
+    }
+    intersection as f32 / union as f32
+}
+
+
+
+/// Mendapatkan semua verse_key berdasarkan cakupan (QuizScope)
+pub fn get_verse_keys_in_scope(filter: &QuizFilter) -> Result<Vec<String>> {
+    let mut keys = Vec::new();
+
+    for (chapter_id, verses) in GLOBAL_DATA.verses.iter() {
+        for verse in verses {
+            let include = match &filter.scope {
+                QuizScope::BySurah { surah_id } => chapter_id == surah_id,
+                QuizScope::ByJuz { juz_numbers } => {
+                    juz_numbers.contains(&verse.juz_number)
+                }
+                QuizScope::All => true,
+            };
+
+            if include {
+                keys.push(verse.verse_key.clone());
+            }
+        }
+    }
+
+    Ok(keys)
+}
+
+/// Membagi teks Utsmani menjadi kata-kata individual berbasis spasi.
+/// Biasanya digunakan untuk deduplikasi opsi jawaban kuis.
+pub fn get_words_from_fragment_string(fragment: &str) -> Vec<String> {
+    fragment
+        .split_whitespace()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect()
+}
+
+pub fn remove_arabic_numbers(input: &str) -> String {
+    input
+        .chars()
+        .filter(|c| !matches!(c, '٠'..='٩')) // Unicode Arabic-Indic digits
+        .collect()
+}
+
+pub fn normalize_text(input: &str) -> String {
+    let no_numbers = remove_arabic_numbers(input);
+    no_numbers
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+pub fn get_decoy_fragments(
+    count: usize,
+    word_count: usize,
+    correct_text: &str,
+    keys_in_scope: &[String],
+) -> Vec<String> {
+    let mut rng = thread_rng();
+    let mut candidates = Vec::new();
+    let normalized_target = normalize_text(correct_text);
+    let mut used_texts = HashSet::new();
+    used_texts.insert(normalized_target.clone());
+
+    for key in keys_in_scope {
+        if let Some(verse) = get_verse_details_by_key(key) {
+            let words: Vec<String> = verse
+                .word_ids
+                .iter()
+                .filter_map(|id| GLOBAL_DATA.words.data.get(id))
+                .map(|w| w.text_uthmani.clone())
+                .collect();
+
+            if words.len() < word_count {
+                continue;
+            }
+
+            for i in 0..=words.len() - word_count {
+                let slice = &words[i..i + word_count];
+                let raw = slice.join(" ");
+                let normalized = normalize_text(&raw);
+
+                if !used_texts.contains(&normalized) {
+                    candidates.push(normalized.clone());
+                    used_texts.insert(normalized);
+                    if candidates.len() == count {
+                        return candidates;
+                    }
+                }
+            }
+        }
+    }
+
+    candidates.shuffle(&mut rng);
+    candidates.truncate(count);
+    candidates
+}
+
+
+
+fn calculate_normalized_levenshtein(s1: &str, s2: &str) -> f32 {
+    let distance = levenshtein(s1, s2);
+    let max_len = s1.len().max(s2.len());
+    if max_len == 0 {
+        return 1.0;
+    }
+    1.0 - (distance as f32 / max_len as f32)
 }

@@ -38,7 +38,7 @@ pub fn get_all_juzs() -> Vec<Juz> {
 pub fn get_page_from_verse_id(verse_id: u32) -> u32 {
     // info!("Mencari page_number untuk verse_id: {}", verse_id);
 
-    for chapter_verses in GLOBAL_DATA.verses_by_chapter.values() {
+    for chapter_verses in GLOBAL_DATA.verses.values() {
         for verse in chapter_verses {
             if verse.id == verse_id {
                 return verse.page_number;
@@ -63,7 +63,7 @@ pub fn get_all_juzs_with_page() -> Vec<JuzWithPage> {
         }
 
         let page = engine_data
-            .verses_by_chapter
+            .verses
             .values()
             .flatten()
             .find(|v| v.id == juz.first_verse_id)
@@ -86,12 +86,7 @@ pub fn get_all_juzs_with_page() -> Vec<JuzWithPage> {
 
 #[frb]
 pub async fn get_mushaf_page_context_info(page_number: i32) -> anyhow::Result<MushafPageInfo> {
-    // Menggunakan anyhow::Result
-    info!(
-        "Mendapatkan info kontekstual untuk halaman Mushaf: {}",
-        page_number
-    );
-
+    info!("Mendapatkan info kontekstual untuk halaman Mushaf: {}", page_number);
     let engine_data = &GLOBAL_DATA;
     let pack_state_guard = PACK_STATE.lock().unwrap();
     let mushaf_bundle = pack_state_guard
@@ -102,132 +97,49 @@ pub async fn get_mushaf_page_context_info(page_number: i32) -> anyhow::Result<Mu
     let mut juz_number = 0;
     let mut next_page_route_text = "".to_string();
 
-    let current_glyphs: Option<&Vec<GlyphPosition>> = mushaf_bundle
-        .index
-        .pages
+    // Ambil glyph dari halaman saat ini
+    let current_glyphs = mushaf_bundle.index.pages
         .get(&(page_number as u16))
         .map(|entry| &entry.glyphs);
 
     if let Some(glyphs) = current_glyphs {
-        if let Some(first_glyph_on_page) = glyphs
-            .iter()
-            .min_by_key(|&g| (g.line_number as u32, g.word_position as u32))
-        {
-            // Konversi ke u32
-            // Ambil ID Surah dan Ayat, konversi ke u32
-            let current_surah_id_from_glyph: u32 = first_glyph_on_page.sura as u32;
-            let current_ayah_number: u32 = first_glyph_on_page.ayah as u32;
+        if let Some(first_glyph) = glyphs.iter().min_by_key(|g| (g.line_number as u32, g.word_position as u32)) {
+            let surah_id = first_glyph.sura as u32;
+            let ayah_number = first_glyph.ayah as u32;
 
-            // Ambil Nama Surah Arab dari GLOBAL_DATA.chapters
-            // Chapter.id adalah u32, jadi bandingkan dengan u32
-            if let Some(chapter_details) = engine_data
-                .chapters
-                .chapters
-                .iter()
-                .find(|c| c.id == current_surah_id_from_glyph)
-            {
-                surah_name_arabic = chapter_details.name_arabic.clone();
-            } else {
-                warn!(
-                    "Detail chapter tidak ditemukan di GLOBAL_DATA untuk surah ID: {}",
-                    current_surah_id_from_glyph
-                );
+            // Ambil nama surah
+            if let Some(chapter) = engine_data.chapters.chapters.iter().find(|c| c.id == surah_id) {
+                surah_name_arabic = chapter.name_arabic.clone();
             }
 
-            // Ambil Nomor Juz dari ayat pertama di halaman ini
-            // engine_data.verses_by_chapter adalah HashMap<u32, Vec<Verse>>
-            // Verse.verse_number adalah u32
-            // Verse.juz_number adalah u32
-            if let Some(chapter_verses) = engine_data
-                .verses_by_chapter
-                .get(&current_surah_id_from_glyph)
-            {
-                if let Some(current_verse) = chapter_verses
-                    .iter()
-                    .find(|v| v.verse_number == current_ayah_number)
-                {
-                    juz_number = current_verse.juz_number; // Langsung ambil u32
-                } else {
-                    warn!(
-                        "Ayat {} tidak ditemukan di GLOBAL_DATA untuk surah {}.",
-                        current_ayah_number, current_surah_id_from_glyph
-                    );
+            // Ambil juz dari verse yang cocok
+            if let Some(verses) = engine_data.verses.get(&surah_id) {
+                if let Some(verse) = verses.iter().find(|v| v.verse_number == ayah_number) {
+                    juz_number = verse.juz_number;
                 }
-            } else {
-                warn!(
-                    "Chapter {} tidak ditemukan di GLOBAL_DATA.verses_by_chapter.",
-                    current_surah_id_from_glyph
-                );
             }
-        } else {
-            warn!(
-                "Tidak ada glyph yang valid ditemukan di halaman {}.",
-                page_number
-            );
         }
-    } else {
-        warn!(
-            "Metadata glyph tidak ditemukan di PACK_STATE untuk halaman {}.",
-            page_number
-        );
     }
 
-    let next_page_number = page_number + 1; // page_number input adalah i32
-    let next_glyphs: Option<&Vec<GlyphPosition>> = mushaf_bundle
-        .index
-        .pages
+    // Ambil kata pertama dan kedua dari halaman berikutnya
+    let next_page_number = page_number + 1;
+    let next_glyphs = mushaf_bundle.index.pages
         .get(&(next_page_number as u16))
         .map(|entry| &entry.glyphs);
 
     if let Some(glyphs) = next_glyphs {
-        if !glyphs.is_empty() {
-            let first_glyph_on_next_page_option = glyphs
-                .iter()
-                .min_by_key(|&g| (g.line_number as u32, g.word_position as u32)); // Konversi ke u32
+        if let Some(first_glyph) = glyphs.iter().min_by_key(|g| (g.line_number as u32, g.word_position as u32)) {
+            let word_key = format!("{}:{}:{}", first_glyph.sura, first_glyph.ayah, first_glyph.word_position);
 
-            if let Some(glyph) = first_glyph_on_next_page_option {
-                if (glyph.page_number as i32) == next_page_number {
-                    // page_number di GlyphPosition adalah u16, next_page_number adalah i32
-                    let next_glyph_sura: u32 = glyph.sura as u32;
-                    let next_glyph_ayah: u32 = glyph.ayah as u32;
+            if let Some(word) = engine_data.words.data.get(&word_key) {
+                next_page_route_text = word.text_uthmani.clone();
 
-                    if let Some(next_chapter_verses) =
-                        engine_data.verses_by_chapter.get(&next_glyph_sura)
-                    {
-                        if let Some(next_verse) = next_chapter_verses
-                            .iter()
-                            .find(|v| v.verse_number == next_glyph_ayah)
-                        {
-                            if !next_verse.words.is_empty() {
-                                next_page_route_text = next_verse.words[0].text_uthmani.clone();
-                                if next_verse.words.len() > 1 {
-                                    next_page_route_text +=
-                                        &format!(" {}", next_verse.words[1].text_uthmani);
-                                }
-                            } else {
-                                warn!(
-                                    "Ayat berikutnya kosong kata untuk halaman {}.",
-                                    next_page_number
-                                );
-                            }
-                        } else {
-                            warn!("Detail verse tidak ditemukan di GLOBAL_DATA untuk halaman berikutnya {}.", next_page_number);
-                        }
-                    } else {
-                        warn!("Chapter {} tidak ditemukan di GLOBAL_DATA.verses_by_chapter untuk halaman berikutnya.", next_glyph_sura);
-                    }
-                } else {
-                    warn!("Glyph pertama yang ditemukan di PACK_STATE untuk halaman {} bukan dari halaman itu sendiri.", next_page_number);
+                let next_word_key = format!("{}:{}:{}", first_glyph.sura, first_glyph.ayah, first_glyph.word_position + 1);
+                if let Some(next_word) = engine_data.words.data.get(&next_word_key) {
+                    next_page_route_text += &format!(" {}", next_word.text_uthmani);
                 }
-            } else {
-                warn!("Tidak ada glyph valid yang ditemukan di PACK_STATE untuk halaman berikutnya {}.", next_page_number);
             }
         }
-    } else {
-        warn!(
-            "Metadata glyph tidak ditemukan di PACK_STATE untuk halaman berikutnya {}.",
-            next_page_number
-        );
     }
 
     Ok(MushafPageInfo {
@@ -235,10 +147,7 @@ pub async fn get_mushaf_page_context_info(page_number: i32) -> anyhow::Result<Mu
         juz_number,
         page_number: page_number as u32,
         next_page_route_text,
-        
-    }) 
-
-    // Ok(MushafPageInfo { surah_name_arabic: "contoh".to_string(), juz_number: "1".to_string(), page_number: "1".to_string(), next_page_route_text: "2".to_string() })
+    })
 }
 
 //// buatkan get_chapter_details_by_page_number(page_number: u32) -> Option<Chapter>

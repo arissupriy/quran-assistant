@@ -1,0 +1,136 @@
+[
+  {
+    "id": 1,
+    "verseNumber": 1,
+    "verseKey": "1:1",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:1:1",
+      "1:1:2",
+      "1:1:3",
+      "1:1:4",
+      "1:1:5"
+    ]
+  },
+  {
+    "id": 2,
+    "verseNumber": 2,
+    "verseKey": "1:2",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:2:1",
+      "1:2:2",
+      "1:2:3",
+      "1:2:4",
+      "1:2:5"
+    ]
+  },
+  {
+    "id": 3,
+    "verseNumber": 3,
+    "verseKey": "1:3",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:3:1",
+      "1:3:2",
+      "1:3:3"
+    ]
+  },
+  {
+    "id": 4,
+    "verseNumber": 4,
+    "verseKey": "1:4",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:4:1",
+      "1:4:2",
+      "1:4:3",
+      "1:4:4"
+    ]
+  },
+  {
+    "id": 5,
+    "verseNumber": 5,
+    "verseKey": "1:5",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:5:1",
+      "1:5:2",
+      "1:5:3",
+      "1:5:4",
+      "1:5:5"
+    ]
+  },
+  {
+    "id": 6,
+    "verseNumber": 6,
+    "verseKey": "1:6",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:6:1",
+      "1:6:2",
+      "1:6:3",
+      "1:6:4"
+    ]
+  },
+  {
+    "id": 7,
+    "verseNumber": 7,
+    "verseKey": "1:7",
+    "hizbNumber": 1,
+    "rubElHizbNumber": 1,
+    "rukuNumber": 1,
+    "manzilNumber": 1,
+    "sajdahNumber": null,
+    "pageNumber": 1,
+    "juzNumber": 1,
+    "wordIds": [
+      "1:7:1",
+      "1:7:2",
+      "1:7:3",
+      "1:7:4",
+      "1:7:5",
+      "1:7:6",
+      "1:7:7",
+      "1:7:8",
+      "1:7:9",
+      "1:7:10"
+    ]
+  }
+]
