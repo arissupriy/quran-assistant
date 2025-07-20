@@ -5,6 +5,7 @@ import 'package:quran_assistant/providers/quiz_provider.dart';
 import 'package:quran_assistant/pages/quiz/quiz_summary_page.dart';
 import 'package:quran_assistant/pages/quiz/quiz_verse_order_page.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
+import 'package:quran_assistant/utils/quiz_uitls.dart';
 
 class QuizPlay extends ConsumerStatefulWidget {
   const QuizPlay({super.key});
@@ -100,6 +101,16 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
       );
     }
 
+    final titleAppbar = quizType == 'verse_order'
+        ? 'Urutkan Ayat'
+        : quizType == 'verse_previous'
+            ? 'Isi Bagian Ayat'
+            : quizType == 'verse_completion'
+                ? 'Lanjutkan Ayat'
+                : quizType == 'fragment_completion'
+                    ? 'Lengkapi Fragmen'
+                    : 'Kuis';
+
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -140,7 +151,7 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
-          title: Text('Kuis', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
+          title: Text(titleAppbar, style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
           centerTitle: true,
           backgroundColor: AppTheme.backgroundColor,
           elevation: 0,
@@ -212,8 +223,8 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
                           textDirection: TextDirection.rtl,
                           child: Text(
                             quizType == 'verse_previous'
-                                ? '${currentQuestion.questionTextPart1} ...'
-                                : '${currentQuestion.questionTextPart1} ______ ${currentQuestion.questionTextPart2}',
+                                ? '${removeArabicNumbers(currentQuestion.questionTextPart1)} ...'
+                                : '${removeArabicNumbers(currentQuestion.questionTextPart1)} ______ ${removeArabicNumbers(currentQuestion.questionTextPart2)}',
                             style: TextStyle(
                               fontSize: 20,
                               height: 2,
@@ -272,7 +283,7 @@ class _QuizPlayState extends ConsumerState<QuizPlay> {
                             child: Directionality(
                               textDirection: TextDirection.rtl,
                               child: Text(
-                                option.text,
+                                removeArabicNumbers(option.text),
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'UthmaniHafs',

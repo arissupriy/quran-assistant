@@ -11,14 +11,14 @@ class QuizPage extends StatelessWidget {
     final quizTypes = [
       {
         'type': 'verse_completion',
-        'title': 'Melengkapi Ayat',
+        'title': 'Melanjutkan Ayat',
         'description':
             'Lengkapi ayat berikutnya dari potongan ayat sebelumnya.',
         'icon': Icons.short_text_rounded,
       },
       {
         'type': 'fragment_completion',
-        'title': 'Melengkapi Fragmen',
+        'title': 'Melengkapi Ayat',
         'description': 'Tebak bagian ayat yang hilang dari satu ayat panjang.',
         'icon': Icons.edit_note_rounded,
       },

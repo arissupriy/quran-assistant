@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_assistant/pages/quiz/quiz_summary_page.dart';
 import 'package:quran_assistant/providers/quiz_provider.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
+import 'package:quran_assistant/utils/quiz_uitls.dart';
 
 class VerseOrderQuizPage extends ConsumerStatefulWidget {
   const VerseOrderQuizPage({super.key});
@@ -94,12 +95,7 @@ class _VerseOrderQuizPageState extends ConsumerState<VerseOrderQuizPage> {
         : shuffledVerses;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Urutkan Ayat'),
-        backgroundColor: AppTheme.backgroundColor,
-        foregroundColor: AppTheme.textColor,
-        elevation: 0,
-      ),
+     
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -129,8 +125,9 @@ class _VerseOrderQuizPageState extends ConsumerState<VerseOrderQuizPage> {
                       title: Directionality(
                         textDirection: TextDirection.rtl,
                         child: Text(
-                          verse,
-                          style: const TextStyle(fontFamily: 'UthmaniHafs'),
+                          removeArabicNumbers(verse),
+                          style: const TextStyle(fontFamily: 'UthmaniHafs', fontSize: 20),
+                          
                         ),
                       ),
                       trailing: const Icon(Icons.drag_handle),
