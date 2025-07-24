@@ -5,7 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:quran_assistant/pages/mushaf_detail_page.dart';
+import 'package:quran_assistant/main_screen.dart';
+import 'package:quran_assistant/pages/mushaf/mushaf_detail_page.dart';
 import 'package:quran_assistant/providers/download_progress_provider.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -93,10 +94,7 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => MushafDetailPage(
-          pageNumber: widget.initialPage ?? 1,
-        ),
-      ),
+        builder: (_) => MainScreen()),
     );
   }
 

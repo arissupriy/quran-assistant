@@ -8,6 +8,8 @@ pub mod quiz_utils;
 
 pub mod search_engine;
 
+pub mod whisper_loader;
+
 
 // Import EngineData dari modul engine_data_loader
 pub mod engine_data_assets;

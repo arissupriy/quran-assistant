@@ -1,92 +1,110 @@
 {
   "ham_wasl": {
-    "name": "ham_wasl",
-    "description": "",
-    "alias": ""
+    "name": "Hamzatul Washl",
+    "alias": "Hamzah Washal",
+    "description": "Hamzah yang dibaca jika berada di awal bacaan dan dihilangkan jika berada di tengah. <b>Contoh:</b> <i>ٱسْمِ ٱللَّهِ</i> dibaca 'Bismillah', bukan 'Ismillah'.",
+    "color": "#00796B"
   },
   "laam_shamsiyah": {
-    "name": "laam_shamsiyah",
-    "description": "",
-    "alias": ""
+    "name": "Lam Syamsiyah",
+    "alias": "Lam Syamsiyah",
+    "description": "Lam yang tidak dibaca ketika bertemu huruf-huruf syamsiyah. <b>Contoh:</b> <i>ٱلشَّمْس</i> dibaca 'asy-syams'.",
+    "color": "#00897B"
   },
   "madda_normal": {
-    "name": "madda_normal",
-    "description": "",
-    "alias": ""
+    "name": "Mad Thabi'i",
+    "alias": "Mad Thobi'i",
+    "description": "Mad asli yang dibaca 2 harakat ketika huruf mad bertemu tanpa sebab hamzah atau sukun. <b>Contoh:</b> <i>قَالَ</i>.",
+    "color": "#009688"
   },
   "madda_permissible": {
-    "name": "madda_permissible",
-    "description": "",
-    "alias": ""
+    "name": "Mad Jaiz Munfasil",
+    "alias": "Mad Jaiz Munfashil",
+    "description": "Mad yang terjadi jika huruf mad berada di akhir kata dan hamzah di awal kata berikutnya. Dibaca 2–5 harakat. <b>Contoh:</b> <i>فِيٓ أَنْفُسِكُمْ</i>.",
+    "color": "#26A69A"
   },
   "madda_necessary": {
-    "name": "madda_necessary",
-    "description": "",
-    "alias": ""
+    "name": "Mad Lazim",
+    "alias": "Mad Lazim",
+    "description": "Mad yang bertemu huruf bertasydid atau sukun asli. Wajib dibaca panjang 6 harakat. <b>Contoh:</b> <i>الضَّالِّينَ</i>.",
+    "color": "#4DB6AC"
   },
   "idgham_wo_ghunnah": {
-    "name": "idgham_wo_ghunnah",
-    "description": "",
-    "alias": ""
+    "name": "Idgham Bila Ghunnah",
+    "alias": "Idgham Bilaghunnah",
+    "description": "Peleburan huruf nun sukun/tanwin ke huruf lam dan ra tanpa dengung. <b>Contoh:</b> <i>مِن رَّبِّهِمْ</i>.",
+    "color": "#00695C"
   },
   "slnt": {
-    "name": "slnt",
-    "description": "",
-    "alias": ""
+    "name": "Saktah",
+    "alias": "Saktah",
+    "description": "Berhenti sejenak tanpa bernapas di tengah bacaan. Biasanya ditandai dengan huruf kecil atau simbol khusus. <b>Contoh:</b> <i>وَقِيلَ مَنْ ۜ رَاقٍ</i>.",
+    "color": "#004D40"
   },
   "ghunnah": {
-    "name": "ghunnah",
-    "description": "",
-    "alias": ""
+    "name": "Ghunnah",
+    "alias": "Ghunnah",
+    "description": "Dengung suara di hidung selama dua harakat. Terjadi saat ada tasydid pada huruf nun/mim. <b>Contoh:</b> <i>إِنَّ</i>, <i>ثُمَّ</i>.",
+    "color": "#80CBC4"
   },
   "qalaqah": {
-    "name": "qalaqah",
-    "description": "",
-    "alias": ""
+    "name": "Qalqalah",
+    "alias": "Qalqalah",
+    "description": "Pantulan suara saat huruf qalqalah dibaca sukun. Terdiri dari huruf ق ط ب ج د. <b>Contoh:</b> <i>أَحَدٌ</i>.",
+    "color": "#B2DFDB"
   },
   "ikhafa": {
-    "name": "ikhafa",
-    "description": "",
-    "alias": ""
+    "name": "Ikhfa'",
+    "alias": "Ikhfa",
+    "description": "Menyamarkan bunyi nun sukun atau tanwin ketika bertemu huruf ikhfa, disertai ghunnah. <b>Contoh:</b> <i>مِن شَرِّ</i>.",
+    "color": "#00796B"
   },
   "madda_obligatory_monfasel": {
-    "name": "madda_obligatory_monfasel",
-    "description": "",
-    "alias": ""
+    "name": "Mad Wajib Munfasil",
+    "alias": "Mad Wajib Munfashil",
+    "description": "Mad yang terjadi saat huruf mad berada di akhir kata dan hamzah di awal kata setelahnya. Harus dibaca 4–5 harakat.<b>Contoh:</b> <i>إِنَّا أَعْطَيْنَاكَ</i>.",
+    "color": "#26A69A"
   },
   "madda_obligatory_mottasel": {
-    "name": "madda_obligatory_mottasel",
-    "description": "",
-    "alias": ""
+    "name": "Mad Wajib Muttasil",
+    "alias": "Mad Wajib Muttashil",
+    "description": "Mad yang bertemu hamzah dalam satu kata. Harus dibaca panjang 4–5 harakat. <b>Contoh:</b> <i>جَاءَ</i>.",
+    "color": "#4DB6AC"
   },
   "idgham_ghunnah": {
-    "name": "idgham_ghunnah",
-    "description": "",
-    "alias": ""
+    "name": "Idgham Ma'al Ghunnah",
+    "alias": "Idgham Bighunnah",
+    "description": "Peleburan nun sukun/tanwin ke huruf ya, nun, mim, dan wau disertai ghunnah. <b>Contoh:</b> <i>مَن يَقُولُ</i>.",
+    "color": "#00897B"
   },
   "ikhafa_shafawi": {
-    "name": "ikhafa_shafawi",
-    "description": "",
-    "alias": ""
+    "name": "Ikhfa' Syafawi",
+    "alias": "Ikhfa Syafawi",
+    "description": "Menyamarkan mim sukun saat bertemu huruf ba, disertai ghunnah. <b>Contoh:</b> <i>تَرْمِيهِم بِحِجَارَةٍ</i>.",
+    "color": "#009688"
   },
   "idgham_shafawi": {
-    "name": "idgham_shafawi",
-    "description": "",
-    "alias": ""
+    "name": "Idgham Syafawi",
+    "alias": "Idgham Syafawi",
+    "description": "Peleburan mim sukun ke huruf mim berikutnya, disertai ghunnah. <b>Contoh:</b> <i>لَهُمْ مَّغْفِرَةٌ</i>.",
+    "color": "#80CBC4"
   },
   "iqlab": {
-    "name": "iqlab",
-    "description": "",
-    "alias": ""
+    "name": "Iqlab",
+    "alias": "Iqlab",
+    "description": "Perubahan bunyi nun sukun atau tanwin menjadi mim disertai ghunnah saat bertemu huruf ba. <b>Contoh:</b> <i>أَنْبِئْهُمْ</i>.",
+    "color": "#B2DFDB"
   },
   "idgham_mutajanisayn": {
-    "name": "idgham_mutajanisayn",
-    "description": "",
-    "alias": ""
+    "name": "Idgham Mutajanisain",
+    "alias": "Idgham Mutajanisain",
+    "description": "Peleburan dua huruf yang makhraj-nya sama tapi sifatnya berbeda. <b>Contoh:</b> <i>قَدْ تَّبَيَّنَ</i>.",
+    "color": "#004D40"
   },
   "idgham_mutaqaribayn": {
-    "name": "idgham_mutaqaribayn",
-    "description": "",
-    "alias": ""
+    "name": "Idgham Mutaqaribain",
+    "alias": "Idgham Mutaqaribain",
+    "description": "Peleburan dua huruf yang makhraj dan sifatnya mirip. <b>Contoh:</b> <i>يَلْهَثْ ذَّٰلِكَ</i>.",
+    "color": "#00695C"
   }
 }

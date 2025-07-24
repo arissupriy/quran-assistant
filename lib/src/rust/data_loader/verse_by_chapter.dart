@@ -6,6 +6,24 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class TajweedSegment {
+  final String rule;
+  final String text;
+
+  const TajweedSegment({required this.rule, required this.text});
+
+  @override
+  int get hashCode => rule.hashCode ^ text.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TajweedSegment &&
+          runtimeType == other.runtimeType &&
+          rule == other.rule &&
+          text == other.text;
+}
+
 class Translation {
   final String text;
   final Map<String, String> footnotes;
@@ -85,4 +103,81 @@ class Verse {
           juzNumber == other.juzNumber &&
           wordIds == other.wordIds &&
           translations == other.translations;
+}
+
+class VerseDetailWithWords {
+  final Verse verse;
+  final List<Word> words;
+
+  const VerseDetailWithWords({required this.verse, required this.words});
+
+  @override
+  int get hashCode => verse.hashCode ^ words.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is VerseDetailWithWords &&
+          runtimeType == other.runtimeType &&
+          verse == other.verse &&
+          words == other.words;
+}
+
+class Word {
+  final int id;
+  final String wordKey;
+  final int position;
+  final String charTypeName;
+  final String textUthmani;
+  final String textUthmaniSimple;
+  final List<TajweedSegment> textTajweed;
+  final int pageNumber;
+  final int lineNumber;
+  final int chapterId;
+  final int verseId;
+
+  const Word({
+    required this.id,
+    required this.wordKey,
+    required this.position,
+    required this.charTypeName,
+    required this.textUthmani,
+    required this.textUthmaniSimple,
+    required this.textTajweed,
+    required this.pageNumber,
+    required this.lineNumber,
+    required this.chapterId,
+    required this.verseId,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      wordKey.hashCode ^
+      position.hashCode ^
+      charTypeName.hashCode ^
+      textUthmani.hashCode ^
+      textUthmaniSimple.hashCode ^
+      textTajweed.hashCode ^
+      pageNumber.hashCode ^
+      lineNumber.hashCode ^
+      chapterId.hashCode ^
+      verseId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Word &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          wordKey == other.wordKey &&
+          position == other.position &&
+          charTypeName == other.charTypeName &&
+          textUthmani == other.textUthmani &&
+          textUthmaniSimple == other.textUthmaniSimple &&
+          textTajweed == other.textTajweed &&
+          pageNumber == other.pageNumber &&
+          lineNumber == other.lineNumber &&
+          chapterId == other.chapterId &&
+          verseId == other.verseId;
 }

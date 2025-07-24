@@ -15,6 +15,7 @@ import 'api/quran/search.dart';
 import 'api/quran/similarity.dart';
 import 'api/quran/verse.dart';
 import 'api/simple.dart';
+import 'api/whisper.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
@@ -83,6 +84,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Verse dco_decode_box_autoadd_verse(dynamic raw);
 
   @protected
+  VerseDetailWithWords dco_decode_box_autoadd_verse_detail_with_words(
+    dynamic raw,
+  );
+
+  @protected
   Chapter dco_decode_chapter(dynamic raw);
 
   @protected
@@ -128,6 +134,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint32List dco_decode_list_prim_u_32_strict(dynamic raw);
 
   @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
@@ -148,7 +157,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<SearchResult> dco_decode_list_search_result(dynamic raw);
 
   @protected
+  List<TajweedSegment> dco_decode_list_tajweed_segment(dynamic raw);
+
+  @protected
   List<Translation> dco_decode_list_translation(dynamic raw);
+
+  @protected
+  List<Word> dco_decode_list_word(dynamic raw);
 
   @protected
   List<WordResult> dco_decode_list_word_result(dynamic raw);
@@ -184,6 +199,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Verse? dco_decode_opt_box_autoadd_verse(dynamic raw);
+
+  @protected
+  VerseDetailWithWords? dco_decode_opt_box_autoadd_verse_detail_with_words(
+    dynamic raw,
+  );
 
   @protected
   List<String>? dco_decode_opt_list_String(dynamic raw);
@@ -230,6 +250,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SearchResult dco_decode_search_result(dynamic raw);
 
   @protected
+  TajweedSegment dco_decode_tajweed_segment(dynamic raw);
+
+  @protected
   TranslatedName dco_decode_translated_name(dynamic raw);
 
   @protected
@@ -249,6 +272,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Verse dco_decode_verse(dynamic raw);
+
+  @protected
+  VerseDetailWithWords dco_decode_verse_detail_with_words(dynamic raw);
+
+  @protected
+  Word dco_decode_word(dynamic raw);
 
   @protected
   WordResult dco_decode_word_result(dynamic raw);
@@ -304,6 +333,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Verse sse_decode_box_autoadd_verse(SseDeserializer deserializer);
 
   @protected
+  VerseDetailWithWords sse_decode_box_autoadd_verse_detail_with_words(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Chapter sse_decode_chapter(SseDeserializer deserializer);
 
   @protected
@@ -353,6 +387,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer);
 
   @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
@@ -379,7 +416,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<TajweedSegment> sse_decode_list_tajweed_segment(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<Translation> sse_decode_list_translation(SseDeserializer deserializer);
+
+  @protected
+  List<Word> sse_decode_list_word(SseDeserializer deserializer);
 
   @protected
   List<WordResult> sse_decode_list_word_result(SseDeserializer deserializer);
@@ -419,6 +464,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Verse? sse_decode_opt_box_autoadd_verse(SseDeserializer deserializer);
+
+  @protected
+  VerseDetailWithWords? sse_decode_opt_box_autoadd_verse_detail_with_words(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
@@ -475,6 +525,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SearchResult sse_decode_search_result(SseDeserializer deserializer);
 
   @protected
+  TajweedSegment sse_decode_tajweed_segment(SseDeserializer deserializer);
+
+  @protected
   TranslatedName sse_decode_translated_name(SseDeserializer deserializer);
 
   @protected
@@ -494,6 +547,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Verse sse_decode_verse(SseDeserializer deserializer);
+
+  @protected
+  VerseDetailWithWords sse_decode_verse_detail_with_words(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  Word sse_decode_word(SseDeserializer deserializer);
 
   @protected
   WordResult sse_decode_word_result(SseDeserializer deserializer);
@@ -562,6 +623,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_verse(Verse self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_verse_detail_with_words(
+    VerseDetailWithWords self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_chapter(Chapter self, SseSerializer serializer);
 
   @protected
@@ -622,6 +689,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -658,10 +728,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_tajweed_segment(
+    List<TajweedSegment> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_translation(
     List<Translation> self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_list_word(List<Word> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_word_result(
@@ -713,6 +792,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_verse(Verse? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_verse_detail_with_words(
+    VerseDetailWithWords? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
@@ -778,6 +863,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_search_result(SearchResult self, SseSerializer serializer);
 
   @protected
+  void sse_encode_tajweed_segment(
+    TajweedSegment self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_translated_name(
     TranslatedName self,
     SseSerializer serializer,
@@ -800,6 +891,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_verse(Verse self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_verse_detail_with_words(
+    VerseDetailWithWords self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_word(Word self, SseSerializer serializer);
 
   @protected
   void sse_encode_word_result(WordResult self, SseSerializer serializer);

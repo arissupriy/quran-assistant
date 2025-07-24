@@ -53,3 +53,4 @@ final mushafPageInfoProvider = FutureProvider.family<MushafPageInfo, int>((ref, 
 final currentPageInfoProvider = StateProvider<MushafPageInfo?>((ref) => null);
 
 final appBarVisibilityProvider = StateProvider<bool>((ref) => true);
+

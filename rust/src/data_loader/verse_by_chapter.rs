@@ -61,6 +61,11 @@ pub struct Word {
     pub verse_id: u32,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct VerseDetailWithWords {
+    pub verse: Verse,
+    pub words: Vec<Word>,
+}
 
 #[derive(Debug, Serialize, Deserialize, Encode, Decode, Clone, Default)]
 pub struct Translation {

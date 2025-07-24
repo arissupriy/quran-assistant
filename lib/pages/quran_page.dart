@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quran_assistant/pages/mushaf_detail_page.dart';
+import 'package:quran_assistant/pages/mushaf/mushaf_detail_page.dart';
+// import 'package:quran_assistant/pages/mushaf_detail_page.dart';
 import 'package:quran_assistant/pages/mushaf_download_page.dart';
 import 'package:quran_assistant/providers/quran_provider.dart';
 import 'package:quran_assistant/src/rust/data_loader/chapters.dart';

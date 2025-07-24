@@ -41,3 +41,6 @@ Future<String?> getTranslationText({required String verseKey}) => RustLib
 /// Mengembalikan detail objek Word (kata) berdasarkan `word_key`, misalnya "2:1:3"
 Future<Translation?> getWordDetails({required String verseKey}) =>
     RustLib.instance.api.crateApiQuranVerseGetWordDetails(verseKey: verseKey);
+
+Future<VerseDetailWithWords?> getVerseDetails({required String verseKey}) =>
+    RustLib.instance.api.crateApiQuranVerseGetVerseDetails(verseKey: verseKey);

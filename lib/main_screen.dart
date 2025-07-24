@@ -5,6 +5,7 @@ import 'package:quran_assistant/pages/home_page.dart';
 import 'package:quran_assistant/pages/quiz_page.dart';
 import 'package:quran_assistant/pages/more_page.dart';
 import 'package:quran_assistant/pages/quran_page.dart';
+import 'package:quran_assistant/pages/quran_recorder.dart';
 import 'package:quran_assistant/pages/statistics/quran_statistic_page.dart';
 import 'package:quran_assistant/widgets/quran_navigation_widgets.dart';
 
@@ -24,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     const FtsSearchPage(),
     const QuranPage(),
     const QuizPage(),
-    const MorePage(),
+    const MorePage()
   ];
 
   // Daftar judul untuk AppBar

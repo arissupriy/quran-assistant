@@ -15,6 +15,7 @@ import 'api/quran/search.dart';
 import 'api/quran/similarity.dart';
 import 'api/quran/verse.dart';
 import 'api/simple.dart';
+import 'api/whisper.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'data_loader/ayah_texts.dart';
@@ -86,7 +87,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 1829330823;
+  int get rustContentHash => -180218191;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -191,6 +192,10 @@ abstract class RustLibApi extends BaseApi {
     required int verseNumber,
   });
 
+  Future<VerseDetailWithWords?> crateApiQuranVerseGetVerseDetails({
+    required String verseKey,
+  });
+
   Future<String?> crateApiQuranVerseGetVerseTextUthmani({
     required String verseKey,
   });
@@ -210,8 +215,14 @@ abstract class RustLibApi extends BaseApi {
     required QuizFilter filter,
   });
 
+  Future<bool> crateApiWhisperIsWhisperModelLoaded();
+
   Future<void> crateApiEngineLoaderLoadEngineDataFromFlutterAssets({
     required Map<String, Uint8List> map,
+  });
+
+  Future<void> crateApiWhisperLoadWhisperModelFromFlutter({
+    required List<int> data,
   });
 
   Future<bool> crateApiMushafOpenMushafPack({required String path});
@@ -1033,7 +1044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String?> crateApiQuranVerseGetVerseTextUthmani({
+  Future<VerseDetailWithWords?> crateApiQuranVerseGetVerseDetails({
     required String verseKey,
   }) {
     return handler.executeNormal(
@@ -1045,6 +1056,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 26,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_verse_detail_with_words,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiQuranVerseGetVerseDetailsConstMeta,
+        argValues: [verseKey],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiQuranVerseGetVerseDetailsConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_verse_details",
+        argNames: ["verseKey"],
+      );
+
+  @override
+  Future<String?> crateApiQuranVerseGetVerseTextUthmani({
+    required String verseKey,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(verseKey, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 27,
             port: port_,
           );
         },
@@ -1075,7 +1119,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 27,
+            funcId: 28,
             port: port_,
           );
         },
@@ -1105,7 +1149,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 28,
+            funcId: 29,
             port: port_,
           );
         },
@@ -1133,7 +1177,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1158,7 +1202,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 30,
+            funcId: 31,
             port: port_,
           );
         },
@@ -1189,7 +1233,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 31,
+            funcId: 32,
             port: port_,
           );
         },
@@ -1213,6 +1257,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<bool> crateApiWhisperIsWhisperModelLoaded() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 33,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWhisperIsWhisperModelLoadedConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWhisperIsWhisperModelLoadedConstMeta =>
+      const TaskConstMeta(debugName: "is_whisper_model_loaded", argNames: []);
+
+  @override
   Future<void> crateApiEngineLoaderLoadEngineDataFromFlutterAssets({
     required Map<String, Uint8List> map,
   }) {
@@ -1224,7 +1295,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 32,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1248,6 +1319,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiWhisperLoadWhisperModelFromFlutter({
+    required List<int> data,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(data, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 35,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiWhisperLoadWhisperModelFromFlutterConstMeta,
+        argValues: [data],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWhisperLoadWhisperModelFromFlutterConstMeta =>
+      const TaskConstMeta(
+        debugName: "load_whisper_model_from_flutter",
+        argNames: ["data"],
+      );
+
+  @override
   Future<bool> crateApiMushafOpenMushafPack({required String path}) {
     return handler.executeNormal(
       NormalTask(
@@ -1257,7 +1361,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 33,
+            funcId: 36,
             port: port_,
           );
         },
@@ -1287,7 +1391,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 34,
+            funcId: 37,
             port: port_,
           );
         },
@@ -1410,6 +1514,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Verse dco_decode_box_autoadd_verse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_verse(raw);
+  }
+
+  @protected
+  VerseDetailWithWords dco_decode_box_autoadd_verse_detail_with_words(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_verse_detail_with_words(raw);
   }
 
   @protected
@@ -1549,6 +1661,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -1589,9 +1707,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TajweedSegment> dco_decode_list_tajweed_segment(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tajweed_segment).toList();
+  }
+
+  @protected
   List<Translation> dco_decode_list_translation(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_translation).toList();
+  }
+
+  @protected
+  List<Word> dco_decode_list_word(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_word).toList();
   }
 
   @protected
@@ -1679,6 +1809,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Verse? dco_decode_opt_box_autoadd_verse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_verse(raw);
+  }
+
+  @protected
+  VerseDetailWithWords? dco_decode_opt_box_autoadd_verse_detail_with_words(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_verse_detail_with_words(raw);
   }
 
   @protected
@@ -1841,6 +1981,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TajweedSegment dco_decode_tajweed_segment(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return TajweedSegment(
+      rule: dco_decode_String(arr[0]),
+      text: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
   TranslatedName dco_decode_translated_name(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1907,6 +2059,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       juzNumber: dco_decode_u_32(arr[9]),
       wordIds: dco_decode_list_String(arr[10]),
       translations: dco_decode_list_translation(arr[11]),
+    );
+  }
+
+  @protected
+  VerseDetailWithWords dco_decode_verse_detail_with_words(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return VerseDetailWithWords(
+      verse: dco_decode_verse(arr[0]),
+      words: dco_decode_list_word(arr[1]),
+    );
+  }
+
+  @protected
+  Word dco_decode_word(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return Word(
+      id: dco_decode_u_32(arr[0]),
+      wordKey: dco_decode_String(arr[1]),
+      position: dco_decode_u_32(arr[2]),
+      charTypeName: dco_decode_String(arr[3]),
+      textUthmani: dco_decode_String(arr[4]),
+      textUthmaniSimple: dco_decode_String(arr[5]),
+      textTajweed: dco_decode_list_tajweed_segment(arr[6]),
+      pageNumber: dco_decode_u_32(arr[7]),
+      lineNumber: dco_decode_u_32(arr[8]),
+      chapterId: dco_decode_u_32(arr[9]),
+      verseId: dco_decode_u_32(arr[10]),
     );
   }
 
@@ -2029,6 +2214,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Verse sse_decode_box_autoadd_verse(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_verse(deserializer));
+  }
+
+  @protected
+  VerseDetailWithWords sse_decode_box_autoadd_verse_detail_with_words(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_verse_detail_with_words(deserializer));
   }
 
   @protected
@@ -2234,6 +2427,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -2309,6 +2509,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TajweedSegment> sse_decode_list_tajweed_segment(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TajweedSegment>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tajweed_segment(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<Translation> sse_decode_list_translation(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2316,6 +2530,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <Translation>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_translation(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Word> sse_decode_list_word(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Word>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_word(deserializer));
     }
     return ans_;
   }
@@ -2453,6 +2679,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_verse(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  VerseDetailWithWords? sse_decode_opt_box_autoadd_verse_detail_with_words(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_verse_detail_with_words(deserializer));
     } else {
       return null;
     }
@@ -2647,6 +2886,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TajweedSegment sse_decode_tajweed_segment(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_rule = sse_decode_String(deserializer);
+    var var_text = sse_decode_String(deserializer);
+    return TajweedSegment(rule: var_rule, text: var_text);
+  }
+
+  @protected
   TranslatedName sse_decode_translated_name(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_languageName = sse_decode_String(deserializer);
@@ -2713,6 +2960,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       juzNumber: var_juzNumber,
       wordIds: var_wordIds,
       translations: var_translations,
+    );
+  }
+
+  @protected
+  VerseDetailWithWords sse_decode_verse_detail_with_words(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_verse = sse_decode_verse(deserializer);
+    var var_words = sse_decode_list_word(deserializer);
+    return VerseDetailWithWords(verse: var_verse, words: var_words);
+  }
+
+  @protected
+  Word sse_decode_word(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_u_32(deserializer);
+    var var_wordKey = sse_decode_String(deserializer);
+    var var_position = sse_decode_u_32(deserializer);
+    var var_charTypeName = sse_decode_String(deserializer);
+    var var_textUthmani = sse_decode_String(deserializer);
+    var var_textUthmaniSimple = sse_decode_String(deserializer);
+    var var_textTajweed = sse_decode_list_tajweed_segment(deserializer);
+    var var_pageNumber = sse_decode_u_32(deserializer);
+    var var_lineNumber = sse_decode_u_32(deserializer);
+    var var_chapterId = sse_decode_u_32(deserializer);
+    var var_verseId = sse_decode_u_32(deserializer);
+    return Word(
+      id: var_id,
+      wordKey: var_wordKey,
+      position: var_position,
+      charTypeName: var_charTypeName,
+      textUthmani: var_textUthmani,
+      textUthmaniSimple: var_textUthmaniSimple,
+      textTajweed: var_textTajweed,
+      pageNumber: var_pageNumber,
+      lineNumber: var_lineNumber,
+      chapterId: var_chapterId,
+      verseId: var_verseId,
     );
   }
 
@@ -2843,6 +3129,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_box_autoadd_verse(Verse self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_verse(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_verse_detail_with_words(
+    VerseDetailWithWords self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_verse_detail_with_words(self, serializer);
   }
 
   @protected
@@ -3003,6 +3298,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_prim_u_8_loose(
+    List<int> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(
+      self is Uint8List ? self : Uint8List.fromList(self),
+    );
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -3073,6 +3380,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_tajweed_segment(
+    List<TajweedSegment> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tajweed_segment(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_translation(
     List<Translation> self,
     SseSerializer serializer,
@@ -3081,6 +3400,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_translation(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_word(List<Word> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_word(item, serializer);
     }
   }
 
@@ -3207,6 +3535,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_verse(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_verse_detail_with_words(
+    VerseDetailWithWords? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_verse_detail_with_words(self, serializer);
     }
   }
 
@@ -3371,6 +3712,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_tajweed_segment(
+    TajweedSegment self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.rule, serializer);
+    sse_encode_String(self.text, serializer);
+  }
+
+  @protected
   void sse_encode_translated_name(
     TranslatedName self,
     SseSerializer serializer,
@@ -3425,6 +3776,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.juzNumber, serializer);
     sse_encode_list_String(self.wordIds, serializer);
     sse_encode_list_translation(self.translations, serializer);
+  }
+
+  @protected
+  void sse_encode_verse_detail_with_words(
+    VerseDetailWithWords self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_verse(self.verse, serializer);
+    sse_encode_list_word(self.words, serializer);
+  }
+
+  @protected
+  void sse_encode_word(Word self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.id, serializer);
+    sse_encode_String(self.wordKey, serializer);
+    sse_encode_u_32(self.position, serializer);
+    sse_encode_String(self.charTypeName, serializer);
+    sse_encode_String(self.textUthmani, serializer);
+    sse_encode_String(self.textUthmaniSimple, serializer);
+    sse_encode_list_tajweed_segment(self.textTajweed, serializer);
+    sse_encode_u_32(self.pageNumber, serializer);
+    sse_encode_u_32(self.lineNumber, serializer);
+    sse_encode_u_32(self.chapterId, serializer);
+    sse_encode_u_32(self.verseId, serializer);
   }
 
   @protected

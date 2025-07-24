@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1829330823;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -180218191;
 
 // Section: executor
 
@@ -930,6 +930,41 @@ fn wire__crate__api__quran__verse__get_verse_by_chapter_and_verse_number_impl(
         },
     )
 }
+fn wire__crate__api__quran__verse__get_verse_details_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_verse_details",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_verse_key = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(
+                        crate::api::quran::verse::get_verse_details(api_verse_key),
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__quran__verse__get_verse_text_uthmani_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1137,6 +1172,39 @@ fn wire__crate__api__quiz__verse_completion__inner_generate_verse_completion_qui
         },
     )
 }
+fn wire__crate__api__whisper__is_whisper_model_loaded_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "is_whisper_model_loaded",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(crate::api::whisper::is_whisper_model_loaded())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__engine_loader__load_engine_data_from_flutter_assets_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1172,6 +1240,39 @@ fn wire__crate__api__engine_loader__load_engine_data_from_flutter_assets_impl(
                         Ok(output_ok)
                     })(),
                 )
+            }
+        },
+    )
+}
+fn wire__crate__api__whisper__load_whisper_model_from_flutter_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "load_whisper_model_from_flutter",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_data = <Vec<u8>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::whisper::load_whisper_model_from_flutter(api_data)?;
+                    Ok(output_ok)
+                })())
             }
         },
     )
@@ -1602,6 +1703,20 @@ impl SseDecode for Vec<crate::data_loader::search_models::SearchResult> {
     }
 }
 
+impl SseDecode for Vec<crate::data_loader::verse_by_chapter::TajweedSegment> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::data_loader::verse_by_chapter::TajweedSegment>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::data_loader::verse_by_chapter::Translation> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1611,6 +1726,20 @@ impl SseDecode for Vec<crate::data_loader::verse_by_chapter::Translation> {
             ans_.push(
                 <crate::data_loader::verse_by_chapter::Translation>::sse_decode(deserializer),
             );
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::data_loader::verse_by_chapter::Word> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::data_loader::verse_by_chapter::Word>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -1756,6 +1885,21 @@ impl SseDecode for Option<crate::data_loader::verse_by_chapter::Verse> {
             return Some(<crate::data_loader::verse_by_chapter::Verse>::sse_decode(
                 deserializer,
             ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::data_loader::verse_by_chapter::VerseDetailWithWords> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::data_loader::verse_by_chapter::VerseDetailWithWords>::sse_decode(
+                    deserializer,
+                ),
+            );
         } else {
             return None;
         }
@@ -1977,6 +2121,18 @@ impl SseDecode for crate::data_loader::search_models::SearchResult {
     }
 }
 
+impl SseDecode for crate::data_loader::verse_by_chapter::TajweedSegment {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_rule = <String>::sse_decode(deserializer);
+        let mut var_text = <String>::sse_decode(deserializer);
+        return crate::data_loader::verse_by_chapter::TajweedSegment {
+            rule: var_rule,
+            text: var_text,
+        };
+    }
+}
+
 impl SseDecode for crate::data_loader::chapters::TranslatedName {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2057,6 +2213,50 @@ impl SseDecode for crate::data_loader::verse_by_chapter::Verse {
             juz_number: var_juzNumber,
             word_ids: var_wordIds,
             translations: var_translations,
+        };
+    }
+}
+
+impl SseDecode for crate::data_loader::verse_by_chapter::VerseDetailWithWords {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_verse = <crate::data_loader::verse_by_chapter::Verse>::sse_decode(deserializer);
+        let mut var_words =
+            <Vec<crate::data_loader::verse_by_chapter::Word>>::sse_decode(deserializer);
+        return crate::data_loader::verse_by_chapter::VerseDetailWithWords {
+            verse: var_verse,
+            words: var_words,
+        };
+    }
+}
+
+impl SseDecode for crate::data_loader::verse_by_chapter::Word {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <u32>::sse_decode(deserializer);
+        let mut var_wordKey = <String>::sse_decode(deserializer);
+        let mut var_position = <u32>::sse_decode(deserializer);
+        let mut var_charTypeName = <String>::sse_decode(deserializer);
+        let mut var_textUthmani = <String>::sse_decode(deserializer);
+        let mut var_textUthmaniSimple = <String>::sse_decode(deserializer);
+        let mut var_textTajweed =
+            <Vec<crate::data_loader::verse_by_chapter::TajweedSegment>>::sse_decode(deserializer);
+        let mut var_pageNumber = <u32>::sse_decode(deserializer);
+        let mut var_lineNumber = <u32>::sse_decode(deserializer);
+        let mut var_chapterId = <u32>::sse_decode(deserializer);
+        let mut var_verseId = <u32>::sse_decode(deserializer);
+        return crate::data_loader::verse_by_chapter::Word {
+            id: var_id,
+            word_key: var_wordKey,
+            position: var_position,
+            char_type_name: var_charTypeName,
+            text_uthmani: var_textUthmani,
+            text_uthmani_simple: var_textUthmaniSimple,
+            text_tajweed: var_textTajweed,
+            page_number: var_pageNumber,
+            line_number: var_lineNumber,
+            chapter_id: var_chapterId,
+            verse_id: var_verseId,
         };
     }
 }
@@ -2210,33 +2410,51 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        26 => wire__crate__api__quran__verse__get_verse_text_uthmani_impl(
+        26 => wire__crate__api__quran__verse__get_verse_details_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        27 => {
+        27 => wire__crate__api__quran__verse__get_verse_text_uthmani_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        28 => {
             wire__crate__api__quran__verse__get_verse_texts_impl(port, ptr, rust_vec_len, data_len)
         }
-        28 => {
+        29 => {
             wire__crate__api__quran__verse__get_word_details_impl(port, ptr, rust_vec_len, data_len)
         }
-        30 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__quiz__verse_completion__inner_generate_verse_completion_quiz_impl(
+        31 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__quiz__verse_completion__inner_generate_verse_completion_quiz_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        32 => wire__crate__api__engine_loader__load_engine_data_from_flutter_assets_impl(
+        33 => wire__crate__api__whisper__is_whisper_model_loaded_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        33 => wire__crate__api__mushaf__open_mushaf_pack_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__engine_loader__reset_engine_from_flutter_impl(
+        34 => wire__crate__api__engine_loader__load_engine_data_from_flutter_assets_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        35 => wire__crate__api__whisper__load_whisper_model_from_flutter_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        36 => wire__crate__api__mushaf__open_mushaf_pack_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__engine_loader__reset_engine_from_flutter_impl(
             port,
             ptr,
             rust_vec_len,
@@ -2264,7 +2482,7 @@ fn pde_ffi_dispatcher_sync_impl(
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -2633,6 +2851,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::search_models::Search
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::data_loader::verse_by_chapter::TajweedSegment {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.rule.into_into_dart().into_dart(),
+            self.text.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::data_loader::verse_by_chapter::TajweedSegment
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::verse_by_chapter::TajweedSegment>
+    for crate::data_loader::verse_by_chapter::TajweedSegment
+{
+    fn into_into_dart(self) -> crate::data_loader::verse_by_chapter::TajweedSegment {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::data_loader::chapters::TranslatedName {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -2702,6 +2941,57 @@ impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::verse_by_chapter::Ver
     for crate::data_loader::verse_by_chapter::Verse
 {
     fn into_into_dart(self) -> crate::data_loader::verse_by_chapter::Verse {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::data_loader::verse_by_chapter::VerseDetailWithWords {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.verse.into_into_dart().into_dart(),
+            self.words.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::data_loader::verse_by_chapter::VerseDetailWithWords
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::verse_by_chapter::VerseDetailWithWords>
+    for crate::data_loader::verse_by_chapter::VerseDetailWithWords
+{
+    fn into_into_dart(self) -> crate::data_loader::verse_by_chapter::VerseDetailWithWords {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::data_loader::verse_by_chapter::Word {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.word_key.into_into_dart().into_dart(),
+            self.position.into_into_dart().into_dart(),
+            self.char_type_name.into_into_dart().into_dart(),
+            self.text_uthmani.into_into_dart().into_dart(),
+            self.text_uthmani_simple.into_into_dart().into_dart(),
+            self.text_tajweed.into_into_dart().into_dart(),
+            self.page_number.into_into_dart().into_dart(),
+            self.line_number.into_into_dart().into_dart(),
+            self.chapter_id.into_into_dart().into_dart(),
+            self.verse_id.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::data_loader::verse_by_chapter::Word
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::verse_by_chapter::Word>
+    for crate::data_loader::verse_by_chapter::Word
+{
+    fn into_into_dart(self) -> crate::data_loader::verse_by_chapter::Word {
         self
     }
 }
@@ -2993,12 +3283,32 @@ impl SseEncode for Vec<crate::data_loader::search_models::SearchResult> {
     }
 }
 
+impl SseEncode for Vec<crate::data_loader::verse_by_chapter::TajweedSegment> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::data_loader::verse_by_chapter::TajweedSegment>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::data_loader::verse_by_chapter::Translation> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::data_loader::verse_by_chapter::Translation>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::data_loader::verse_by_chapter::Word> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::data_loader::verse_by_chapter::Word>::sse_encode(item, serializer);
         }
     }
 }
@@ -3110,6 +3420,18 @@ impl SseEncode for Option<crate::data_loader::verse_by_chapter::Verse> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::data_loader::verse_by_chapter::Verse>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::data_loader::verse_by_chapter::VerseDetailWithWords> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::data_loader::verse_by_chapter::VerseDetailWithWords>::sse_encode(
+                value, serializer,
+            );
         }
     }
 }
@@ -3281,6 +3603,14 @@ impl SseEncode for crate::data_loader::search_models::SearchResult {
     }
 }
 
+impl SseEncode for crate::data_loader::verse_by_chapter::TajweedSegment {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.rule, serializer);
+        <String>::sse_encode(self.text, serializer);
+    }
+}
+
 impl SseEncode for crate::data_loader::chapters::TranslatedName {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3341,6 +3671,34 @@ impl SseEncode for crate::data_loader::verse_by_chapter::Verse {
             self.translations,
             serializer,
         );
+    }
+}
+
+impl SseEncode for crate::data_loader::verse_by_chapter::VerseDetailWithWords {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::data_loader::verse_by_chapter::Verse>::sse_encode(self.verse, serializer);
+        <Vec<crate::data_loader::verse_by_chapter::Word>>::sse_encode(self.words, serializer);
+    }
+}
+
+impl SseEncode for crate::data_loader::verse_by_chapter::Word {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.word_key, serializer);
+        <u32>::sse_encode(self.position, serializer);
+        <String>::sse_encode(self.char_type_name, serializer);
+        <String>::sse_encode(self.text_uthmani, serializer);
+        <String>::sse_encode(self.text_uthmani_simple, serializer);
+        <Vec<crate::data_loader::verse_by_chapter::TajweedSegment>>::sse_encode(
+            self.text_tajweed,
+            serializer,
+        );
+        <u32>::sse_encode(self.page_number, serializer);
+        <u32>::sse_encode(self.line_number, serializer);
+        <u32>::sse_encode(self.chapter_id, serializer);
+        <u32>::sse_encode(self.verse_id, serializer);
     }
 }
 

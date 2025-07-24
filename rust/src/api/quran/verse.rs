@@ -4,7 +4,7 @@ use flutter_rust_bridge::frb;
 
 use crate::GLOBAL_DATA;
 use crate::data_loader::ayah_texts::AyahText;
-use crate::data_loader::verse_by_chapter::{Translation, Verse, Word};
+use crate::data_loader::verse_by_chapter::{Translation, Verse, VerseDetailWithWords, Word};
 use log::{debug, info, warn};
 
 #[frb]
@@ -110,3 +110,36 @@ pub fn get_word_details(verse_key: String) -> Option<Translation> {
     let engine_data = &GLOBAL_DATA;
     engine_data.translation.get(&verse_key).cloned()
 }
+
+#[frb]
+pub fn get_verse_details(verse_key: String) -> Option<VerseDetailWithWords> {
+    // Parse verse_key seperti "2:1"
+    let parts: Vec<&str> = verse_key.split(':').collect();
+    if parts.len() != 2 {
+        return None;
+    }
+
+    let chapter_id: u32 = parts[0].parse().ok()?;
+    let verse_number: u32 = parts[1].parse().ok()?;
+
+    // Ambil vector verse dari GLOBAL_DATA
+    let verses_in_chapter = GLOBAL_DATA.verses.get(&chapter_id)?;
+
+    // Cari verse dengan verse_number yang cocok
+    let verse = verses_in_chapter
+        .iter()
+        .find(|v| v.verse_number == verse_number)?
+        .clone();
+
+    // Ambil semua Word berdasarkan word_ids dari verse
+    let mut words = Vec::new();
+    for word_id in &verse.word_ids {
+        if let Some(word) = GLOBAL_DATA.words.data.get(word_id) {
+            words.push(word.clone());
+        }
+    }
+
+    Some(VerseDetailWithWords { verse, words })
+}
+
+
