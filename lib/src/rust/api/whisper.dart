@@ -6,6 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `map_whisper_err`, `run_full`
+
 /// Flutter kirim GGML sebagai bytes (model sudah diunduh)
 Future<void> loadWhisperModelFromFlutter({required List<int> data}) =>
     RustLib.instance.api.crateApiWhisperLoadWhisperModelFromFlutter(data: data);
@@ -13,3 +15,18 @@ Future<void> loadWhisperModelFromFlutter({required List<int> data}) =>
 /// Cek apakah model sudah dimuat
 Future<bool> isWhisperModelLoaded() =>
     RustLib.instance.api.crateApiWhisperIsWhisperModelLoaded();
+
+/// Transcribe audio from 16-bit PCM mono samples at a given sample rate.
+/// - `pcm_s16_mono` is little-endian i16 samples (e.g., from recorder)
+/// - `sample_rate` typically 16000
+Future<String> transcribePcm({
+  required List<int> pcmS16Mono,
+  required int sampleRate,
+}) => RustLib.instance.api.crateApiWhisperTranscribePcm(
+  pcmS16Mono: pcmS16Mono,
+  sampleRate: sampleRate,
+);
+
+/// Transcribe audio from WAV bytes. Supports PCM mono/stereo; will downmix to mono.
+Future<String> transcribeWavBytes({required List<int> wavBytes}) =>
+    RustLib.instance.api.crateApiWhisperTranscribeWavBytes(wavBytes: wavBytes);

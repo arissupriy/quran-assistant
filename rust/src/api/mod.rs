@@ -6,5 +6,6 @@ pub mod quiz;
 
 pub mod engine_loader;
 pub mod whisper;
+pub mod recorder;
 
 // pub mod database;
