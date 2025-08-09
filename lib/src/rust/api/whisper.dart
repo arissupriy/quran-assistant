@@ -6,7 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `map_whisper_err`, `run_full`
+// These functions are ignored because they are not marked as `pub`: `map_whisper_err`, `run_full_params`, `run_full`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
 
 /// Flutter kirim GGML sebagai bytes (model sudah diunduh)
 Future<void> loadWhisperModelFromFlutter({required List<int> data}) =>
@@ -27,6 +28,70 @@ Future<String> transcribePcm({
   sampleRate: sampleRate,
 );
 
+/// Transcribe with parameters: language (e.g., "ar"), no_timestamps for faster streaming,
+/// temperature, and beam_size (>=2 uses beam search; <=1 uses greedy).
+Future<String> transcribePcmWithParams({
+  required List<int> pcmS16Mono,
+  required int sampleRate,
+  String? language,
+  required bool noTimestamps,
+  required double temperature,
+  required int beamSize,
+}) => RustLib.instance.api.crateApiWhisperTranscribePcmWithParams(
+  pcmS16Mono: pcmS16Mono,
+  sampleRate: sampleRate,
+  language: language,
+  noTimestamps: noTimestamps,
+  temperature: temperature,
+  beamSize: beamSize,
+);
+
+/// Transcribe and return segments, optionally with timestamps.
+/// If `with_timestamps` is false, t0_ms/t1_ms may be zero.
+Future<List<FrbSegment>> transcribePcmSegments({
+  required List<int> pcmS16Mono,
+  required int sampleRate,
+  String? language,
+  required bool withTimestamps,
+  required double temperature,
+  required int beamSize,
+}) => RustLib.instance.api.crateApiWhisperTranscribePcmSegments(
+  pcmS16Mono: pcmS16Mono,
+  sampleRate: sampleRate,
+  language: language,
+  withTimestamps: withTimestamps,
+  temperature: temperature,
+  beamSize: beamSize,
+);
+
 /// Transcribe audio from WAV bytes. Supports PCM mono/stereo; will downmix to mono.
 Future<String> transcribeWavBytes({required List<int> wavBytes}) =>
     RustLib.instance.api.crateApiWhisperTranscribeWavBytes(wavBytes: wavBytes);
+
+class FrbSegment {
+  final String text;
+
+  /// start time in milliseconds
+  final int t0Ms;
+
+  /// end time in milliseconds
+  final int t1Ms;
+
+  const FrbSegment({
+    required this.text,
+    required this.t0Ms,
+    required this.t1Ms,
+  });
+
+  @override
+  int get hashCode => text.hashCode ^ t0Ms.hashCode ^ t1Ms.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FrbSegment &&
+          runtimeType == other.runtimeType &&
+          text == other.text &&
+          t0Ms == other.t0Ms &&
+          t1Ms == other.t1Ms;
+}

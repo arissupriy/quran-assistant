@@ -112,6 +112,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double dco_decode_f_32(dynamic raw);
 
   @protected
+  FrbSegment dco_decode_frb_segment(dynamic raw);
+
+  @protected
   GlyphPosition dco_decode_glyph_position(dynamic raw);
 
   @protected
@@ -134,6 +137,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<Chapter> dco_decode_list_chapter(dynamic raw);
+
+  @protected
+  List<FrbSegment> dco_decode_list_frb_segment(dynamic raw);
 
   @protected
   List<GlyphPosition> dco_decode_list_glyph_position(dynamic raw);
@@ -265,6 +271,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QuizScope dco_decode_quiz_scope(dynamic raw);
 
   @protected
+  RecInputPreset dco_decode_rec_input_preset(dynamic raw);
+
+  @protected
   (String, Uint8List) dco_decode_record_string_list_prim_u_8_strict(
     dynamic raw,
   );
@@ -385,6 +394,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double sse_decode_f_32(SseDeserializer deserializer);
 
   @protected
+  FrbSegment sse_decode_frb_segment(SseDeserializer deserializer);
+
+  @protected
   GlyphPosition sse_decode_glyph_position(SseDeserializer deserializer);
 
   @protected
@@ -407,6 +419,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<Chapter> sse_decode_list_chapter(SseDeserializer deserializer);
+
+  @protected
+  List<FrbSegment> sse_decode_list_frb_segment(SseDeserializer deserializer);
 
   @protected
   List<GlyphPosition> sse_decode_list_glyph_position(
@@ -562,6 +577,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QuizScope sse_decode_quiz_scope(SseDeserializer deserializer);
 
   @protected
+  RecInputPreset sse_decode_rec_input_preset(SseDeserializer deserializer);
+
+  @protected
   (String, Uint8List) sse_decode_record_string_list_prim_u_8_strict(
     SseDeserializer deserializer,
   );
@@ -702,6 +720,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_32(double self, SseSerializer serializer);
 
   @protected
+  void sse_encode_frb_segment(FrbSegment self, SseSerializer serializer);
+
+  @protected
   void sse_encode_glyph_position(GlyphPosition self, SseSerializer serializer);
 
   @protected
@@ -724,6 +745,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_chapter(List<Chapter> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_frb_segment(
+    List<FrbSegment> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_glyph_position(
@@ -928,6 +955,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_quiz_scope(QuizScope self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_rec_input_preset(
+    RecInputPreset self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_record_string_list_prim_u_8_strict(

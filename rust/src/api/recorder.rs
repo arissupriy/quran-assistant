@@ -30,6 +30,7 @@ pub struct SharedBuffer {
 }
 
 impl SharedBuffer {
+    #[allow(dead_code)]
     fn push(&self, data: &[i16]) {
         if let Ok(mut buf) = self.inner.lock() { buf.extend_from_slice(data); }
     }
@@ -42,22 +43,33 @@ impl SharedBuffer {
 static REC_BUFFER: OnceCell<SharedBuffer> = OnceCell::new();
 
 #[frb]
+#[derive(Clone, Copy, Debug)]
+pub enum RecInputPreset {
+    VoiceRecognition,
+    Unprocessed,
+}
+
+#[frb]
 pub fn recorder_init() { let _ = REC_BUFFER.set(SharedBuffer::default()); }
 
 #[frb]
 pub fn recorder_take_samples() -> Vec<i16> { REC_BUFFER.get().cloned().unwrap_or_default().take() }
 
 #[frb]
-pub fn recorder_start(sample_rate: i32) -> Result<(), String> {
+pub fn recorder_start(sample_rate: i32, preset: RecInputPreset) -> Result<(), String> {
     #[cfg(target_os = "android")] {
         let buf = REC_BUFFER.get().cloned().unwrap_or_default();
+        let oboe_preset = match preset {
+            RecInputPreset::VoiceRecognition => InputPreset::VoiceRecognition,
+            RecInputPreset::Unprocessed => InputPreset::Unprocessed,
+        };
         let builder = AudioStreamBuilder::default()
             .set_input()
             .set_mono()
             .set_i16()
             .set_sample_rate(sample_rate as i32)
             .set_performance_mode(PerformanceMode::LowLatency)
-            .set_input_preset(InputPreset::VoiceRecognition)
+            .set_input_preset(oboe_preset)
             .set_sharing_mode(SharingMode::Shared)
             .set_callback(MicCallback { buf });
         let mut stream = builder
@@ -68,6 +80,8 @@ pub fn recorder_start(sample_rate: i32) -> Result<(), String> {
         Ok(())
     }
     #[cfg(not(target_os = "android"))] {
+    let _ = sample_rate;
+    let _ = preset;
         Err("Recorder hanya didukung di Android".into())
     }
 }

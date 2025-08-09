@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `push`, `take`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`
 
 Future<void> recorderInit() =>
     RustLib.instance.api.crateApiRecorderRecorderInit();
@@ -15,8 +15,13 @@ Future<void> recorderInit() =>
 Future<Int16List> recorderTakeSamples() =>
     RustLib.instance.api.crateApiRecorderRecorderTakeSamples();
 
-Future<void> recorderStart({required int sampleRate}) =>
-    RustLib.instance.api.crateApiRecorderRecorderStart(sampleRate: sampleRate);
+Future<void> recorderStart({
+  required int sampleRate,
+  required RecInputPreset preset,
+}) => RustLib.instance.api.crateApiRecorderRecorderStart(
+  sampleRate: sampleRate,
+  preset: preset,
+);
 
 Future<void> recorderStop() =>
     RustLib.instance.api.crateApiRecorderRecorderStop();
@@ -26,3 +31,5 @@ abstract class SharedBuffer implements RustOpaqueInterface {
   static Future<SharedBuffer> default_() =>
       RustLib.instance.api.crateApiRecorderSharedBufferDefault();
 }
+
+enum RecInputPreset { voiceRecognition, unprocessed }

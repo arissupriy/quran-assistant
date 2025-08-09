@@ -28,6 +28,78 @@ pub fn transcribe_pcm(pcm_s16_mono: Vec<i16>, _sample_rate: i32) -> Result<Strin
     run_full(&mut state, &pcm_s16_mono)
 }
 
+/// Transcribe with parameters: language (e.g., "ar"), no_timestamps for faster streaming,
+/// temperature, and beam_size (>=2 uses beam search; <=1 uses greedy).
+#[frb]
+pub fn transcribe_pcm_with_params(
+    pcm_s16_mono: Vec<i16>,
+    _sample_rate: i32,
+    language: Option<String>,
+    no_timestamps: bool,
+    temperature: f32,
+    beam_size: i32,
+) -> Result<String, String> {
+    let ctx: &WhisperContext = whisper_loader::get_model().ok_or_else(|| "Model belum dimuat".to_string())?;
+    let mut state = ctx.create_state().map_err(map_whisper_err)?;
+    run_full_params(&mut state, &pcm_s16_mono, language.as_deref(), no_timestamps, temperature, beam_size)
+}
+
+#[frb]
+#[derive(Debug, Clone)]
+pub struct FrbSegment {
+    pub text: String,
+    /// start time in milliseconds
+    pub t0_ms: i32,
+    /// end time in milliseconds
+    pub t1_ms: i32,
+}
+
+/// Transcribe and return segments, optionally with timestamps.
+/// If `with_timestamps` is false, t0_ms/t1_ms may be zero.
+#[frb]
+pub fn transcribe_pcm_segments(
+    pcm_s16_mono: Vec<i16>,
+    _sample_rate: i32,
+    language: Option<String>,
+    with_timestamps: bool,
+    temperature: f32,
+    beam_size: i32,
+) -> Result<Vec<FrbSegment>, String> {
+    let ctx: &WhisperContext = whisper_loader::get_model().ok_or_else(|| "Model belum dimuat".to_string())?;
+    let mut state = ctx.create_state().map_err(map_whisper_err)?;
+
+    let audio: Vec<f32> = pcm_s16_mono.iter().map(|&s| s as f32 / i16::MAX as f32).collect();
+    let strat = if beam_size >= 2 {
+        SamplingStrategy::BeamSearch { beam_size: beam_size as i32, patience: 1.0 }
+    } else {
+        SamplingStrategy::Greedy { best_of: 1 }
+    };
+    let mut params = FullParams::new(strat);
+    params.set_translate(false);
+    if let Some(lang) = language.as_deref() {
+        params.set_language(Some(lang));
+    }
+    params.set_no_timestamps(!with_timestamps);
+    params.set_temperature(temperature);
+
+    state.full(params, &audio).map_err(map_whisper_err)?;
+
+    let n = state.full_n_segments().map_err(map_whisper_err)?;
+    let mut segs = Vec::with_capacity(n as usize);
+    for i in 0..n {
+        let text = state.full_get_segment_text(i).map_err(map_whisper_err)?;
+        let (mut t0_ms, mut t1_ms) = (0, 0);
+        if with_timestamps {
+            let t0 = state.full_get_segment_t0(i).map_err(map_whisper_err)?; // in 10ms units
+            let t1 = state.full_get_segment_t1(i).map_err(map_whisper_err)?;
+            t0_ms = t0 * 10;
+            t1_ms = t1 * 10;
+        }
+    segs.push(FrbSegment { text, t0_ms: t0_ms as i32, t1_ms: t1_ms as i32 });
+    }
+    Ok(segs)
+}
+
 /// Transcribe audio from WAV bytes. Supports PCM mono/stereo; will downmix to mono.
 #[frb]
 pub fn transcribe_wav_bytes(wav_bytes: Vec<u8>) -> Result<String, String> {
@@ -108,6 +180,36 @@ fn run_full(state: &mut WhisperState, pcm_s16_mono: &[i16]) -> Result<String, St
     let num_segments = state.full_n_segments().map_err(map_whisper_err)?;
     let mut text = String::new();
     for i in 0..num_segments {
+        let seg = state.full_get_segment_text(i).map_err(map_whisper_err)?;
+        text.push_str(&seg);
+    }
+    Ok(text)
+}
+
+fn run_full_params(
+    state: &mut WhisperState,
+    pcm_s16_mono: &[i16],
+    language: Option<&str>,
+    no_timestamps: bool,
+    temperature: f32,
+    beam_size: i32,
+) -> Result<String, String> {
+    // Convert i16 PCM to f32
+    let audio: Vec<f32> = pcm_s16_mono.iter().map(|&s| s as f32 / i16::MAX as f32).collect();
+    let strat = if beam_size >= 2 {
+        SamplingStrategy::BeamSearch { beam_size: beam_size as i32, patience: 1.0 }
+    } else {
+        SamplingStrategy::Greedy { best_of: 1 }
+    };
+    let mut params = FullParams::new(strat);
+    params.set_translate(false);
+    if let Some(lang) = language { params.set_language(Some(lang)); }
+    params.set_no_timestamps(no_timestamps);
+    params.set_temperature(temperature);
+    state.full(params, &audio).map_err(map_whisper_err)?;
+    let n = state.full_n_segments().map_err(map_whisper_err)?;
+    let mut text = String::new();
+    for i in 0..n {
         let seg = state.full_get_segment_text(i).map_err(map_whisper_err)?;
         text.push_str(&seg);
     }

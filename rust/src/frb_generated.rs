@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -939638697;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1311851018;
 
 // Section: executor
 
@@ -1403,10 +1403,12 @@ fn wire__crate__api__recorder__recorder_start_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_sample_rate = <i32>::sse_decode(&mut deserializer);
+            let api_preset = <crate::api::recorder::RecInputPreset>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::api::recorder::recorder_start(api_sample_rate)?;
+                    let output_ok =
+                        crate::api::recorder::recorder_start(api_sample_rate, api_preset)?;
                     Ok(output_ok)
                 })())
             }
@@ -1546,6 +1548,96 @@ fn wire__crate__api__whisper__transcribe_pcm_impl(
                 transform_result_sse::<_, String>((move || {
                     let output_ok =
                         crate::api::whisper::transcribe_pcm(api_pcm_s16_mono, api__sample_rate)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__whisper__transcribe_pcm_segments_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "transcribe_pcm_segments",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_pcm_s16_mono = <Vec<i16>>::sse_decode(&mut deserializer);
+            let api__sample_rate = <i32>::sse_decode(&mut deserializer);
+            let api_language = <Option<String>>::sse_decode(&mut deserializer);
+            let api_with_timestamps = <bool>::sse_decode(&mut deserializer);
+            let api_temperature = <f32>::sse_decode(&mut deserializer);
+            let api_beam_size = <i32>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::whisper::transcribe_pcm_segments(
+                        api_pcm_s16_mono,
+                        api__sample_rate,
+                        api_language,
+                        api_with_timestamps,
+                        api_temperature,
+                        api_beam_size,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__whisper__transcribe_pcm_with_params_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "transcribe_pcm_with_params",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_pcm_s16_mono = <Vec<i16>>::sse_decode(&mut deserializer);
+            let api__sample_rate = <i32>::sse_decode(&mut deserializer);
+            let api_language = <Option<String>>::sse_decode(&mut deserializer);
+            let api_no_timestamps = <bool>::sse_decode(&mut deserializer);
+            let api_temperature = <f32>::sse_decode(&mut deserializer);
+            let api_beam_size = <i32>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::whisper::transcribe_pcm_with_params(
+                        api_pcm_s16_mono,
+                        api__sample_rate,
+                        api_language,
+                        api_no_timestamps,
+                        api_temperature,
+                        api_beam_size,
+                    )?;
                     Ok(output_ok)
                 })())
             }
@@ -1705,6 +1797,20 @@ impl SseDecode for f32 {
     }
 }
 
+impl SseDecode for crate::api::whisper::FrbSegment {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_text = <String>::sse_decode(deserializer);
+        let mut var_t0Ms = <i32>::sse_decode(deserializer);
+        let mut var_t1Ms = <i32>::sse_decode(deserializer);
+        return crate::api::whisper::FrbSegment {
+            text: var_text,
+            t0_ms: var_t0Ms,
+            t1_ms: var_t1Ms,
+        };
+    }
+}
+
 impl SseDecode for crate::models::GlyphPosition {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1815,6 +1921,18 @@ impl SseDecode for Vec<crate::data_loader::chapters::Chapter> {
             ans_.push(<crate::data_loader::chapters::Chapter>::sse_decode(
                 deserializer,
             ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::whisper::FrbSegment> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::whisper::FrbSegment>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -2369,6 +2487,18 @@ impl SseDecode for crate::data_loader::quiz_models::QuizScope {
     }
 }
 
+impl SseDecode for crate::api::recorder::RecInputPreset {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::recorder::RecInputPreset::VoiceRecognition,
+            1 => crate::api::recorder::RecInputPreset::Unprocessed,
+            _ => unreachable!("Invalid variant for RecInputPreset: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for (String, Vec<u8>) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2761,7 +2891,19 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         43 => wire__crate__api__whisper__transcribe_pcm_impl(port, ptr, rust_vec_len, data_len),
-        44 => {
+        44 => wire__crate__api__whisper__transcribe_pcm_segments_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        45 => wire__crate__api__whisper__transcribe_pcm_with_params_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        46 => {
             wire__crate__api__whisper__transcribe_wav_bytes_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -2857,6 +2999,28 @@ impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::chapters::Chapter>
     for crate::data_loader::chapters::Chapter
 {
     fn into_into_dart(self) -> crate::data_loader::chapters::Chapter {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::whisper::FrbSegment {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.text.into_into_dart().into_dart(),
+            self.t0_ms.into_into_dart().into_dart(),
+            self.t1_ms.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::whisper::FrbSegment
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::whisper::FrbSegment>
+    for crate::api::whisper::FrbSegment
+{
+    fn into_into_dart(self) -> crate::api::whisper::FrbSegment {
         self
     }
 }
@@ -3148,6 +3312,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::data_loader::quiz_models::QuizScop
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::recorder::RecInputPreset {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::VoiceRecognition => 0.into_dart(),
+            Self::Unprocessed => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::recorder::RecInputPreset
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::recorder::RecInputPreset>
+    for crate::api::recorder::RecInputPreset
+{
+    fn into_into_dart(self) -> crate::api::recorder::RecInputPreset {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::data_loader::search_models::SearchResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3427,6 +3612,15 @@ impl SseEncode for f32 {
     }
 }
 
+impl SseEncode for crate::api::whisper::FrbSegment {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.text, serializer);
+        <i32>::sse_encode(self.t0_ms, serializer);
+        <i32>::sse_encode(self.t1_ms, serializer);
+    }
+}
+
 impl SseEncode for crate::models::GlyphPosition {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3503,6 +3697,16 @@ impl SseEncode for Vec<crate::data_loader::chapters::Chapter> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::data_loader::chapters::Chapter>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::whisper::FrbSegment> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::whisper::FrbSegment>::sse_encode(item, serializer);
         }
     }
 }
@@ -3929,6 +4133,22 @@ impl SseEncode for crate::data_loader::quiz_models::QuizScope {
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseEncode for crate::api::recorder::RecInputPreset {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::recorder::RecInputPreset::VoiceRecognition => 0,
+                crate::api::recorder::RecInputPreset::Unprocessed => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
