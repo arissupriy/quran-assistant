@@ -1,20 +1,25 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:quran_assistant/core/audio/quran_audio_handler.dart';
 import 'package:quran_assistant/core/models/quiz_history.dart';
 import 'package:quran_assistant/core/models/reading_session.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
 import 'package:quran_assistant/engine/init_quran_engine.dart';
 import 'package:quran_assistant/main_screen.dart';
+import 'package:quran_assistant/providers/audio_handler_provider.dart';
 import 'package:quran_assistant/src/rust/frb_generated.dart';
 
-void main() async {
+Future<void> main() async {
   // Set untuk membuat zone errors menjadi non-fatal untuk mengatasi zone mismatch
   BindingBase.debugZoneErrorsAreFatal = false;
-  
+
   // Enhanced error handling untuk Flutter errors
   FlutterError.onError = (FlutterErrorDetails details) {
     debugPrint('🐛 Flutter Error: ${details.exception}');
@@ -30,8 +35,10 @@ void main() async {
   };
 
   runZonedGuarded(() async {
-    // Pastikan binding diinisialisasi dalam zone yang sama
+    // Pastikan binding diinisialisasi dan background audio siap dalam zone yang sama
     WidgetsFlutterBinding.ensureInitialized();
+    await _ensureNotificationPermission();
+    final audioHandler = await _initAudioHandler();
     
     try {
       await RustLib.init();
@@ -95,7 +102,12 @@ void main() async {
     }
 
     debugPrint('🚀 Starting app...');
-    runApp(const ProviderScope(child: MyApp()));
+    runApp(
+      ProviderScope(
+        overrides: [audioHandlerProvider.overrideWithValue(audioHandler)],
+        child: const MyApp(),
+      ),
+    );
     
   }, (Object error, StackTrace stack) {
     debugPrint("❗ Global error caught: $error");
@@ -115,19 +127,62 @@ void main() async {
   });
 }
 
+Future<AudioHandler> _initAudioHandler() async {
+  try {
+    final handler = await AudioService.init(
+      builder: () => QuranAudioHandler(),
+      config: AudioServiceConfig(
+        androidNotificationChannelId: 'quran_assistant.audio',
+        androidNotificationChannelName: 'Audio playback',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ),
+    );
+    debugPrint('✅ AudioService initialized');
+    return handler;
+  } catch (e) {
+    debugPrint('❌ Failed to initialize AudioService: $e');
+    rethrow;
+  }
+}
+
+Future<void> _ensureNotificationPermission() async {
+  if (!Platform.isAndroid) return;
+
+  try {
+    final status = await Permission.notification.status;
+    if (status.isGranted || status.isLimited) {
+      debugPrint('🔔 Notification permission already granted');
+      return;
+    }
+
+    final result = await Permission.notification.request();
+    if (result.isGranted || result.isLimited) {
+      debugPrint('🔔 Notification permission granted');
+    } else if (result.isPermanentlyDenied) {
+      debugPrint('🔔 Notification permission permanently denied');
+    } else {
+      debugPrint('🔔 Notification permission denied');
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to request notification permission: $e');
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Quran Assistant',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme, // Menggunakan tema dari AppTheme
-      home: const MainScreen(),
-      
-      // Enhanced error handling untuk build context
-      builder: (context, child) {
+    return AudioServiceWidget(
+      child: MaterialApp(
+        title: 'Quran Assistant',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme, // Menggunakan tema dari AppTheme
+        home: const MainScreen(),
+        
+        // Enhanced error handling untuk build context
+        builder: (context, child) {
         ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
           debugPrint('🚨 Widget Error: ${errorDetails.exception}');
           
@@ -204,6 +259,7 @@ class MyApp extends StatelessWidget {
         };
         return child ?? const SizedBox();
       },
+      ),
     );
   }
 }

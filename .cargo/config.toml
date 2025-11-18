@@ -1,8 +1,14 @@
 [target.aarch64-linux-android]
 linker = "/home/arissupriy/Android/Sdk/ndk/29.0.13599879/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android23-clang"
+rustflags = [
+	"-Clink-arg=-lc++_shared",
+]
 
 [target.x86_64-linux-android]
 linker = "/home/arissupriy/Android/Sdk/ndk/29.0.13599879/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android23-clang"
+rustflags = [
+	"-Clink-arg=-lc++_shared",
+]
 
 [env]
 ANDROID_NDK = "/home/arissupriy/Android/Sdk/ndk/29.0.13599879"

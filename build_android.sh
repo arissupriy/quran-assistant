@@ -43,7 +43,7 @@ export CMAKE_C_COMPILER_TARGET="aarch64-linux-android23"
 export CMAKE_CXX_COMPILER_TARGET="aarch64-linux-android23"
 export CMAKE_TRY_COMPILE_TARGET_TYPE="STATIC_LIBRARY"
 
-# Bindgen header fix (set keduanya karena whisper-rs-sys ngecek 2 nama var)
+# Bindgen header fix (set keduanya untuk memastikan bindgen menemukan header yang tepat)
 SYSROOT="$TOOLCHAIN/sysroot"
 CLANG_INC="$TOOLCHAIN/lib/clang/20/include"
 

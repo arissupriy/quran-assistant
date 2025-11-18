@@ -33,7 +33,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
-        // Build only 64-bit ABIs to avoid armeabi-v7a issues with whisper-rs-sys
+    // Build only 64-bit ABIs to simplify native publishing and reduce artifact size
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
@@ -47,7 +47,7 @@ android {
         }
     }
 
-    // Ensure libc++_shared.so is packaged; some Rust deps (e.g., whisper/ggml) link against it
+    // Ensure libc++_shared.so is packaged in case native deps require it
     packaging {
         jniLibs {
             // In case multiple plugins bring libc++_shared, prefer the first

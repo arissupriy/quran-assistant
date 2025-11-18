@@ -16,7 +16,6 @@ import 'api/quran/similarity.dart';
 import 'api/quran/verse.dart';
 import 'api/recorder.dart';
 import 'api/simple.dart';
-import 'api/whisper.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
@@ -112,9 +111,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double dco_decode_f_32(dynamic raw);
 
   @protected
-  FrbSegment dco_decode_frb_segment(dynamic raw);
-
-  @protected
   GlyphPosition dco_decode_glyph_position(dynamic raw);
 
   @protected
@@ -139,9 +135,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Chapter> dco_decode_list_chapter(dynamic raw);
 
   @protected
-  List<FrbSegment> dco_decode_list_frb_segment(dynamic raw);
-
-  @protected
   List<GlyphPosition> dco_decode_list_glyph_position(dynamic raw);
 
   @protected
@@ -157,16 +150,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<MatchedAyah> dco_decode_list_matched_ayah(dynamic raw);
 
   @protected
-  List<int> dco_decode_list_prim_i_16_loose(dynamic raw);
-
-  @protected
   Int16List dco_decode_list_prim_i_16_strict(dynamic raw);
 
   @protected
   Uint32List dco_decode_list_prim_u_32_strict(dynamic raw);
-
-  @protected
-  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -394,9 +381,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double sse_decode_f_32(SseDeserializer deserializer);
 
   @protected
-  FrbSegment sse_decode_frb_segment(SseDeserializer deserializer);
-
-  @protected
   GlyphPosition sse_decode_glyph_position(SseDeserializer deserializer);
 
   @protected
@@ -421,9 +405,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Chapter> sse_decode_list_chapter(SseDeserializer deserializer);
 
   @protected
-  List<FrbSegment> sse_decode_list_frb_segment(SseDeserializer deserializer);
-
-  @protected
   List<GlyphPosition> sse_decode_list_glyph_position(
     SseDeserializer deserializer,
   );
@@ -443,16 +424,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<MatchedAyah> sse_decode_list_matched_ayah(SseDeserializer deserializer);
 
   @protected
-  List<int> sse_decode_list_prim_i_16_loose(SseDeserializer deserializer);
-
-  @protected
   Int16List sse_decode_list_prim_i_16_strict(SseDeserializer deserializer);
 
   @protected
   Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer);
-
-  @protected
-  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -720,9 +695,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_32(double self, SseSerializer serializer);
 
   @protected
-  void sse_encode_frb_segment(FrbSegment self, SseSerializer serializer);
-
-  @protected
   void sse_encode_glyph_position(GlyphPosition self, SseSerializer serializer);
 
   @protected
@@ -745,12 +717,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_chapter(List<Chapter> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_frb_segment(
-    List<FrbSegment> self,
-    SseSerializer serializer,
-  );
 
   @protected
   void sse_encode_list_glyph_position(
@@ -780,12 +746,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_list_prim_i_16_loose(
-    List<int> self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_list_prim_i_16_strict(
     Int16List self,
     SseSerializer serializer,
@@ -796,9 +756,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     Uint32List self,
     SseSerializer serializer,
   );
-
-  @protected
-  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(

@@ -16,7 +16,6 @@ import 'api/quran/similarity.dart';
 import 'api/quran/verse.dart';
 import 'api/recorder.dart';
 import 'api/simple.dart';
-import 'api/whisper.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'data_loader/ayah_texts.dart';
@@ -88,7 +87,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -1311851018;
+  int get rustContentHash => -71083690;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -218,14 +217,8 @@ abstract class RustLibApi extends BaseApi {
     required QuizFilter filter,
   });
 
-  Future<bool> crateApiWhisperIsWhisperModelLoaded();
-
   Future<void> crateApiEngineLoaderLoadEngineDataFromFlutterAssets({
     required Map<String, Uint8List> map,
-  });
-
-  Future<void> crateApiWhisperLoadWhisperModelFromFlutter({
-    required List<int> data,
   });
 
   Future<bool> crateApiMushafOpenMushafPack({required String path});
@@ -243,33 +236,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiEngineLoaderResetEngineFromFlutter({
     required Map<String, Uint8List> map,
-  });
-
-  Future<String> crateApiWhisperTranscribePcm({
-    required List<int> pcmS16Mono,
-    required int sampleRate,
-  });
-
-  Future<List<FrbSegment>> crateApiWhisperTranscribePcmSegments({
-    required List<int> pcmS16Mono,
-    required int sampleRate,
-    String? language,
-    required bool withTimestamps,
-    required double temperature,
-    required int beamSize,
-  });
-
-  Future<String> crateApiWhisperTranscribePcmWithParams({
-    required List<int> pcmS16Mono,
-    required int sampleRate,
-    String? language,
-    required bool noTimestamps,
-    required double temperature,
-    required int beamSize,
-  });
-
-  Future<String> crateApiWhisperTranscribeWavBytes({
-    required List<int> wavBytes,
   });
 
   RustArcIncrementStrongCountFnType
@@ -1334,33 +1300,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<bool> crateApiWhisperIsWhisperModelLoaded() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 34,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_bool,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiWhisperIsWhisperModelLoadedConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiWhisperIsWhisperModelLoadedConstMeta =>
-      const TaskConstMeta(debugName: "is_whisper_model_loaded", argNames: []);
-
-  @override
   Future<void> crateApiEngineLoaderLoadEngineDataFromFlutterAssets({
     required Map<String, Uint8List> map,
   }) {
@@ -1372,7 +1311,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 35,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1396,39 +1335,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiWhisperLoadWhisperModelFromFlutter({
-    required List<int> data,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_u_8_loose(data, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 36,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateApiWhisperLoadWhisperModelFromFlutterConstMeta,
-        argValues: [data],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiWhisperLoadWhisperModelFromFlutterConstMeta =>
-      const TaskConstMeta(
-        debugName: "load_whisper_model_from_flutter",
-        argNames: ["data"],
-      );
-
-  @override
   Future<bool> crateApiMushafOpenMushafPack({required String path}) {
     return handler.executeNormal(
       NormalTask(
@@ -1438,7 +1344,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 37,
+            funcId: 35,
             port: port_,
           );
         },
@@ -1465,7 +1371,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 38,
+            funcId: 36,
             port: port_,
           );
         },
@@ -1497,7 +1403,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 39,
+            funcId: 37,
             port: port_,
           );
         },
@@ -1527,7 +1433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 40,
+            funcId: 38,
             port: port_,
           );
         },
@@ -1554,7 +1460,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 41,
+            funcId: 39,
             port: port_,
           );
         },
@@ -1584,7 +1490,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 42,
+            funcId: 40,
             port: port_,
           );
         },
@@ -1603,188 +1509,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "reset_engine_from_flutter",
         argNames: ["map"],
-      );
-
-  @override
-  Future<String> crateApiWhisperTranscribePcm({
-    required List<int> pcmS16Mono,
-    required int sampleRate,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_i_16_loose(pcmS16Mono, serializer);
-          sse_encode_i_32(sampleRate, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 43,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateApiWhisperTranscribePcmConstMeta,
-        argValues: [pcmS16Mono, sampleRate],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiWhisperTranscribePcmConstMeta =>
-      const TaskConstMeta(
-        debugName: "transcribe_pcm",
-        argNames: ["pcmS16Mono", "sampleRate"],
-      );
-
-  @override
-  Future<List<FrbSegment>> crateApiWhisperTranscribePcmSegments({
-    required List<int> pcmS16Mono,
-    required int sampleRate,
-    String? language,
-    required bool withTimestamps,
-    required double temperature,
-    required int beamSize,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_i_16_loose(pcmS16Mono, serializer);
-          sse_encode_i_32(sampleRate, serializer);
-          sse_encode_opt_String(language, serializer);
-          sse_encode_bool(withTimestamps, serializer);
-          sse_encode_f_32(temperature, serializer);
-          sse_encode_i_32(beamSize, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 44,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_frb_segment,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateApiWhisperTranscribePcmSegmentsConstMeta,
-        argValues: [
-          pcmS16Mono,
-          sampleRate,
-          language,
-          withTimestamps,
-          temperature,
-          beamSize,
-        ],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiWhisperTranscribePcmSegmentsConstMeta =>
-      const TaskConstMeta(
-        debugName: "transcribe_pcm_segments",
-        argNames: [
-          "pcmS16Mono",
-          "sampleRate",
-          "language",
-          "withTimestamps",
-          "temperature",
-          "beamSize",
-        ],
-      );
-
-  @override
-  Future<String> crateApiWhisperTranscribePcmWithParams({
-    required List<int> pcmS16Mono,
-    required int sampleRate,
-    String? language,
-    required bool noTimestamps,
-    required double temperature,
-    required int beamSize,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_i_16_loose(pcmS16Mono, serializer);
-          sse_encode_i_32(sampleRate, serializer);
-          sse_encode_opt_String(language, serializer);
-          sse_encode_bool(noTimestamps, serializer);
-          sse_encode_f_32(temperature, serializer);
-          sse_encode_i_32(beamSize, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 45,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateApiWhisperTranscribePcmWithParamsConstMeta,
-        argValues: [
-          pcmS16Mono,
-          sampleRate,
-          language,
-          noTimestamps,
-          temperature,
-          beamSize,
-        ],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiWhisperTranscribePcmWithParamsConstMeta =>
-      const TaskConstMeta(
-        debugName: "transcribe_pcm_with_params",
-        argNames: [
-          "pcmS16Mono",
-          "sampleRate",
-          "language",
-          "noTimestamps",
-          "temperature",
-          "beamSize",
-        ],
-      );
-
-  @override
-  Future<String> crateApiWhisperTranscribeWavBytes({
-    required List<int> wavBytes,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_u_8_loose(wavBytes, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 46,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateApiWhisperTranscribeWavBytesConstMeta,
-        argValues: [wavBytes],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiWhisperTranscribeWavBytesConstMeta =>
-      const TaskConstMeta(
-        debugName: "transcribe_wav_bytes",
-        argNames: ["wavBytes"],
       );
 
   RustArcIncrementStrongCountFnType
@@ -1952,19 +1676,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FrbSegment dco_decode_frb_segment(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return FrbSegment(
-      text: dco_decode_String(arr[0]),
-      t0Ms: dco_decode_i_32(arr[1]),
-      t1Ms: dco_decode_i_32(arr[2]),
-    );
-  }
-
-  @protected
   GlyphPosition dco_decode_glyph_position(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2043,12 +1754,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<FrbSegment> dco_decode_list_frb_segment(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_frb_segment).toList();
-  }
-
-  @protected
   List<GlyphPosition> dco_decode_list_glyph_position(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_glyph_position).toList();
@@ -2081,12 +1786,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<int> dco_decode_list_prim_i_16_loose(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as List<int>;
-  }
-
-  @protected
   Int16List dco_decode_list_prim_i_16_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Int16List;
@@ -2096,12 +1795,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint32List dco_decode_list_prim_u_32_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint32List;
-  }
-
-  @protected
-  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as List<int>;
   }
 
   @protected
@@ -2732,15 +2425,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FrbSegment sse_decode_frb_segment(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_text = sse_decode_String(deserializer);
-    var var_t0Ms = sse_decode_i_32(deserializer);
-    var var_t1Ms = sse_decode_i_32(deserializer);
-    return FrbSegment(text: var_text, t0Ms: var_t0Ms, t1Ms: var_t1Ms);
-  }
-
-  @protected
   GlyphPosition sse_decode_glyph_position(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_glyphId = sse_decode_u_32(deserializer);
@@ -2843,18 +2527,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<FrbSegment> sse_decode_list_frb_segment(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <FrbSegment>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_frb_segment(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<GlyphPosition> sse_decode_list_glyph_position(
     SseDeserializer deserializer,
   ) {
@@ -2921,13 +2593,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<int> sse_decode_list_prim_i_16_loose(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var len_ = sse_decode_i_32(deserializer);
-    return deserializer.buffer.getInt16List(len_);
-  }
-
-  @protected
   Int16List sse_decode_list_prim_i_16_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -2939,13 +2604,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint32List(len_);
-  }
-
-  @protected
-  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var len_ = sse_decode_i_32(deserializer);
-    return deserializer.buffer.getUint8List(len_);
   }
 
   @protected
@@ -3716,14 +3374,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_frb_segment(FrbSegment self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.text, serializer);
-    sse_encode_i_32(self.t0Ms, serializer);
-    sse_encode_i_32(self.t1Ms, serializer);
-  }
-
-  @protected
   void sse_encode_glyph_position(GlyphPosition self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.glyphId, serializer);
@@ -3799,18 +3449,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_frb_segment(
-    List<FrbSegment> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_frb_segment(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_glyph_position(
     List<GlyphPosition> self,
     SseSerializer serializer,
@@ -3868,18 +3506,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_prim_i_16_loose(
-    List<int> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    serializer.buffer.putInt16List(
-      self is Int16List ? self : Int16List.fromList(self),
-    );
-  }
-
-  @protected
   void sse_encode_list_prim_i_16_strict(
     Int16List self,
     SseSerializer serializer,
@@ -3897,18 +3523,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint32List(self);
-  }
-
-  @protected
-  void sse_encode_list_prim_u_8_loose(
-    List<int> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    serializer.buffer.putUint8List(
-      self is Uint8List ? self : Uint8List.fromList(self),
-    );
   }
 
   @protected

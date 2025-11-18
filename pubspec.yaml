@@ -42,6 +42,12 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   shared_preferences: ^2.5.3
+  cached_network_image: ^3.4.1
+  flutter_html: ^3.0.0-beta.2
+  share_plus: ^7.2.2
+  just_audio: ^0.10.5
+  audio_session: ^0.1.25
+  audio_service: 0.18.18
   rust_lib_quran_assistant:
     path: rust_builder
   flutter_rust_bridge: ^2.11.1
@@ -52,7 +58,6 @@ dependencies:
   hive_flutter: ^1.1.0
   intl: ^0.20.2
   shimmer: ^3.0.0 
-  # whisper_ggml: ^1.1.1
   # flutter_sound: ^9.2.13    # contoh untuk rekaman audio
   # flutter_audio_capture: ^1.1.11
   record: ^6.0.0
@@ -103,7 +108,6 @@ flutter:
     - assets/quran_assets/
     - assets/quran_assets/verse-by-chapter/
     - assets/images/
-    - assets/ggml-tiny.bin
   fonts:
     - family: UthmaniHafs
       fonts:

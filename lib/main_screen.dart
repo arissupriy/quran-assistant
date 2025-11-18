@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:quran_assistant/pages/fts_search_page.dart';
+import 'package:quran_assistant/pages/articles/article_list_page.dart';
 import 'package:quran_assistant/pages/home_page.dart';
 import 'package:quran_assistant/pages/quiz_page.dart';
 import 'package:quran_assistant/pages/more_placeholder_page.dart';
 import 'package:quran_assistant/pages/quran_page.dart';
 import 'package:quran_assistant/widgets/quran_navigation_widgets.dart';
+import 'package:quran_assistant/widgets/global_mini_audio_player.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   // Daftar halaman yang akan ditampilkan, sesuai urutan BottomNavigationBar
   final List<Widget> _pages = [
     const HomePage(),
-    const FtsSearchPage(),
+  const ArticleListPage(),
     const QuranPage(),
     const QuizPage(),
     const MorePlaceholderPage()
@@ -28,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   // Daftar judul untuk AppBar
   final List<String> _appBarTitles = [
     'Quran Assistant', // Untuk Beranda
-    'Pencarian', // Untuk Pencarian
+  'Artikel',
     'Quran',      // Untuk Quran
     'Kuis',       // Untuk Kuis
     'Lainnya',    // Untuk Lainnya
@@ -41,8 +42,8 @@ class _MainScreenState extends State<MainScreen> {
       iconData: Icons.home_rounded,
     ),
     CustomBottomNavigationItem(
-      label: 'Pencarian',
-      iconData: Icons.search_rounded,
+      label: 'Artikel',
+      iconData: Icons.menu_book_outlined,
     ),
     CustomBottomNavigationItem(
       label: 'Quran',
@@ -81,7 +82,12 @@ class _MainScreenState extends State<MainScreen> {
         // showMenu: _selectedIndex == 0,
       ),
       body: SafeArea(
-        child: _pages[_selectedIndex],
+        child: Column(
+          children: [
+            Expanded(child: _pages[_selectedIndex]),
+            const GlobalMiniAudioPlayer(),
+          ],
+        ),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: _selectedIndex,
