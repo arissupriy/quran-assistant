@@ -1,6 +1,7 @@
 // lib/providers/download_progress_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 // Enum untuk merepresentasikan status unduhan
 enum DownloadStatus {
@@ -10,6 +11,7 @@ enum DownloadStatus {
   decompressing,
   completed,
   error,
+  canceled,
 }
 
 // Model untuk menampung state progres unduhan
@@ -57,7 +59,7 @@ class DownloadProgressNotifier extends StateNotifier<DownloadProgressState> {
     );
   }
 
-  void setDownloading(double currentProgress) {
+  void setDownloading(double? currentProgress) {
     state = state.copyWith(
       status: DownloadStatus.downloading,
       progress: currentProgress,
@@ -80,12 +82,55 @@ class DownloadProgressNotifier extends StateNotifier<DownloadProgressState> {
     );
   }
 
+  void setCanceled() {
+    state = state.copyWith(
+      status: DownloadStatus.canceled,
+      progress: null,
+      message: "Download dibatalkan.",
+      errorMessage: null,
+    );
+  }
+
   void setError(String message) {
     state = state.copyWith(
       status: DownloadStatus.error,
       errorMessage: message,
       message: "Gagal mempersiapkan data.",
     );
+  }
+
+  void setMessage(String message) {
+    state = state.copyWith(message: message);
+  }
+
+  void updateFromDownloader(DownloadTaskStatus status, int progressValue) {
+    switch (status) {
+      case DownloadTaskStatus.enqueued:
+        setChecking();
+        break;
+      case DownloadTaskStatus.running:
+        final progress = progressValue >= 0 ? progressValue / 100 : null;
+        setDownloading(progress);
+        break;
+      case DownloadTaskStatus.paused:
+        state = state.copyWith(
+          status: DownloadStatus.downloading,
+          progress: progressValue >= 0 ? progressValue / 100 : state.progress,
+          message: "Download dijeda",
+        );
+        break;
+      case DownloadTaskStatus.complete:
+        setCompleted();
+        break;
+      case DownloadTaskStatus.canceled:
+        setCanceled();
+        break;
+      case DownloadTaskStatus.failed:
+        setError('Download gagal. Coba lagi.');
+        break;
+      case DownloadTaskStatus.undefined:
+        break;
+    }
   }
 
   // Metode untuk mereset state (misalnya jika ingin mengulang unduhan)

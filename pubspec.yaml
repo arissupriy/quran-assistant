@@ -48,6 +48,8 @@ dependencies:
   just_audio: ^0.10.5
   audio_session: ^0.1.25
   audio_service: 0.18.18
+  flutter_downloader:
+    path: packages/flutter_downloader
   rust_lib_quran_assistant:
     path: rust_builder
   flutter_rust_bridge: ^2.11.1

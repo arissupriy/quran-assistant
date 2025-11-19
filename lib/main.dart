@@ -4,10 +4,13 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quran_assistant/core/audio/quran_audio_handler.dart';
+import 'package:quran_assistant/core/download/download_notification_router.dart';
+import 'package:quran_assistant/core/download/mushaf_download_manager.dart';
 import 'package:quran_assistant/core/models/quiz_history.dart';
 import 'package:quran_assistant/core/models/reading_session.dart';
 import 'package:quran_assistant/core/themes/app_theme.dart';
@@ -15,6 +18,8 @@ import 'package:quran_assistant/engine/init_quran_engine.dart';
 import 'package:quran_assistant/main_screen.dart';
 import 'package:quran_assistant/providers/audio_handler_provider.dart';
 import 'package:quran_assistant/src/rust/frb_generated.dart';
+
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   // Set untuk membuat zone errors menjadi non-fatal untuk mengatasi zone mismatch
@@ -37,6 +42,12 @@ Future<void> main() async {
   runZonedGuarded(() async {
     // Pastikan binding diinisialisasi dan background audio siap dalam zone yang sama
     WidgetsFlutterBinding.ensureInitialized();
+    DownloadNotificationRouter.instance.initialize(appNavigatorKey);
+    await FlutterDownloader.initialize(
+      debug: kDebugMode,
+      ignoreSsl: true,
+    );
+    FlutterDownloader.registerCallback(mushafDownloadBackgroundCallback);
     await _ensureNotificationPermission();
     final audioHandler = await _initAudioHandler();
     
@@ -108,6 +119,9 @@ Future<void> main() async {
         child: const MyApp(),
       ),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DownloadNotificationRouter.instance.markNavigatorReady();
+    });
     
   }, (Object error, StackTrace stack) {
     debugPrint("❗ Global error caught: $error");
@@ -179,6 +193,7 @@ class MyApp extends StatelessWidget {
         title: 'Quran Assistant',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme, // Menggunakan tema dari AppTheme
+        navigatorKey: appNavigatorKey,
         home: const MainScreen(),
         
         // Enhanced error handling untuk build context

@@ -1,15 +1,17 @@
 // lib/pages/mushaf_download_page.dart
 
 import 'dart:io';
-import 'package:dio/dio.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:quran_assistant/core/download/mushaf_download_manager.dart';
+import 'package:quran_assistant/core/download/mushaf_download_preferences.dart';
 import 'package:quran_assistant/main_screen.dart';
 import 'package:quran_assistant/pages/mushaf/mushaf_detail_page.dart';
 import 'package:quran_assistant/providers/download_progress_provider.dart';
 import 'package:quran_assistant/utils/quran_utils.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MushafDownloadPage extends ConsumerStatefulWidget {
   final int? initialPage;
@@ -20,10 +22,11 @@ class MushafDownloadPage extends ConsumerStatefulWidget {
 }
 
 class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
+  bool _navigateScheduled = false;
+
   @override
   void initState() {
     super.initState();
-    // debugPrint('MushafDownloadPage initialized with initialPage: ${widget.initialPage}');
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkAndDownloadIfNeeded());
   }
 
@@ -38,68 +41,68 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
 
     try {
       final resolution = getMushafResolutionSuffix(context);
-      final mushafDir = await getApplicationSupportDirectory();
-      final mushafPath = '${mushafDir.path}/data.mushafpack';
+      final mushafPath = await _resolveMushafPath();
       final mushafFile = File(mushafPath);
 
       final url = await getMushafDownloadUrl(resolution);
 
-      if (mushafFile.existsSync()) {
+      if (await mushafFile.exists()) {
         notifier.setCompleted();
-        await Future.delayed(const Duration(milliseconds: 500));
-        _navigateToMushaf();
-      } else {
-        await _downloadMushaf(url, mushafPath);
+        await MushafDownloadPreferences.clearInitialPage();
+        return;
       }
+
+      final manager = ref.read(mushafDownloadManagerProvider);
+      await MushafDownloadPreferences.setInitialPage(widget.initialPage);
+      await manager.startDownload(
+        url: url,
+        savePath: mushafPath,
+        initialPage: widget.initialPage,
+      );
     } catch (e) {
       notifier.setError('Terjadi kesalahan: ${e.toString()}');
     }
   }
 
-  Future<void> _downloadMushaf(String url, String savePath) async {
-    final notifier = ref.read(downloadProgressProvider.notifier);
+  Future<String> _resolveMushafPath() async {
+    final mushafDir = await getApplicationSupportDirectory();
+    return '${mushafDir.path}/data.mushafpack';
+  }
 
-    try {
-      notifier.setDownloading(0.0);
-      final dio = Dio();
-
-      await dio.download(
-        url,
-        savePath,
-        onReceiveProgress: (received, total) {
-          if (total > 0) {
-            final progress = received / total;
-            notifier.setDownloading(progress);
-          }
-        },
-        options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: false,
-          receiveTimeout: const Duration(minutes: 5),
-        ),
-      );
-
-      notifier.setCompleted();
-      await Future.delayed(const Duration(milliseconds: 500));
-      _navigateToMushaf();
-    } catch (e) {
-      notifier.setError('Download gagal: ${e.toString()}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengunduh mushaf: $e')),
-      );
-    }
+  Future<void> _cancelDownload() async {
+    final manager = ref.read(mushafDownloadManagerProvider);
+    await manager.cancelDownload();
   }
 
   void _navigateToMushaf() {
+    if (!mounted) return;
+    final target = widget.initialPage != null
+        ? MushafDetailPage(pageNumber: widget.initialPage!)
+        : const MainScreen();
+
+    MushafDownloadPreferences.clearInitialPage();
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => MainScreen()),
+      MaterialPageRoute(builder: (_) => target),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<DownloadProgressState>(downloadProgressProvider, (previous, next) {
+      if (!mounted) return;
+
+      if (next.status == DownloadStatus.completed && !_navigateScheduled) {
+        _navigateScheduled = true;
+        Future.delayed(const Duration(milliseconds: 350), _navigateToMushaf);
+      } else if (next.status == DownloadStatus.error && next.errorMessage != null) {
+        _showSnack(next.errorMessage!);
+      } else if (next.status == DownloadStatus.canceled) {
+        _showSnack('Unduhan mushaf dibatalkan.');
+      }
+    });
+
     final state = ref.watch(downloadProgressProvider);
 
     return Scaffold(
@@ -143,10 +146,21 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        '${(state.progress! * 100).toStringAsFixed(1)}%',
+                        state.progress != null
+                            ? '${(state.progress! * 100).toStringAsFixed(1)}%'
+                            : 'Menyiapkan unduhan...',
                         style: GoogleFonts.roboto(
                           fontSize: 16,
                           color: Colors.teal[600],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton.icon(
+                        onPressed: _cancelDownload,
+                        icon: const Icon(Icons.cancel_outlined),
+                        label: const Text('Batalkan unduhan'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red[700],
                         ),
                       ),
                     ],
@@ -187,8 +201,17 @@ class _MushafDownloadPageState extends ConsumerState<MushafDownloadPage> {
         return const Icon(Icons.check_circle_rounded, size: 80, color: Colors.green);
       case DownloadStatus.error:
         return const Icon(Icons.error_outline_rounded, size: 80, color: Colors.red);
+      case DownloadStatus.canceled:
+        return const Icon(Icons.cancel_outlined, size: 80, color: Colors.orange);
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  void _showSnack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
