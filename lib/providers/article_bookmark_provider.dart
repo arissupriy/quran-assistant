@@ -30,4 +30,12 @@ class ArticleBookmarkNotifier extends StateNotifier<Set<String>> {
     state = newSet;
     await _prefs?.setStringList(_kStorageKey, newSet.toList());
   }
+
+  Future<void> removeIds(Iterable<String> ids) async {
+    final idSet = ids.toSet();
+    if (idSet.isEmpty) return;
+    final newSet = state.toSet()..removeAll(idSet);
+    state = newSet;
+    await _prefs?.setStringList(_kStorageKey, newSet.toList());
+  }
 }

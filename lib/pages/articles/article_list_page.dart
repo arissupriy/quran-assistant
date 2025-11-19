@@ -22,10 +22,7 @@ class ArticleListPage extends StatelessWidget {
           Expanded(
             child: TabBarView(
               physics: BouncingScrollPhysics(),
-              children: [
-                _ArticlesTab(),
-                _PodcastTab(),
-              ],
+              children: [_ArticlesTab(), _PodcastTab()],
             ),
           ),
         ],
@@ -43,6 +40,7 @@ class _ArticleTabSwitcher extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       child: Container(
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(26),
@@ -60,7 +58,8 @@ class _ArticleTabSwitcher extends StatelessWidget {
             color: theme.colorScheme.primary,
             borderRadius: BorderRadius.circular(22),
           ),
-          indicatorPadding: const EdgeInsets.all(4),
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicatorPadding: EdgeInsets.zero,
           labelStyle: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -318,9 +317,7 @@ class _PodcastTabState extends ConsumerState<_PodcastTab> {
 
   void _openAudio(BuildContext context, ArticleAudio audio) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ArticleAudioDetailPage(audio: audio),
-      ),
+      MaterialPageRoute(builder: (_) => ArticleAudioDetailPage(audio: audio)),
     );
   }
 
@@ -350,8 +347,7 @@ class _PodcastTabState extends ConsumerState<_PodcastTab> {
                 child: EmptyState(
                   icon: Icons.podcasts_rounded,
                   title: 'Belum ada audio',
-                  subtitle:
-                      'Tarik untuk memuat ulang daftar podcast artikel.',
+                  subtitle: 'Tarik untuk memuat ulang daftar podcast artikel.',
                 ),
               ),
             )
@@ -380,20 +376,18 @@ class _PodcastTabState extends ConsumerState<_PodcastTab> {
                   if (!state.isPaging && !state.hasMore)
                     Text(
                       'Sudah semua podcast 🎧',
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelMedium
-                          ?.copyWith(color: Colors.grey),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelMedium?.copyWith(color: Colors.grey),
                     ),
                   if (state.errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: Text(
                         state.errorMessage!,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(color: Colors.redAccent),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.redAccent,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -448,94 +442,104 @@ class _PodcastCard extends StatelessWidget {
     final theme = Theme.of(context);
     final parentArticle = audio.article;
     final imageUrl = audio.featuredImageUrl ?? parentArticle?.featuredImageUrl;
+    final isPlayable = (audio.audioUrl ?? '').isNotEmpty;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Material(
-        elevation: 3,
+        elevation: 2,
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(20),
         child: InkWell(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(20),
           onTap: onTap,
-          child: SizedBox(
-            height: 130,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Hero(
                   tag: audio.heroTag,
                   child: _PodcastArtwork(imageUrl: imageUrl),
                 ),
+                const SizedBox(width: 14),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          audio.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        audio.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
-                        const SizedBox(height: 8),
-                        if (parentArticle != null)
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.article_outlined,
-                                size: 16,
-                                color: Colors.grey,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.article_outlined,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              parentArticle?.title ?? 'Audio mandiri',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey.shade600,
                               ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  parentArticle.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        else
-                          Text(
-                            'Audio mandiri',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey.shade600,
                             ),
                           ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.podcasts_rounded,
-                              size: 20,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                audio.audioUrl ?? 'Audio belum tersedia',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  fontStyle: audio.audioUrl == null
-                                      ? FontStyle.italic
-                                      : FontStyle.normal,
-                                ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: [
+                          if (parentArticle != null)
+                            _AudioMetaChip(
+                              icon: Icons.bookmark_added_rounded,
+                              label: 'Artikel terhubung',
+                              background: theme.colorScheme.primary.withOpacity(
+                                0.12,
                               ),
+                              foreground: theme.colorScheme.primary,
                             ),
-                            const Icon(Icons.play_arrow_rounded),
-                          ],
-                        ),
-                      ],
-                    ),
+                          _AudioMetaChip(
+                            icon: isPlayable
+                                ? Icons.hearing_rounded
+                                : Icons.hourglass_bottom_rounded,
+                            label: isPlayable ? 'Siap diputar' : 'Segera hadir',
+                            background: isPlayable
+                                ? theme.colorScheme.secondaryContainer
+                                : Colors.orange.withOpacity(0.15),
+                            foreground: isPlayable
+                                ? theme.colorScheme.onSecondaryContainer
+                                : Colors.orange.shade800,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.primary.withOpacity(0.12),
+                  ),
+                  child: Icon(
+                    Icons.play_arrow_rounded,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],
@@ -555,25 +559,66 @@ class _PodcastArtwork extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: const BorderRadius.horizontal(left: Radius.circular(22)),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
-        width: 110,
-        color: Colors.grey.shade200,
+        width: 78,
+        height: 78,
+        decoration: BoxDecoration(color: Colors.grey.shade200),
         child: imageUrl == null
-            ? const Icon(Icons.audiotrack_rounded, size: 36)
+            ? const Icon(Icons.audiotrack_rounded, size: 30)
             : CachedNetworkImage(
                 imageUrl: imageUrl!,
                 fit: BoxFit.cover,
-                width: 110,
-                height: double.infinity,
+                width: 78,
+                height: 78,
                 placeholder: (context, url) => Container(
                   color: Colors.grey.shade100,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(Icons.broken_image_outlined),
-                ),
+                errorWidget: (context, url, error) =>
+                    const Center(child: Icon(Icons.broken_image_outlined)),
               ),
+      ),
+    );
+  }
+}
+
+class _AudioMetaChip extends StatelessWidget {
+  const _AudioMetaChip({
+    required this.icon,
+    required this.label,
+    required this.background,
+    required this.foreground,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: foreground),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: foreground,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

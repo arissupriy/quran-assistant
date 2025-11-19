@@ -42,6 +42,7 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   shared_preferences: ^2.5.3
+  package_info_plus: ^8.0.0
   cached_network_image: ^3.4.1
   flutter_html: ^3.0.0-beta.2
   share_plus: ^7.2.2

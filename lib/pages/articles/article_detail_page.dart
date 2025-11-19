@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:quran_assistant/core/models/article_models.dart';
+import 'package:quran_assistant/core/storage/saved_content_repository.dart';
 import 'package:quran_assistant/providers/article_bookmark_provider.dart';
 import 'package:quran_assistant/providers/article_provider.dart';
+import 'package:quran_assistant/providers/saved_content_providers.dart';
 
 const String _publicSiteBaseUrl = 'http://192.168.101.20:8000';
 
@@ -21,6 +25,21 @@ class ArticleDetailPage extends ConsumerStatefulWidget {
 class _ArticleDetailPageState extends ConsumerState<ArticleDetailPage> {
   double fontScale = 1.0;
   bool darkMode = false;
+  final Stopwatch _readStopwatch = Stopwatch();
+  Article? _lastArticle;
+
+  @override
+  void initState() {
+    super.initState();
+    _readStopwatch.start();
+  }
+
+  @override
+  void dispose() {
+    _readStopwatch.stop();
+    unawaited(_logReadHistory());
+    super.dispose();
+  }
 
   Future<void> _onRefresh() async {
     ref.invalidate(articleDetailProvider(widget.articleId));
@@ -41,6 +60,9 @@ class _ArticleDetailPageState extends ConsumerState<ArticleDetailPage> {
   final textColor = darkMode ? Colors.white : colorScheme.onSurface;
 
     final Article? article = articleAsync.valueOrNull;
+    if (article != null) {
+      _lastArticle = article;
+    }
 
     return Scaffold(
       backgroundColor: background,
@@ -134,6 +156,10 @@ class _ArticleDetailPageState extends ConsumerState<ArticleDetailPage> {
                 article.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             leading: IconButton(
@@ -385,8 +411,11 @@ class _ArticleDetailPageState extends ConsumerState<ArticleDetailPage> {
             if (states.contains(WidgetState.selected)) {
               return colorScheme.primary.withValues(alpha: 0.5);
             }
-            return colorScheme.outlineVariant.withValues(alpha: 0.5);
+            return colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
           }),
+          trackOutlineColor: WidgetStateProperty.all(
+            colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+          ),
         );
 
         return StatefulBuilder(
@@ -468,9 +497,18 @@ class _ArticleDetailPageState extends ConsumerState<ArticleDetailPage> {
                           : 'Simpan ke bookmark',
                     ),
                     onTap: () async {
+                      final repo = ref.read(savedContentRepositoryProvider);
+                      if (isBookmarked) {
+                        await repo.removeArticles([article.id]);
+                      } else {
+                        await repo.upsertArticle(
+                          SavedArticleEntry.fromArticle(article),
+                        );
+                      }
                       await ref
                           .read(articleBookmarkProvider.notifier)
                           .toggle(widget.articleId);
+                      await ref.read(savedArticlesProvider.notifier).refresh();
                       setState(() {});
                       if (context.mounted) Navigator.of(context).pop();
                     },
@@ -491,6 +529,23 @@ class _ArticleDetailPageState extends ConsumerState<ArticleDetailPage> {
         );
       },
     );
+  }
+
+  Future<void> _logReadHistory() async {
+    final article = _lastArticle;
+    if (article == null) return;
+    final seconds = _readStopwatch.elapsed.inSeconds;
+    if (seconds < 5) return;
+    final repo = ref.read(savedContentRepositoryProvider);
+    final entry = ReadArticleEntry(
+      id: article.id,
+      title: article.title,
+      durationSeconds: seconds,
+      readAt: DateTime.now(),
+      imageUrl: article.featuredImageUrl,
+    );
+    await repo.addReadHistory(entry);
+    await ref.read(readHistoryProvider.notifier).refresh();
   }
 
   String _resolveContentUrl(String? raw) {

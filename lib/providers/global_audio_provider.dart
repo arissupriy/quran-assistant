@@ -8,8 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:quran_assistant/core/models/article_models.dart';
+import 'package:quran_assistant/core/storage/saved_content_repository.dart';
 import 'package:quran_assistant/providers/article_provider.dart';
 import 'package:quran_assistant/providers/audio_handler_provider.dart';
+import 'package:quran_assistant/providers/saved_content_providers.dart';
 
 class GlobalAudioState {
   static const _sentinel = Object();
@@ -68,7 +70,7 @@ class GlobalAudioState {
 }
 
 class GlobalAudioController extends StateNotifier<GlobalAudioState> {
-  GlobalAudioController(this.ref, this._audioHandler)
+  GlobalAudioController(this.ref, this._audioHandler, this._repository)
       : _dio = Dio(),
         super(const GlobalAudioState()) {
     _playbackSub = _audioHandler.playbackState.listen(_handlePlaybackState);
@@ -80,6 +82,7 @@ class GlobalAudioController extends StateNotifier<GlobalAudioState> {
 
   final Ref ref;
   final AudioHandler _audioHandler;
+  final SavedContentRepository _repository;
   final Dio _dio;
   late final StreamSubscription<PlaybackState> _playbackSub;
   late final StreamSubscription<MediaItem?> _mediaItemSub;
@@ -153,9 +156,9 @@ class GlobalAudioController extends StateNotifier<GlobalAudioState> {
         current: audio,
         mediaItem: mediaItem,
         cachedPath: file.path,
-        error: null,
-        isDownloading: false,
-  downloadProgress: 1.0,
+    error: null,
+    isDownloading: false,
+    downloadProgress: 1.0,
       );
       await _audioHandler.playMediaItem(mediaItem);
     } catch (err) {
@@ -176,7 +179,7 @@ class GlobalAudioController extends StateNotifier<GlobalAudioState> {
       return cacheFile;
     }
 
-  state = state.copyWith(isDownloading: true, downloadProgress: 0.0);
+    state = state.copyWith(isDownloading: true, downloadProgress: 0.0);
     if (kDebugMode) debugPrint('[GlobalAudio] Download started: $uri');
 
     try {
@@ -191,8 +194,9 @@ class GlobalAudioController extends StateNotifier<GlobalAudioState> {
           }
         },
       );
-  state = state.copyWith(isDownloading: false, downloadProgress: 1.0);
+      state = state.copyWith(isDownloading: false, downloadProgress: 1.0);
       if (kDebugMode) debugPrint('[GlobalAudio] Download finished: ${cacheFile.path}');
+      unawaited(_persistAudioEntry(audio, cacheFile));
       return cacheFile;
     } catch (err) {
       debugPrint('[GlobalAudio] Download error: $err');
@@ -202,9 +206,42 @@ class GlobalAudioController extends StateNotifier<GlobalAudioState> {
   }
 
   Future<File> _resolveCacheFile(String id) async {
-    final dir = await getTemporaryDirectory();
+    final dir = await _offlineAudioDirectory();
     final fileName = 'article_audio_$id.mp3';
     return File(p.join(dir.path, fileName));
+  }
+
+  Future<Directory> _offlineAudioDirectory() async {
+    final supportDir = await getApplicationSupportDirectory();
+    final audioDir = Directory(p.join(supportDir.path, 'offline_audios'));
+    if (!await audioDir.exists()) {
+      await audioDir.create(recursive: true);
+    }
+    return audioDir;
+  }
+
+  Future<void> _persistAudioEntry(ArticleAudio audio, File file) async {
+    try {
+      final stat = await file.stat();
+      final entry = SavedAudioEntry(
+        id: audio.id,
+        title: audio.title,
+        savedAt: DateTime.now(),
+        sizeBytes: stat.size,
+        articleId: audio.article?.id,
+        articleTitle: audio.article?.title,
+        audioUrl: audio.audioUrl,
+        imageUrl: audio.featuredImageUrl ?? audio.article?.featuredImageUrl,
+        filePath: file.path,
+      );
+      await _repository.upsertAudio(entry);
+      ref.read(savedAudioProvider.notifier).refresh();
+  ref.invalidate(dataStorageProvider);
+    } catch (err) {
+      if (kDebugMode) {
+        debugPrint('[GlobalAudio] Failed to persist audio entry: $err');
+      }
+    }
   }
 
   Future<void> togglePlayPause() async {
@@ -238,5 +275,6 @@ class GlobalAudioController extends StateNotifier<GlobalAudioState> {
 final globalAudioControllerProvider =
     StateNotifierProvider<GlobalAudioController, GlobalAudioState>((ref) {
   final handler = ref.watch(audioHandlerProvider);
-  return GlobalAudioController(ref, handler);
+  final repo = ref.watch(savedContentRepositoryProvider);
+  return GlobalAudioController(ref, handler, repo);
 });
